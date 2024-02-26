@@ -16,7 +16,7 @@ controllers.list = async (req, res) => {
   } catch (error) {
     console.log("Error: " + error);
     res.json({ success: false, message: 'Ocorreu um erro ao listar os empreendimentos.'});
-  }
+  } 
 };
 
 controllers.create = async (req, res) => {
@@ -102,7 +102,7 @@ controllers.get = async (req, res) => {
     res.status(200).json({ success: true, data, message: 'Dados obtidos com sucesso.' });
   } catch (error) {
     console.log("Error: " + error);
-    res.json({ success: false, message: 'Ocorreu um erro ao obter os empreendimentos.' });
+    res.json({ success: false, message: 'Ocorreu um erro ao obter os detalhes do empreedimento.' });
   }
 };
 
