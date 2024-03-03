@@ -1,4 +1,6 @@
 const Utilizador = require("../models/utilizador.model");
+const Cargo = require("../models/cargo.model");
+const TipoCliente = require("../models/tipocliente.model");
 
 // Controller for creating a new Utilizador
 const createUtilizador = async (req, res) => {
