@@ -1,19 +1,8 @@
-const { Model, DataTypes } = require('sequelize');
 const sequelize = require("../config/sequelize");
+const { Model, DataTypes } = require('sequelize');
 const Cargo = sequelize.define('Cargo', {
-    NCargo: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        allowNull: false,
-        primaryKey: true
-    },
-    Cargo: {
-        type: DataTypes.STRING,
-        allowNull: false
-    }
-}, { 
-  timestamps: false,
-  freezeTableName: true // adicionando a opção freezeTableName para evitar a pluralização do nome da tabela
+    cargo_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    cargo: { type: DataTypes.STRING, allowNull: false }
 });
 
 module.exports = Cargo;

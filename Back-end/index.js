@@ -1,9 +1,10 @@
 // index.js
+require('dotenv').config()
 const express = require('express')
-
+//const sequelize = require('./config/sequelize')
 const app = express()
 const PORT = process.env.PORT || 4000
-
+console.log(process.env.DATABASE, process.env.USER, process.env.PASSWORD, process.env.HOST)
 const bodyParser = require('body-parser');
 const passport = require("passport");
 const cors = require('cors');
@@ -29,28 +30,12 @@ app.use(session({
     saveUninitialized: false
   }));
 // Obtenção de todas os rotas
-require("./routes/clientes.routes")(app)
-require("./routes/beneficios.routes")(app)
-require("./routes/usuarios.routes")(app)
-require("./routes/auth.routes")(app)
-require("./routes/vagas.routes")(app)
-require("./routes/candidaturas.routes")(app)
-require("./routes/indicacoes.routes")(app)
-require("./routes/upload.routes")(app)
-require("./routes/localicade.routes")(app)
-require("./routes/tipovagas.routes")(app)
-require("./routes/ideias.routes")(app)
-require("./routes/topicoideias.routes")(app)
-require("./routes/topicosdasideias.routes")(app)
-require("./routes/anexos.routes")(app)
 require("./routes/cargos.routes")(app)
-require("./routes/reunioes.routes")(app)
-require("./routes/entrevista.routes")(app)
-require("./routes/usuarioreunioes.routes")(app)
-require("./routes/nota.routes")(app)
-require("./routes/etiquetas.routes")(app)
-require("./routes/estagios.routes")(app)
-require("./routes/oportunidades.routes")(app)
+require("./routes/alerta.routes")(app)
+require("./routes/casa.routes")(app)
+require("./routes/consumos.routes")(app)
+require("./routes/tipocliente.routes")(app)
+require("./routes/utilizador.routes")(app)
 //const transporter = require("./config/nodemailer")
 
 
