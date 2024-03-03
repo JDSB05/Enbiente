@@ -1,11 +1,15 @@
-import logo from './logo.svg';
 import './App.css';
+import api from './services/api';
+import React, { useEffect, useState,useCallback } from 'react';
+import { Button, Modal } from 'react-bootstrap';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+       
         <p>
           Edit <code>src/App.js</code> and save to reload.
         </p>
