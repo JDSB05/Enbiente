@@ -4,7 +4,6 @@ const express = require('express')
 //const sequelize = require('./config/sequelize')
 const app = express()
 const PORT = process.env.PORT || 4000
-console.log(process.env.DATABASE, process.env.USER, process.env.PASSWORD, process.env.HOST)
 const bodyParser = require('body-parser');
 const passport = require("passport");
 const cors = require('cors');
