@@ -13,5 +13,5 @@ const Alerta = sequelize.define('Alerta', {
 });
 
 Alerta.belongsTo(Casa, { foreignKey: 'casa_id' });
-
+Casa.hasMany(Alerta, { foreignKey: 'casa_id' });
 module.exports = Alerta;

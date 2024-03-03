@@ -1,4 +1,5 @@
 const Consumo = require('../models/consumos.model');
+const Casa = require('../models/casa.model');
 
 // Controller actions
 const getAllConsumos = async (req, res) => {
@@ -40,10 +41,7 @@ const updateConsumo = async (req, res) => {
     try {
         const consumo = await Consumo.findByPk(id);
         if (consumo) {
-            consumo.casa_id = casa_id;
-            consumo.data_consumo = data_consumo;
-            consumo.volume_consumido = volume_consumido;
-            await consumo.save();
+            await consumo.update({ casa_id, data_consumo, volume_consumido });
             res.json(consumo);
         } else {
             res.status(404).json({ error: 'Consumo not found' });

@@ -1,4 +1,5 @@
 const Casa = require('../models/casa.model');
+const Utilizador = require('../models/utilizador.model');
 
 // Controller actions
 const getAllCasas = async (req, res) => {

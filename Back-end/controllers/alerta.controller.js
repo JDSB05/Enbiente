@@ -1,5 +1,5 @@
 const Alerta = require('../models/alerta.model');
-
+const Casa = require('../models/casa.model');
 // GET all alertas
 const getAllAlertas = async (req, res) => {
   try {
