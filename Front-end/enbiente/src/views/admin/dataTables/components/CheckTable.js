@@ -19,8 +19,8 @@ import {
 } from "react-table";
 
 // Custom components
-import Card from "components/card/Card";
-import Menu from "components/menu/MainMenu";
+import Card from "../../../../components/card/Card";
+import Menu from "../../../../components/menu/MainMenu";
 export default function CheckTable(props) {
   const { columnsData, tableData } = props;
 

@@ -20,8 +20,8 @@ import {
 } from "react-table";
 
 // Custom components
-import Card from "components/card/Card";
-import Menu from "components/menu/MainMenu";
+import Card from "../../../../components/card/Card";
+import Menu from "../../../../components/menu/MainMenu";
 
 // Assets
 import { MdCheckCircle, MdCancel, MdOutlineError } from "react-icons/md";

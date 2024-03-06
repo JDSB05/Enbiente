@@ -6,7 +6,7 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-import logoWhite from "assets/img/layout/logoWhite.png";
+import logoWhite from "../../../assets/img/layout/logoWhite.png";
 import React from "react";
 
 export default function SidebarDocs() {
@@ -53,7 +53,7 @@ export default function SidebarDocs() {
           px='10px'
           mt="10px"
           mb='6px'>
-          Upgrade to PRO
+          Teste da pagina
         </Text>
         <Text
           fontSize='14px'
@@ -62,11 +62,10 @@ export default function SidebarDocs() {
           px='10px'
           mb='6px'
           textAlign='center'>
-          Improve your development process and start doing more with Horizon UI
-          PRO!
+          Este é um teste de texto
         </Text>
       </Flex>
-      <Link href='https://horizon-ui.com/pro?ref=horizon-chakra-free'>
+      <Link href='https://www.google.com'>
         <Button
           bg='whiteAlpha.300'
           _hover={{ bg: "whiteAlpha.200" }}
@@ -77,7 +76,7 @@ export default function SidebarDocs() {
           fontSize='sm'
           minW='185px'
           mx='auto'>
-          Upgrade to PRO
+          Visita a pagina
         </Button>
       </Link>
     </Flex>

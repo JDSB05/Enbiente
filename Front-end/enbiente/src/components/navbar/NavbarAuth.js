@@ -22,14 +22,14 @@ import {
 } from "@chakra-ui/react";
 
 // Custom components
-import IconBox from "components/icons/IconBox";
-import { HorizonLogo } from "components/icons/Icons";
-import { SidebarResponsive } from "components/sidebar/Sidebar";
-import { SidebarContext } from "contexts/SidebarContext";
+import IconBox from "../../components/icons/IconBox";
+import { HorizonLogo } from "../../components/icons/Icons";
+import { SidebarResponsive } from "../../components/sidebar/Sidebar";
+import { SidebarContext } from "../../contexts/SidebarContext";
 
 // Assets
 import { GoChevronDown, GoChevronRight } from "react-icons/go";
-import routes from "routes.js";
+import routes from "../../routes.js";
 
 export default function AuthNavbar(props) {
   const { logo, logoText, secondary, sidebarWidth, ...rest } = props;
