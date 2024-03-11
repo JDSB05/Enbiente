@@ -18,7 +18,7 @@ export default function Notifications(props) {
           fontSize="2xl"
           mb="4px"
         >
-          Notifications
+          Notificações
         </Text>
         <Menu />
       </Flex>

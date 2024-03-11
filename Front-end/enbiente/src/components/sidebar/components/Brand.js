@@ -4,7 +4,7 @@ import React from "react";
 import { Flex, useColorModeValue } from "@chakra-ui/react";
 
 // Custom components
-import { HorizonLogo } from "../../../components/icons/Icons";
+import AquaTrackLogo from "../../../assets/img/layout/AquaAHsemfundo.png";
 import { HSeparator } from "../../../components/separator/Separator";
 
 export function SidebarBrand() {
@@ -13,7 +13,7 @@ export function SidebarBrand() {
 
   return (
     <Flex align='center' direction='column'>
-      <HorizonLogo h='26px' w='175px' my='32px' color={logoColor} />
+      <img src={AquaTrackLogo} alt='AquaTrack' className="py-3" style={{ width: 'auto', height: '120px' }} />
       <HSeparator mb='20px' />
     </Flex>
   );

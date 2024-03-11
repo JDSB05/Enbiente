@@ -79,7 +79,7 @@ export default function UserReports() {
               }
             />
           }
-          name='Earnings'
+          name='Poupado'
           value='$350.4'
         />
         <MiniStatistics
@@ -93,10 +93,10 @@ export default function UserReports() {
               }
             />
           }
-          name='Spend this month'
+          name='Valor do mês atual'
           value='$642.39'
         />
-        <MiniStatistics growth='+23%' name='Sales' value='$574.34' />
+        <MiniStatistics growth='+23%' name='Poupado' value='$574.34' />
         <MiniStatistics
           endContent={
             <Flex me='-16px' mt='10px'>

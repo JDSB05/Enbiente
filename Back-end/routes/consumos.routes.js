@@ -18,6 +18,7 @@ router.put('/:id', consumosController.updateConsumo);
 // Delete a casa by id
 router.delete('/:id', consumosController.deleteConsumo);
 
+
 module.exports = app => {
     app.use("/api/consumos", router);
 };
