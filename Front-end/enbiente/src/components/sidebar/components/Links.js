@@ -87,8 +87,8 @@ export function SidebarLinks(props) {
                     </Text>
                   </Flex>
                   <Box
-                    h='36px'
-                    w='4px'
+                    h='30px'
+                    w='7px'
                     bg={
                       activeRoute(route.path.toLowerCase())
                         ? brandColor

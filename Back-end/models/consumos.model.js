@@ -7,7 +7,8 @@ const Consumo = sequelize.define('Consumo', {
     consumo_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     casa_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: Casa, key: 'casa_id' } },
     data_consumo: { type: DataTypes.DATE, allowNull: false },
-    volume_consumido: { type: DataTypes.FLOAT, allowNull: false }
+    volume_consumido: { type: DataTypes.FLOAT, allowNull: false },
+    valor: { type: DataTypes.FLOAT, allowNull: false }
 });
 
 // Define the association between Consumo and Casa
