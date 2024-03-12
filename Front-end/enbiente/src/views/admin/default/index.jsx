@@ -64,7 +64,7 @@ export default function UserReports() {
   // Chakra Color Mode
   const brandColor = useColorModeValue("brand.500", "white");
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
-
+  const [dadosMensuais, setDadosMensuais] = useState([]); 
   const [poupado, setPoupado] = useState("");
   const [poupadoeuros, setPoupadoeuros] = useState("");
   const [valorMesAtual, setValorMesAtual] = useState("");
@@ -86,13 +86,17 @@ export default function UserReports() {
       const poupadoValue = parseFloat(data.lastMonthWaterValue); // Convert to number
       setPoupado(poupadoValue.toFixed(2) + "€"); // Format as currency string
       setValorMesAtual(data.lastMonthWaterValue + "€");
-      setVolumeMes(data.lastMonthConsumoTotal + "m3");
+      setVolumeMes(data.lastMonthConsumoTotal + " m³");
       const poupadoAnterior = parseFloat(data.penultimateMonthWaterValue); // replace with the actual value of poupado do mês anterior
       const poupadoGrowthValue = (((poupadoValue - poupadoAnterior) / poupadoAnterior) * 100).toFixed(2);
       setPoupadoGrowth(poupadoGrowthValue);
       setPoupadoeuros((poupadoAnterior-poupadoValue).toFixed(2) + "€");
       setNewTasks(data.newTasks);
       setTotalProjects(data.totalProjects);
+      response = await api.get("/consumos?tipo=consumosmensais");
+      console.log(response);
+      setDadosMensuais(response.data);
+
   
     } catch (error) {
       console.log(error);
@@ -122,7 +126,7 @@ export default function UserReports() {
               }
             />
           }
-          name="Consumido no total"
+          name="Consumido neste mês"
           value={volumeMes}
         />
         <MiniStatistics
@@ -179,7 +183,7 @@ export default function UserReports() {
       </SimpleGrid>
 
       <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap="20px" mb="20px">
-        <TotalSpent />
+        <TotalSpent data={dadosMensuais} />
         <WeeklyRevenue />
       </SimpleGrid>
       <SimpleGrid columns={{ base: 1, md: 1, xl: 2 }} gap="20px" mb="20px">

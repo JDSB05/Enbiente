@@ -21,7 +21,7 @@ import {
 } from "../../../../variables/charts";
 
 export default function TotalSpent(props) {
-  const { ...rest } = props;
+  const { data, ...rest } = props;
 
   // Chakra Color Mode
   const precoMedio = "51.23€"
