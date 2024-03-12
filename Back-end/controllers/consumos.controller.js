@@ -47,9 +47,9 @@ const getAllConsumos = async (req, res) => {
 
             res.json({
                 consumos,
-                consumoTotals: consumoTotals.toFixed(2),
-                lastMonthConsumoTotal: lastMonthConsumoTotal !== 0 ? lastMonthConsumoTotal.toFixed(2) : 'Sem dados',
-                penultimateMonthConsumoTotal: penultimateMonthConsumoTotal !== 0 ? penultimateMonthConsumoTotal.toFixed(2) : 'Sem dados',
+                consumoTotals: consumoTotals.toFixed(3),
+                lastMonthConsumoTotal: lastMonthConsumoTotal !== 0 ? lastMonthConsumoTotal.toFixed(3) : 'Sem dados',
+                penultimateMonthConsumoTotal: penultimateMonthConsumoTotal !== 0 ? penultimateMonthConsumoTotal.toFixed(3) : 'Sem dados',
                 lastMonthWaterValue: lastMonthWaterValue.toFixed(2),
                 penultimateMonthWaterValue: penultimateMonthWaterValue.toFixed(2),
             });
@@ -70,7 +70,7 @@ const getAllConsumos = async (req, res) => {
 
             consumosAnuais.forEach(consumo => {
                 consumo['preçovolumetotal'] = parseFloat(consumo['preçovolumetotal'].toFixed(2));
-                consumo['volumetotalconsumido'] = parseFloat(consumo['volumetotalconsumido'].toFixed(2));
+                consumo['volumetotalconsumido'] = parseFloat(consumo['volumetotalconsumido'].toFixed(3));
             });
         
             res.json(consumosAnuais);
