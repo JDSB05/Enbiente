@@ -8,6 +8,7 @@ const Casa = sequelize.define('Casa', {
     nome: { type: DataTypes.STRING, allowNull: false },
     endereco: { type: DataTypes.STRING, allowNull: false },
     tipo_casa: { type: DataTypes.STRING, allowNull: false },
+    precopormetro: { type: DataTypes.FLOAT, allowNull: false },
     data_criacao: { type: DataTypes.DATE, allowNull: false },
     data_ultalteracao: { type: DataTypes.DATE, allowNull: false }
 });

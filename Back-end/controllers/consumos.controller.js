@@ -1,61 +1,104 @@
 const Consumo = require('../models/consumos.model');
 const Casa = require('../models/casa.model');
-const { Op } = require('sequelize'); // Add this line to import the Op object from Sequelize
-
+const sequelize  = require('sequelize'); // Add this line to import the Op object from Sequelize
 // Controller actions
 const getAllConsumos = async (req, res) => {
-    const organiza = req.query.orderby;
-    const top = req.query.top;
+    const tipo = req.query.tipo;
+    const casa = req.query.casa;
     try {
         let consumos;
         let consumoTotals = 0;
         let lastMonthConsumoTotal = 0;
         let penultimateMonthConsumoTotal = 0;
-        if (organiza && top) {
+        let lastMonthWaterValue = 0;
+        let penultimateMonthWaterValue = 0;
+
+        // Verificar se há query de tipo
+        if (tipo === 'ultimosconsumos') {
+            // Se houver, buscar consumos com ordenação e limite
             consumos = await Consumo.findAll({
-                order: [['data_consumo', organiza]],
-                limit: top ? parseInt(top) : 10,
+                order: [['casa_id', 'ASC'],['data_consumo', 'DESC']],
                 include: {
                     model: Casa,
-                    attributes: [],
+                    attributes: ['precopormetro'], // Incluir precopormetro da Casa
                 },
                 attributes: ['casa_id', 'data_consumo', 'volume_consumido'],
                 raw: true,
             });
 
-            console.log('consumos: ');
-            console.log(consumos);
-
-            // Calculate the total volume_consumido for the last and penultimate month
-            const currentDate = new Date();
-            const currentMonth = currentDate.getMonth();
-            const lastMonth = currentMonth - 1;
-            const penultimateMonth = currentMonth - 2;
-
+            // Calcular os totais de consumo e valor total da água
             consumos.forEach(consumo => {
+                const casaPrecopormetro = consumo['Casa.precopormetro']; // Obter o precopormetro da casa
+                consumoTotals += consumo.volume_consumido;
                 const consumoMonth = new Date(consumo.data_consumo).getMonth();
+                const currentDate = new Date();
+                const currentMonth = currentDate.getMonth();
+                const lastMonth = currentMonth - 1;
+                const penultimateMonth = currentMonth - 2;
+
                 if (consumoMonth === lastMonth) {
                     lastMonthConsumoTotal += consumo.volume_consumido;
+                    lastMonthWaterValue += consumo.volume_consumido * casaPrecopormetro;
                 } else if (consumoMonth === penultimateMonth) {
                     penultimateMonthConsumoTotal += consumo.volume_consumido;
+                    penultimateMonthWaterValue += consumo.volume_consumido * casaPrecopormetro;
                 }
-                consumoTotals += consumo.volume_consumido;
             });
 
             res.json({
                 consumos,
-                consumoTotals,
-                lastMonthConsumoTotal: lastMonthConsumoTotal !== 0 ? lastMonthConsumoTotal : 'Não existe',
-                penultimateMonthConsumoTotal: penultimateMonthConsumoTotal !== 0 ? penultimateMonthConsumoTotal : 'Não existe',
+                consumoTotals: consumoTotals.toFixed(2),
+                lastMonthConsumoTotal: lastMonthConsumoTotal !== 0 ? lastMonthConsumoTotal.toFixed(2) : 'Sem dados',
+                penultimateMonthConsumoTotal: penultimateMonthConsumoTotal !== 0 ? penultimateMonthConsumoTotal.toFixed(2) : 'Sem dados',
+                lastMonthWaterValue: lastMonthWaterValue.toFixed(2),
+                penultimateMonthWaterValue: penultimateMonthWaterValue.toFixed(2),
             });
-        } else {
+        }else if (tipo === 'consumosanuais') {
+            const consumosAnuais = await Consumo.findAll({
+                attributes: [
+                    [sequelize.fn('SUM', sequelize.literal('volume_consumido * "Casa"."precopormetro"')), 'preçovolumetotal'],
+                    [sequelize.fn('SUM', sequelize.col('volume_consumido')), 'volumetotalconsumido'],
+                    [sequelize.fn('TO_CHAR', sequelize.col('data_consumo'), 'YYYY-MM'), 'data']
+                ],
+                include: {
+                    model: Casa,
+                    attributes: []
+                },
+                group: [sequelize.fn('TO_CHAR', sequelize.col('data_consumo'), 'YYYY-MM')],
+                raw: true
+            });
+
+            consumosAnuais.forEach(consumo => {
+                consumo['preçovolumetotal'] = parseFloat(consumo['preçovolumetotal'].toFixed(2));
+                consumo['volumetotalconsumido'] = parseFloat(consumo['volumetotalconsumido'].toFixed(2));
+            });
+        
+            res.json(consumosAnuais);
+        }
+        
+        else if (tipo === 'consumosporcasa' && casa) {
+            consumos = await Consumo.findAll({
+                where: {
+                    casa_id: casa
+                },
+                attributes: ['casa_id', 'data_consumo', 'volume_consumido', 'valor'],
+                raw: true,  
+            });
+            res.json(consumos);
+        }else {
+            // Caso contrário, buscar todos os consumos
             consumos = await Consumo.findAll();
             res.json(consumos);
         }
+
+        console.log('consumos: ');
+        console.log(consumos);
     } catch (error) {
+        console.error('Erro ao processar requisição:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 }
+
 
 const getConsumoById = async (req, res) => {
     const { id } = req.params;
@@ -69,16 +112,18 @@ const getConsumoById = async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
+        console.log('Erro ao processar requisição:', error.message);
     }
 };
 
 const createConsumo = async (req, res) => {
-    const { casa_id, data_consumo, volume_consumido } = req.body;
+    const { casa_id, data_consumo, volume_consumido, valor } = req.body;
     try {
-        const consumo = await Consumo.create({ casa_id, data_consumo, volume_consumido });
+        const consumo = await Consumo.create({ casa_id, data_consumo, volume_consumido, valor });
         res.status(201).json(consumo);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
+        console.log('Erro ao processar requisição:', error.message);
     }
 };
 
@@ -95,6 +140,7 @@ const updateConsumo = async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
+        console.log('Erro ao processar requisição:', error.message);
     }
 };
 
@@ -110,6 +156,7 @@ const deleteConsumo = async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
+        console.log('Erro ao processar requisição:', error.message);
     }
 };
 

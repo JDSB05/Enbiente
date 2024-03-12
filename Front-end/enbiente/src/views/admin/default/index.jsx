@@ -66,8 +66,10 @@ export default function UserReports() {
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
 
   const [poupado, setPoupado] = useState("");
+  const [poupadoeuros, setPoupadoeuros] = useState("");
   const [valorMesAtual, setValorMesAtual] = useState("");
   const [poupadoGrowth, setPoupadoGrowth] = useState("");
+  const [volumeMes, setVolumeMes] = useState("");
   const [balance, setBalance] = useState("");
   const [newTasks, setNewTasks] = useState("");
   const [totalProjects, setTotalProjects] = useState("");
@@ -78,17 +80,17 @@ export default function UserReports() {
 
   const fetchData = async () => {
     try {
-      const response = await api.get("/consumos/1");
+      const response = await api.get("/consumos?tipo=ultimosconsumos");
       const data = response.data;
   
-      const poupadoValue = parseFloat(data.volume_consumido); // Convert to number
+      const poupadoValue = parseFloat(data.lastMonthWaterValue); // Convert to number
       setPoupado(poupadoValue.toFixed(2) + "€"); // Format as currency string
-      setValorMesAtual("25,1€");
-  
-      const poupadoAnterior = 14.2; // replace with the actual value of poupado do mês anterior
+      setValorMesAtual(data.lastMonthWaterValue + "€");
+      setVolumeMes(data.lastMonthConsumoTotal + "m3");
+      const poupadoAnterior = parseFloat(data.penultimateMonthWaterValue); // replace with the actual value of poupado do mês anterior
       const poupadoGrowthValue = (((poupadoValue - poupadoAnterior) / poupadoAnterior) * 100).toFixed(2);
-      setPoupadoGrowth(poupadoGrowthValue + " %");
-  
+      setPoupadoGrowth(poupadoGrowthValue);
+      setPoupadoeuros((poupadoAnterior-poupadoValue).toFixed(2) + "€");
       setNewTasks(data.newTasks);
       setTotalProjects(data.totalProjects);
   
@@ -120,8 +122,8 @@ export default function UserReports() {
               }
             />
           }
-          name="Poupado"
-          value={poupado}
+          name="Consumido no total"
+          value={volumeMes}
         />
         <MiniStatistics
           startContent={
@@ -142,7 +144,7 @@ export default function UserReports() {
           name="Valor do mês atual"
           value={valorMesAtual}
         />
-        <MiniStatistics growth={poupadoGrowth} name="Poupado" value={poupado} />
+        <MiniStatistics growth={poupadoGrowth} name="Poupado" value={poupadoeuros} />
         <MiniStatistics
           startContent={
             <IconBox
