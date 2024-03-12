@@ -24,7 +24,8 @@ export default function TotalSpent(props) {
   const { ...rest } = props;
 
   // Chakra Color Mode
-
+  const precoMedio = "51.23€"
+  const precoAnual = "614.76€"
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = useColorModeValue("secondaryGray.600", "white");
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
@@ -59,7 +60,7 @@ export default function TotalSpent(props) {
               color={textColorSecondary}
               me='4px'
             />
-            This month
+            Consumo por mês
           </Button>
           <Button
             ms='auto'
@@ -86,7 +87,7 @@ export default function TotalSpent(props) {
             textAlign='start'
             fontWeight='700'
             lineHeight='100%'>
-            $37.5K
+            {precoMedio}
           </Text>
           <Flex align='center' mb='20px'>
             <Text
@@ -95,14 +96,8 @@ export default function TotalSpent(props) {
               fontWeight='500'
               mt='4px'
               me='12px'>
-              Total Spent
+              Anual: {precoAnual}
             </Text>
-            <Flex align='center'>
-              <Icon as={RiArrowUpSFill} color='green.500' me='2px' mt='2px' />
-              <Text color='green.500' fontSize='sm' fontWeight='700'>
-                +2.45%
-              </Text>
-            </Flex>
           </Flex>
 
           <Flex align='center'>

@@ -24,7 +24,7 @@ app.use((req, res, next) => {
 const session = require('express-session');
 
 app.use(session({
-    secret: 'segredo',
+    secret: process.env.SECRET,
     resave: false,
     saveUninitialized: false
   }));
