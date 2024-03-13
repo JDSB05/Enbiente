@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/7dbd17fa-e7b2-401b-b4fc-9bbb928a63a9/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/Enbiente",
+    "appService.deploySubpath": "Front-end\\enbiente"
+}
