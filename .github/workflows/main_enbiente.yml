@@ -23,6 +23,7 @@ jobs:
 
       - name: npm install, build, and test
         run: |
+          cd Front-end/enbiente
           npm install
           npm run build --if-present
           npm run test --if-present
@@ -68,4 +69,3 @@ jobs:
           app-name: 'Enbiente'
           slot-name: 'Production'
           package: .
-          
