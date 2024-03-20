@@ -1,5 +1,6 @@
 //import './App.css';
 import api from './services/api';
+require('dotenv').config();
 import React, { useEffect, useState,useCallback } from 'react';
 //import { Button, Modal } from 'react-bootstrap';
 import { buttonStyles } from '././theme/components/button'

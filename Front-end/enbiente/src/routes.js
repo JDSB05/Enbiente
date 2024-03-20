@@ -19,6 +19,8 @@ import RTL from "./views/admin/rtl";
 // Auth Imports
 import SignInCentered from "./views/auth/signIn";
 
+//
+
 const routes = [
   {
     name: "Inicio",
