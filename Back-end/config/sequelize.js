@@ -16,10 +16,19 @@
 
 
 const Sequelize = require('sequelize');
-const sequelize = new Sequelize(process.env.DATABASE, process.env.USER, process.env.PASSWORD, {
-    port: process.env.DATABASE_PORT,
-    host: process.env.HOST,
-    dialect: 'postgres'
+const fs = require('fs');
+const sequelize = new Sequelize({
+  database: process.env.DATABASE,
+  username: process.env.USER,
+  password: process.env.PASSWORD,
+  host: process.env.HOST,
+  port: process.env.DATABASE_PORT,
+  dialect: 'postgres',
+  dialectOptions: {
+    ssl: {
+      ca: fs.readFileSync('DigiCertGlobalRootCA.crt.pem')
+    }
+  }
 });
 (async () => {
   await sequelize.sync();
