@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-
 const api = axios.create({
 
-  baseURL: process.env.API_URL || 'http://localhost:5000',
-
+  baseURL: 'https://enbiente.onrender.com/api',
+  
 });
+
 /*
 api.interceptors.request.use(function (config) {
   const token = localStorage.getItem('token');
