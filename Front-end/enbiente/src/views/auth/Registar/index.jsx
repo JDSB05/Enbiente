@@ -4,7 +4,6 @@ import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { RiEyeCloseLine } from "react-icons/ri";
 import { useHistory } from "react-router-dom";
 import api from "../../../services/api";
-import { Modal } from "react-bootstrap";
 import { useToast } from '../../../components/toasts/toast';
 import {
   Box,
@@ -20,6 +19,13 @@ import {
   InputRightElement,
   Text,
   useColorModeValue,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
 } from "@chakra-ui/react";
 import DefaultAuth from "layouts/auth/Default.js";
 
@@ -85,14 +91,11 @@ function Registar() {
       return;
     }
   
-    api.post("/utilizador", {
+    api.post("/auth/register", {
         nome: name,
         email: email,
         password: password,
-        cargo_id: 1,
-        tipo_cliente_id: 1,
-        estado: "inativo",
-        telemovel: "123456789"
+
       })
       .then((user) => {
         showSuccessToast("Registo feito com sucesso!");
@@ -235,6 +238,9 @@ function Registar() {
                 />
               </InputRightElement>
             </InputGroup>
+            <Text color={textColorDetails} fontWeight='400' fontSize='13px'>
+              {errorMessage && <div className="text-danger">{errorMessage}</div>}
+            </Text>
             <FormLabel
               ms='4px'
               fontSize='sm'
@@ -278,18 +284,20 @@ function Registar() {
           </FormControl>
         </Flex>
       </Flex>
-      <Modal show={showModal} onHide={handleModalClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Registo feito</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Verifique a conta, acedendo ao link que foi enviado para: {email}</p>
-          </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleModalClose}>
-            Ok
-          </Button>
-        </Modal.Footer>
+      <Modal isOpen={showModal} onClose={handleModalClose}>
+      <ModalOverlay />
+      <ModalContent>
+          <ModalHeader>Registo feito</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <p>Verifique a conta, acedendo ao link que foi enviado para: {email}</p>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="brand" mr={3} onClick={handleModalClose}>
+              Ok
+            </Button>
+          </ModalFooter>
+        </ModalContent>
       </Modal>
     </DefaultAuth>
   );

@@ -12,8 +12,9 @@ const Utilizador = sequelize.define('Utilizador', {
   tipo_cliente_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: TipoCliente, key: 'tipo_cliente_id' } },
   primeiroLogin: { type: DataTypes.DATE, allowNull: true },
   ultimoLogin: { type: DataTypes.DATE, allowNull: true },
-  estado: { type: DataTypes.STRING, allowNull: false },
-  telemovel: { type: DataTypes.STRING, allowNull: false }
+  estado: { type: DataTypes.INTEGER, allowNull: false },
+  telemovel: { type: DataTypes.STRING, allowNull: true },
+  TokenEmail: { type: DataTypes.STRING, allowNull: true},
 }, { 
   timestamps: false,
   freezeTableName: true // adicionando a opção freezeTableName para evitar a pluralização do nome da tabela
