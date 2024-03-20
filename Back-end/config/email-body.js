@@ -1,6 +1,25 @@
 const transporter = require("./nodemailer")
 const defaultEmail = process.env.EMAIL || 'pint-2023@outlook.com'
-const website = process.env.WEBSITE || 'https://pint-2023.netlify.app'
+const website = process.env.WEBSITE || 'https://enbiente.netlify.app'
+const apiwebsite = process.env.APIWEBSITE || 'https://enbiente.onrender.com'
+
+const mailOptions = async () =>{
+  let mailOptions = {
+  from: defaultEmail, // sender address
+  to: 'jesus2santos06@hotmail.com',
+  subject: 'Some subject', // Subject line
+  html: `<p>test</p>`,
+  };// plain text body
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log('Erro sending email: ' + error);
+      //res.status(500).send('Error sending email');
+    } else {
+      console.log('Email sent: ' + info.response);
+      // res.send('Email sent successfully!');
+    }
+  });
+ };
 
 const verificarEmail = async (email, code) => {
     let mailOptions = {
@@ -44,7 +63,7 @@ const verificarEmail = async (email, code) => {
           <body>
             <h1>Verificação de email</h1>
             <p>Olá! Clique no botão abaixo para validar seu endereço de email.</p>
-            <a href="https://pint-2023-api.onrender.com/api/validaremail?code=${code}" class="button">Validar email</a>
+            <a href="${apiwebsite}/api/auth/validaremail?code=${code}" class="button">Validar email</a>
           </body>
         </html>
         `
@@ -301,6 +320,7 @@ const verificarEmail = async (email, code) => {
 
   module.exports =
   {
+    mailOptions,
     resetPassword,
     verificarEmail,
     contaCriadaPorAdmin,

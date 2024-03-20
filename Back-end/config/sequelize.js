@@ -15,6 +15,7 @@
 //);
 
 
+
 const Sequelize = require('sequelize');
 const fs = require('fs');
 const sequelize = new Sequelize({
@@ -33,7 +34,6 @@ const sequelize = new Sequelize({
 (async () => {
   await sequelize.sync();
   console.log('All models were synchronized successfully.');
-  
 
 })();
 
