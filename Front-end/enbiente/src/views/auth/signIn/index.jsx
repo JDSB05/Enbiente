@@ -83,7 +83,7 @@ function SignIn() {
         flexDirection='column'>
         <Box me='auto'>
           <Heading color={textColor} fontSize='36px' mb='10px'>
-            Sign In
+            Iniciar Sessão
           </Heading>
           <Text
             mb='36px'
@@ -91,7 +91,7 @@ function SignIn() {
             color={textColorSecondary}
             fontWeight='400'
             fontSize='md'>
-            Enter your email and password to sign in!
+            Introduza o seu email e palavra passe para iniciar sessão!
           </Text>
         </Box>
         <Flex
@@ -104,29 +104,6 @@ function SignIn() {
           mx={{ base: "auto", lg: "unset" }}
           me='auto'
           mb={{ base: "20px", md: "auto" }}>
-          <Button
-            fontSize='sm'
-            me='0px'
-            mb='26px'
-            py='15px'
-            h='50px'
-            borderRadius='16px'
-            bg={googleBg}
-            color={googleText}
-            fontWeight='500'
-            _hover={googleHover}
-            _active={googleActive}
-            _focus={googleActive}>
-            <Icon as={FcGoogle} w='20px' h='20px' me='10px' />
-            Sign in with Google
-          </Button>
-          <Flex align='center' mb='25px'>
-            <HSeparator />
-            <Text color='gray.400' mx='14px'>
-              or
-            </Text>
-            <HSeparator />
-          </Flex>
           <FormControl>
             <FormLabel
               display='flex'
@@ -143,7 +120,7 @@ function SignIn() {
               fontSize='sm'
               ms={{ base: "0px", md: "0px" }}
               type='email'
-              placeholder='mail@simmmple.com'
+              placeholder='mail@exemplo.com'
               mb='24px'
               fontWeight='500'
               size='lg'
@@ -188,7 +165,7 @@ function SignIn() {
                   fontWeight='normal'
                   color={textColor}
                   fontSize='sm'>
-                  Keep me logged in
+                  Manter a conta iniciada
                 </FormLabel>
               </FormControl>
               <NavLink to='/auth/forgot-password'>
@@ -197,7 +174,7 @@ function SignIn() {
                   fontSize='sm'
                   w='124px'
                   fontWeight='500'>
-                  Forgot password?
+                  Esqueceu a palavra-passe?
                 </Text>
               </NavLink>
             </Flex>
@@ -208,7 +185,7 @@ function SignIn() {
               w='100%'
               h='50'
               mb='24px'>
-              Sign In
+              Iniciar Sessão
             </Button>
           </FormControl>
           <Flex
@@ -218,14 +195,14 @@ function SignIn() {
             maxW='100%'
             mt='0px'>
             <Text color={textColorDetails} fontWeight='400' fontSize='14px'>
-              Not registered yet?
-              <NavLink to='/auth/sign-up'>
+              Ainda não tem uma conta?
+              <NavLink to='/registar'>
                 <Text
                   color={textColorBrand}
                   as='span'
                   ms='5px'
                   fontWeight='500'>
-                  Create an Account
+                  Registar
                 </Text>
               </NavLink>
             </Text>
