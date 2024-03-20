@@ -9,7 +9,10 @@ const Consumo = sequelize.define('Consumo', {
     data_consumo: { type: DataTypes.DATE, allowNull: false },
     volume_consumido: { type: DataTypes.FLOAT, allowNull: false },
     valor: { type: DataTypes.FLOAT, allowNull: false }
-});
+}, { 
+    timestamps: false,
+    freezeTableName: true // adicionando a opção freezeTableName para evitar a pluralização do nome da tabela
+  });
 
 // Define the association between Consumo and Casa
 Consumo.belongsTo(Casa, { foreignKey: 'casa_id' });

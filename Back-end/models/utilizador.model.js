@@ -10,10 +10,13 @@ const Utilizador = sequelize.define('Utilizador', {
   password: { type: DataTypes.STRING, allowNull: false },
   cargo_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: Cargo, key: 'cargo_id' } },
   tipo_cliente_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: TipoCliente, key: 'tipo_cliente_id' } },
-  primeiroLogin: { type: DataTypes.DATE, allowNull: false },
-  ultimoLogin: { type: DataTypes.DATE, allowNull: false },
+  primeiroLogin: { type: DataTypes.DATE, allowNull: true },
+  ultimoLogin: { type: DataTypes.DATE, allowNull: true },
   estado: { type: DataTypes.STRING, allowNull: false },
   telemovel: { type: DataTypes.STRING, allowNull: false }
+}, { 
+  timestamps: false,
+  freezeTableName: true // adicionando a opção freezeTableName para evitar a pluralização do nome da tabela
 });
 
 // Definindo a associação com o modelo Cargo

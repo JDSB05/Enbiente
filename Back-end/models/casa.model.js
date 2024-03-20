@@ -11,7 +11,10 @@ const Casa = sequelize.define('Casa', {
     precopormetro: { type: DataTypes.FLOAT, allowNull: false },
     data_criacao: { type: DataTypes.DATE, allowNull: false },
     data_ultalteracao: { type: DataTypes.DATE, allowNull: false }
-});
+}, { 
+    timestamps: false,
+    freezeTableName: true // adicionando a opção freezeTableName para evitar a pluralização do nome da tabela
+  });
 
 Casa.belongsTo(Utilizador, { foreignKey: 'utilizador_id' });
 Utilizador.hasMany(Casa, { foreignKey: 'utilizador_id' });
