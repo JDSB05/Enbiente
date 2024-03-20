@@ -10,7 +10,10 @@ const Alerta = sequelize.define('Alerta', {
     mensagem_alerta: { type: DataTypes.STRING, allowNull: false },
     data_alerta: { type: DataTypes.DATE, allowNull: false },
     estado: { type: DataTypes.STRING, allowNull: false }
-});
+}, { 
+    timestamps: false,
+    freezeTableName: true // adicionando a opção freezeTableName para evitar a pluralização do nome da tabela
+  });
 
 Alerta.belongsTo(Casa, { foreignKey: 'casa_id' });
 Casa.hasMany(Alerta, { foreignKey: 'casa_id' });
