@@ -194,11 +194,7 @@ exports.validarEmail = async function (req, res) {
     }
 
 
-    return res.send({
-      message: "Código validado com sucesso! Pode voltar à pagina de login e entrar com as suas credenciais.",
-      success: true
-    }
-    );
+    return res.redirect(process.env.WEBSITE + "/#/login");
   } catch (error) {
     console.error(error);
     return res.status(500).send({

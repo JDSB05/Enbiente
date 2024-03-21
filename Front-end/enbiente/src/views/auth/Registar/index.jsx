@@ -49,8 +49,9 @@ function Registar() {
   const googleBg = useColorModeValue("secondaryGray.300", "whiteAlpha.200");
   const googleText = useColorModeValue("navy.700", "white");
   const [show, setShow] = React.useState(false);
-  
+  const [show2, setShow2] = React.useState(false);
   const handleClick = () => setShow(!show);
+  const handleClick2 = () => setShow2(!show2);
   const handleChangePassword = (event) => {
     const { value } = event.target;
     setPassword(value);
@@ -64,13 +65,6 @@ function Registar() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    
-    if (submitting) {
-      console.log("Ainda a enviar");
-      showMessageToast("Ainda a enviar! O seu pedido está a ser processado.");
-      return;
-    }
-
     setSubmitting(true);
 
   
@@ -99,10 +93,11 @@ function Registar() {
       })
       .then((user) => {
         showSuccessToast("Registo feito com sucesso!");
-        history.push("/login");
+        setShowModal(true);
       })
       .catch((err) => {
         console.log(err);  
+        showErrorToast(err.response.data.message);
         setSubmitting(false);
       });
   };
@@ -119,7 +114,7 @@ function Registar() {
     }
   };
 
-
+  console.log(process.env.REACT_APP_API_URL)
   const handleModalClose = () => {
     setShowModal(false);
     history.push("/login");
@@ -184,7 +179,7 @@ function Registar() {
               mb='24px'
               fontWeight='500'
               size='lg'
-              isrequired
+              isrequired={true}
             />
             <FormLabel
               display='flex'
@@ -207,7 +202,7 @@ function Registar() {
               mb='24px'
               fontWeight='500'
               size='lg'
-              isrequired
+              isrequired={true}
             />
             <FormLabel
               ms='4px'
@@ -227,7 +222,7 @@ function Registar() {
                 size='lg'
                 type={show ? "text" : "password"}
                 variant='auth'
-                isrequired
+                isrequired={true}
               />
               <InputRightElement display='flex' alignItems='center' mt='4px'>
                 <Icon
@@ -257,20 +252,19 @@ function Registar() {
                 placeholder='Minimo 8 caracteres'
                 mb='24px'
                 size='lg'
-                type={show ? "text" : "password"}
+                type={show2 ? "text" : "password"}
                 variant='auth'
-                isrequired
+                isrequired={true}
               />
               <InputRightElement display='flex' alignItems='center' mt='4px'>
                 <Icon
                   color={textColorSecondary}
                   _hover={{ cursor: "pointer" }}
                   as={show ? RiEyeCloseLine : MdOutlineRemoveRedEye}
-                  onClick={handleClick}
+                  onClick={handleClick2}
                 />
               </InputRightElement>
             </InputGroup>
-            {/* Other fields */}
             <Button
               onClick={handleSubmit}
               fontSize='sm'
@@ -278,7 +272,8 @@ function Registar() {
               fontWeight='500'
               w='100%'
               h='50'
-              mb='24px'>
+              mb='24px'
+              isLoading={submitting}>
               Criar conta
             </Button>
           </FormControl>
