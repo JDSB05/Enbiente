@@ -21,7 +21,6 @@
     "babel-preset-react": "^6.24.1",
     "babel-register": "^6.26.0",
     "bootstrap": "^5.3.3",
-    "dotenv": "^16.4.5",
     "framer-motion": "^4.1.17",
     "react": "^18.2.0",
     "react-apexcharts": "1.4.0",
