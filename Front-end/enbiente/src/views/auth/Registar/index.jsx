@@ -96,8 +96,11 @@ function Registar() {
         setShowModal(true);
       })
       .catch((err) => {
-        console.log(err);  
-        showErrorToast(err.response.data.message);
+        if (err.code === "ERR_NETWORK") {
+          showErrorToast("Erro de Conexão");
+        } else {
+          showErrorToast(err.response.data.message);
+        }
         setSubmitting(false);
       });
   };
