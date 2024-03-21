@@ -20,9 +20,10 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-
+import api from "../../../services/api";
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useHistory } from "react-router-dom";
+import { useToast } from '../../../components/toasts/toast';
 // Chakra imports
 import {
   Box,
@@ -40,33 +41,63 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 // Custom components
-import { HSeparator } from "../../../components/separator/Separator";
 import DefaultAuth from "../../../layouts/auth/Default.js";
 // Assets
 import illustration from "../../../assets/img/auth/auth.png";
-import { FcGoogle } from "react-icons/fc";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { RiEyeCloseLine } from "react-icons/ri";
 
-function SignIn() {
-  // Chakra color mode
+function SignIn({ verificarAutenticacao }) {
+  // Chakra color mode  
+  let history = useHistory();
+  const { showSuccessToast, showErrorToast, showMessageToast } = useToast();
   const textColor = useColorModeValue("navy.700", "white");
   const textColorSecondary = "gray.400";
   const textColorDetails = useColorModeValue("navy.700", "secondaryGray.600");
   const textColorBrand = useColorModeValue("brand.500", "white");
   const brandStars = useColorModeValue("brand.500", "brand.400");
-  const googleBg = useColorModeValue("secondaryGray.300", "whiteAlpha.200");
-  const googleText = useColorModeValue("navy.700", "white");
-  const googleHover = useColorModeValue(
-    { bg: "gray.200" },
-    { bg: "whiteAlpha.300" }
-  );
-  const googleActive = useColorModeValue(
-    { bg: "secondaryGray.300" },
-    { bg: "whiteAlpha.200" }
-  );
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
   const [show, setShow] = React.useState(false);
   const handleClick = () => setShow(!show);
+  const [isLoading, setIsLoading] = React.useState(false);
+  
+  const submit = async (event) => {
+    event.preventDefault();
+
+    try {
+      setIsLoading(true);
+      const user = await api.post("/auth/login", { email, password });
+      localStorage.setItem("token", user.data.message); // guardar o token no localStorage
+
+      await verificarAutenticacao();
+      const currentHour = new Date().getHours();
+      let greeting;
+      let nome = localStorage.getItem("utilizador_nome");
+      if (currentHour >= 5 && currentHour < 12) {
+        greeting = "Bom dia";
+      } else if (currentHour >= 12 && currentHour < 18) {
+        greeting = "Boa tarde";
+      } else {
+        greeting = "Boa noite";
+      }
+      showSuccessToast(`${greeting}, ${nome}. Seja bem-vindo!`);
+
+      history.push("/admin/dashboard");
+ 
+    } catch (err) {
+      console.log(err);
+
+      if (err.code === "ERR_NETWORK") {
+        showErrorToast("Erro de Conexão");
+        setIsLoading(false);
+      } else {
+        showErrorToast(err.response.data.message);
+        setIsLoading(false);
+      }
+    }
+  };
+
   return (
     <DefaultAuth illustrationBackground={illustration} image={illustration}>
       <Flex
@@ -116,6 +147,8 @@ function SignIn() {
             </FormLabel>
             <Input
               isRequired={true}
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
               variant='auth'
               fontSize='sm'
               ms={{ base: "0px", md: "0px" }}
@@ -136,6 +169,8 @@ function SignIn() {
             <InputGroup size='md'>
               <Input
                 isRequired={true}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
                 fontSize='sm'
                 placeholder='Min. 8 characters'
                 mb='24px'
@@ -168,7 +203,7 @@ function SignIn() {
                   Manter a conta iniciada
                 </FormLabel>
               </FormControl>
-              <NavLink to='/auth/forgot-password'>
+              <NavLink to='/recuperarconta'>
                 <Text
                   color={textColorBrand}
                   fontSize='sm'
@@ -179,6 +214,8 @@ function SignIn() {
               </NavLink>
             </Flex>
             <Button
+              isLoading={isLoading}
+              onClick={submit}
               fontSize='sm'
               variant='brand'
               fontWeight='500'

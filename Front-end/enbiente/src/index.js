@@ -4,7 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastProvider } from './components/toasts/toast.js'
 import ReactDOM from 'react-dom';
 import './assets/css/App.css';
-import { HashRouter, Route, Switch, Redirect } from 'react-router-dom';
+
 import AuthLayout from './layouts/auth';
 import Dashboard from './pages/dashboard.js';
 import RtlLayout from './layouts/rtl';
@@ -13,6 +13,7 @@ import Login from './views/auth/signIn/index.jsx';
 import { ChakraProvider } from '@chakra-ui/react';
 import theme from './theme/theme';
 import { ThemeEditorProvider } from '@hypertheme-editor/chakra-ui';
+import App from 'App.js';
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -20,16 +21,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 		<React.StrictMode>
 			<ThemeEditorProvider>
 				<ToastProvider>
-					<HashRouter>
-						<Switch>
-							<Route path={`/auth`} component={AuthLayout} />
-							<Route path={`/admin`} component={Dashboard} />
-							<Route path={`/rtl`} component={RtlLayout} />
-							<Route path={`/registar`} component={Registar} />
-							<Route path={`/login`} component={Login} />
-							<Redirect from='/' to='/login' />
-						</Switch>
-					</HashRouter>
+					<App />
 				</ToastProvider>
 			</ThemeEditorProvider>
 		</React.StrictMode>
