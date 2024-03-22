@@ -48,7 +48,7 @@ function AuthIllustration(props) {
               color='secondaryGray.600'
             />
             <Text ms='0px' fontSize='sm' color='secondaryGray.600'>
-              Back to Simmmple
+              Voltar ( esta opção vai ser retirada depois)
             </Text>
           </Flex>
         </NavLink>
@@ -64,12 +64,13 @@ function AuthIllustration(props) {
             bg={`url(${illustrationBackground})`}
             justify='center'
             align='end'
+            shadow={{ lg: "2xl" }}
             w='100%'
             h='100%'
             bgSize='cover'
             bgPosition='50%'
             position='absolute'
-            borderBottomLeftRadius={{ lg: "120px", xl: "200px" }}></Flex>
+            borderBottomLeftRadius={{ lg: "40px", xl: "120px" }}></Flex>
         </Box>
         <Footer />
       </Flex>

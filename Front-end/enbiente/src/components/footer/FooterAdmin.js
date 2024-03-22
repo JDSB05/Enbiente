@@ -38,15 +38,16 @@ export default function Footer() {
         {" "}
         &copy; {1900 + new Date().getYear()}
         <Text as='span' fontWeight='500' ms='4px'>
-          Horizon UI. All Rights Reserved. Made with love by
+          AquaTrack. Todos os direitos reservados. Plataforma feita para
           <Link
             mx='3px'
             color={textColor}
-            href='https://www.simmmple.com?ref=horizon-chakra-free'
+            href='https://www.enbiente.com'
             target='_blank'
             fontWeight='700'>
-            Simmmple!
+            Enbiente
           </Link>
+          &copy;
         </Text>
       </Text>
       <List display='flex'>
@@ -56,42 +57,11 @@ export default function Footer() {
             md: "44px",
           }}>
           <Link
+            marginLeft={{ base: "0px", lg: "20px" }}
             fontWeight='500'
             color={textColor}
-            href='mailto:hello@simmmple.com'>
-            Support
-          </Link>
-        </ListItem>
-        <ListItem
-          me={{
-            base: "20px",
-            md: "44px",
-          }}>
-          <Link
-            fontWeight='500'
-            color={textColor}
-            href='https://www.simmmple.com/licenses?ref=horizon-chakra-free'>
-            License
-          </Link>
-        </ListItem>
-        <ListItem
-          me={{
-            base: "20px",
-            md: "44px",
-          }}>
-          <Link
-            fontWeight='500'
-            color={textColor}
-            href='https://simmmple.com/terms-of-service?ref=horizon-chakra-free'>
-            Terms of Use
-          </Link>
-        </ListItem>
-        <ListItem>
-          <Link
-            fontWeight='500'
-            color={textColor}
-            href='https://www.blog.simmmple.com/?ref=horizon-chakra-free'>
-            Blog
+            href='mailto:geral@enbiente.com?subject=Plataforma AquaTrack'>
+            Suporte
           </Link>
         </ListItem>
       </List>

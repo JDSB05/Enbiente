@@ -64,7 +64,11 @@ function SignIn({ verificarAutenticacao }) {
   
   const submit = async (event) => {
     event.preventDefault();
-
+    if (!email || !password) {
+      showMessageToast("Preencha todos os campos!");
+      setIsLoading(false);
+      return;
+    }
     try {
       setIsLoading(true);
       const user = await api.post("/auth/login", { email, password });
@@ -81,7 +85,7 @@ function SignIn({ verificarAutenticacao }) {
       } else {
         greeting = "Boa noite";
       }
-      showSuccessToast(`${greeting}, ${nome}. Seja bem-vindo!`);
+      showSuccessToast(`${greeting}, ${nome}. Seja bem-vind@!`);
 
       history.push("/admin/dashboard");
  
@@ -172,7 +176,7 @@ function SignIn({ verificarAutenticacao }) {
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 fontSize='sm'
-                placeholder='Min. 8 characters'
+                placeholder='Insira a sua palavra-passe'
                 mb='24px'
                 size='lg'
                 type={show ? "text" : "password"}
