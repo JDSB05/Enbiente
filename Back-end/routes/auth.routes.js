@@ -32,7 +32,7 @@ router.get('/checktoken', passport.authenticate('jwt', { session: false }), (req
   const { utilizador_id, cargo_id, email, nome } = req.user.message;
   console.log(req.user.message);
   res.status(200).json({success: true,
-    message:{ utilizador_id, cargo_id, email, nome}});
+    message:{ utilizador_id, cargo_id, email, nome, email}});
 });
   app.use("/api/auth", router);
 };
