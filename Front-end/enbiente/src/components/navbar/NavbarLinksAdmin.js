@@ -11,7 +11,8 @@ import {
 	MenuItem,
 	MenuList,
 	Text,
-	useColorModeValue
+	useColorModeValue,
+	useColorMode
 } from '@chakra-ui/react';
 // Custom Components
 import { ItemContent } from '../../components/menu/ItemContent';
@@ -22,11 +23,14 @@ import React from 'react';
 // Assets
 import navImage from '../../assets/img/layout/Navbar.png';
 import { MdNotificationsNone, MdInfoOutline } from 'react-icons/md';
+import { IoMdMoon, IoMdSunny } from "react-icons/io";
 import { FaEthereum } from 'react-icons/fa';
 import routes from '../../routes.js';
 import { ThemeEditor } from './ThemeEditor';
+import  FixedPlugin  from '../fixedPlugin/FixedPlugin';
 export default function HeaderLinks(props) {
 	const { secondary } = props;
+	const { colorMode, toggleColorMode } = useColorMode();
 	const nome = localStorage.getItem('utilizador_nome');
 	//const [email, setEmail] = React.useState('');
 	// Chakra Color Mode
@@ -43,6 +47,7 @@ export default function HeaderLinks(props) {
 		'14px 17px 40px 4px rgba(112, 144, 176, 0.06)'
 	);
 	const borderButton = useColorModeValue('secondaryGray.500', 'whiteAlpha.200');
+	const btnRef = React.useRef();
 	return (
 		<Flex
 			w={{ sm: '100%', md: 'auto' }}
@@ -54,10 +59,11 @@ export default function HeaderLinks(props) {
 			borderRadius="30px"
 			boxShadow={shadow}>
 			<SearchBar mb={secondary ? { base: '10px', md: 'unset' } : 'unset'} me="10px" borderRadius="30px" />
-			<SidebarResponsive routes={routes} />
+			<SidebarResponsive align='center' justify='center' routes={routes} />
+			
 			<Menu>
-				<MenuButton p="0px">
-					<Icon mt="6px" as={MdNotificationsNone} color={navbarIcon} w="18px" h="18px" me="10px" />
+				<MenuButton mt='-1px' mx='5px' align='center' justify='center'>
+					<Icon  as={MdNotificationsNone} color={navbarIcon} w="18px" h="18px"/>
 				</MenuButton>
 				<MenuList
 					boxShadow={shadow}
@@ -71,15 +77,15 @@ export default function HeaderLinks(props) {
 					maxW={{ base: '360px', md: 'unset' }}>
 					<Flex jusitfy="space-between" w="100%" mb="20px">
 						<Text fontSize="md" fontWeight="600" color={textColor}>
-							Notifications
+							Alertas
 						</Text>
 						<Text fontSize="sm" fontWeight="500" color={textColorBrand} ms="auto" cursor="pointer">
-							Mark all read
+							Marcas todas como lidas
 						</Text>
 					</Flex>
 					<Flex flexDirection="column">
 						<MenuItem _hover={{ bg: 'none' }} _focus={{ bg: 'none' }} px="0" borderRadius="8px" mb="10px">
-							<ItemContent info="Horizon UI Dashboard PRO" aName="Alicia" />
+							<ItemContent  tipoalerta="Alerta" info="Consumo Alto detectado" descricao="A casa Rua do terraço, tem consumo elevado" />
 						</MenuItem>
 						<MenuItem _hover={{ bg: 'none' }} _focus={{ bg: 'none' }} px="0" borderRadius="8px" mb="10px">
 							<ItemContent info="Horizon Design System Free" aName="Josh Henry" />
@@ -87,13 +93,26 @@ export default function HeaderLinks(props) {
 					</Flex>
 				</MenuList>
 			</Menu>
-
-
-
-			<ThemeEditor navbarIcon={navbarIcon} />
+			<Flex
+				ref={btnRef}
+				w='max-content' 
+				h='max-content'
+				mx='5px'
+				variant='no-effects'
+				onClick={toggleColorMode}
+				align='center'
+				justify='center'>
+				<Icon
+					h='18px'
+					w='18px'
+					color={navbarIcon}
+					as={colorMode === "light" ? IoMdMoon : IoMdSunny}
+				/>
+			</Flex>
+			{/*<ThemeEditor navbarIcon={navbarIcon} />*/}
 
 			<Menu>
-				<MenuButton p="0px">
+				<MenuButton p="0px" mx='5px'>
 					<Avatar
 						_hover={{ cursor: 'pointer' }}
 						color="white"
