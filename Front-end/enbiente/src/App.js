@@ -64,11 +64,12 @@ const handleModalClose = () => {
   
         //setHeader(header);
   
-       // console.log(response.data.message);
+       //console.log(response.data.message);
   
         localStorage.setItem('utilizador_nome', response.data.message.nome);
         localStorage.setItem('utilizador_id', response.data.message.utilizador_id);
         localStorage.setItem('cargo', response.data.message.cargo_id);
+        localStorage.setItem('email', response.data.message.email);
         if (!isAuthenticated) {
           setIsAuthenticated(true);
         }

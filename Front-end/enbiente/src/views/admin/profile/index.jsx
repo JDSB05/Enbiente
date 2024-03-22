@@ -37,6 +37,8 @@ import avatar from "../../../assets/img/avatars/avatar4.png";
 import React from "react";
 
 export default function Overview() {
+  const nome = localStorage.getItem('utilizador_nome');
+	const email = localStorage.getItem('email');
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       {/* Main Fields */}
@@ -54,8 +56,8 @@ export default function Overview() {
           gridArea='1 / 1 / 2 / 2'
           banner={banner}
           avatar={avatar}
-          name='Adela Parkson'
-          job='Product Designer'
+          nome={nome}
+          email={nome === "Francisca" ? "A princesa mais linda" : email}
           posts='17'
           followers='9.7k'
           following='274'
