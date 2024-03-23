@@ -10,7 +10,7 @@ export default function Notifications(props) {
   // Chakra Color Mode
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   return (
-    <Card mb="20px" mt="40px" mx="auto" maxW="410px" {...rest}>
+    <Card mb="20px" mx="auto" maxW="410px" {...rest}>
       <Flex align="center" w="100%" justify="space-between" mb="30px">
         <Text
           color={textColorPrimary}
@@ -74,27 +74,6 @@ export default function Notifications(props) {
         mb="20px"
         id="7"
         label="New launches and projects"
-      />
-      <SwitchField
-        reversed={true}
-        fontSize="sm"
-        mb="20px"
-        id="8"
-        label="Monthly product changes"
-      />
-      <SwitchField
-        isChecked={true}
-        reversed={true}
-        fontSize="sm"
-        mb="20px"
-        id="9"
-        label="Subscribe to newsletter"
-      />
-      <SwitchField
-        reversed={true}
-        fontSize="sm"
-        id="10"
-        label="Email me when someone follows me"
       />
     </Card>
   );

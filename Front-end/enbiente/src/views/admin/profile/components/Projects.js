@@ -25,11 +25,7 @@ export default function Projects(props) {
         fontSize='2xl'
         mt='10px'
         mb='4px'>
-        All projects
-      </Text>
-      <Text color={textColorSecondary} fontSize='md' me='26px' mb='40px'>
-        Here you can find more details about your projects. Keep you user
-        engaged by providing meaningful information.
+        Casas
       </Text>
       <Project
         boxShadow={cardShadow}

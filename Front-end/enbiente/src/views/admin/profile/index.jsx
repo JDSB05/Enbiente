@@ -22,7 +22,7 @@
 
 // Chakra imports
 import { Box, Grid } from "@chakra-ui/react";
-
+import api from "../../../services/api"
 // Custom components
 import Banner from "../../../views/admin/profile/components/Banner";
 import General from "../../../views/admin/profile/components/General";
@@ -34,11 +34,32 @@ import Upload from "../../../views/admin/profile/components/Upload";
 // Assets
 import banner from "../../../assets/img/auth/banner.png";
 import avatar from "../../../assets/img/avatars/avatar4.png";
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 export default function Overview() {
-  const nome = localStorage.getItem('utilizador_nome');
-	const email = localStorage.getItem('email');
+  const [nome, setNome] = useState("");
+  const [nome1, setNome1] = useState("");
+	const [email, setEmail] = useState("");
+  const [tipoCliente, setTipoCliente] = useState([]);
+  const [telemovel, setTelemovel] = useState("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await api.get('/tipoclientes');
+        const response1 = await api.get('/utilizador/' + localStorage.getItem('utilizador_id'));
+        setTipoCliente(response.data.message);
+        setNome(response1.data.nome);
+        setNome1(response1.data.nome)
+        setTelemovel(response1.data.telemovel);
+        setEmail(response1.data.email);
+      } catch (error) {
+        console.error("Erro ao buscar dados:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       {/* Main Fields */}
@@ -56,8 +77,8 @@ export default function Overview() {
           gridArea='1 / 1 / 2 / 2'
           banner={banner}
           avatar={avatar}
-          nome={nome}
-          email={nome === "Francisca" ? "A princesa mais linda" : email}
+          nome={nome1}
+          email={email}
           posts='17'
           followers='9.7k'
           following='274'
@@ -94,8 +115,8 @@ export default function Overview() {
           gridArea='1 / 2 / 2 / 2'
           banner={banner}
           avatar={avatar}
-          name='Adela Parkson'
-          job='Product Designer'
+          name='Teste'
+          job='Teste'
           posts='17'
           followers='9.7k'
           following='274'
@@ -104,6 +125,12 @@ export default function Overview() {
           gridArea={{ base: "2 / 1 / 3 / 2", lg: "1 / 2 / 2 / 3" }}
           minH='365px'
           pe='20px'
+          nome={nome ? nome : ""}
+          telemovel={telemovel ? telemovel : ""}
+          tipoCliente={tipoCliente ? tipoCliente : []}
+          setNome={setNome}
+          setTelemovel={setTelemovel}
+          setTipoCliente={setTipoCliente}
         />
         <Notifications
           used={25.6}

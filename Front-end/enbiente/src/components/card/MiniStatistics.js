@@ -50,7 +50,7 @@ export default function Default(props) {
                 fontSize='s'
                 fontWeight='700'
                 me='5px'>
-                {growth}%
+                {isNaN(growth) ? "Sem dados" : growth + " %"}
               </Text>
               <Text
                 color='secondaryGray.600'
