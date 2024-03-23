@@ -5,6 +5,7 @@ const getAllTipoClientes = async (req, res) => {
     try {
         const tipoClientes = await TipoCliente.findAll();
         res.json(tipoClientes);
+        console.log(tipoClientes);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });

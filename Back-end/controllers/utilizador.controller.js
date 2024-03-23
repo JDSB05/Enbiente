@@ -52,7 +52,9 @@ const getUtilizadorById = async (req, res) => {
     const { id } = req.params;
 
     // Find the Utilizador by ID
-    const utilizador = await Utilizador.findByPk(id);
+    const utilizador = await Utilizador.findByPk(id, {
+      attributes: { exclude: ['password', 'TokenEmail'] }
+    });
 
     // Check if Utilizador exists
     if (!utilizador) {

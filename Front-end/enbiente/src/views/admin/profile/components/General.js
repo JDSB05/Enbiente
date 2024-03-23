@@ -1,20 +1,37 @@
-// Chakra imports
-import { SimpleGrid, Text, useColorModeValue } from "@chakra-ui/react";
-// Custom components
-import Card from "../../../../components/card/Card.js";
 import React from "react";
-import Information from "../../../../views/admin/profile/components/Information";
+import { SimpleGrid, Text, useColorModeValue, Input, FormLabel, FormControl, Select, Button } from "@chakra-ui/react";
+import Card from "../../../../components/card/Card.js";
+import api from "../../../../services/api.js";
 
-// Assets
 export default function GeneralInformation(props) {
-  const { ...rest } = props;
-  // Chakra Color Mode
+  const { nome, telemovel, tipoCliente, setNome, setTelemovel, setTipoCliente, ...rest } = props;
+  const textColor = useColorModeValue("secondaryGray.900", "white");
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
-  const textColorSecondary = "gray.400";
-  const cardShadow = useColorModeValue(
-    "0px 18px 40px rgba(112, 144, 176, 0.12)",
-    "unset"
-  );
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [tipoClienteValor, setTipoClienteValor] = React.useState("");
+  function submit() {
+    setTipoClienteValor(2);
+    setIsLoading(true);
+    try {
+      console.log(nome, telemovel, tipoCliente); 
+      
+      api.put('/utilizador/' + localStorage.getItem('utilizador_id'), { nome: nome, telemovel: telemovel, tipo_cliente_id: parseInt(tipoClienteValor)})
+        .then(() => {
+          console.log("Dados do usuário atualizados com sucesso!");
+          setIsLoading(false);
+          localStorage.setItem('utilizador_nome', nome);
+          window.location.reload();
+        })
+        .catch(error => {
+          console.error("Erro ao atualizar dados do usuário:", error);
+          setIsLoading(false);
+        });
+    } catch (error) {
+      console.error("Erro ao fazer requisição para atualizar dados do usuário:", error);
+      setIsLoading(false);
+    }
+  }
+
   return (
     <Card mb={{ base: "0px", "2xl": "20px" }} {...rest}>
       <Text
@@ -23,46 +40,93 @@ export default function GeneralInformation(props) {
         fontSize='2xl'
         mt='10px'
         mb='4px'>
-        General Information
+        Dados do seu perfil
       </Text>
-      <Text color={textColorSecondary} fontSize='md' me='26px' mb='40px'>
-        As we live, our hearts turn colder. Cause pain is what we go through as
-        we become older. We get insulted by others, lose trust for those others.
-        We get back stabbed by friends. It becomes harder for us to give others
-        a hand. We get our heart broken by people we love, even that we give
-        them all...
-      </Text>
-      <SimpleGrid columns='2' gap='20px'>
-        <Information
-          boxShadow={cardShadow}
-          title='Education'
-          value='Stanford University'
-        />
-        <Information
-          boxShadow={cardShadow}
-          title='Languages'
-          value='English, Spanish, Italian'
-        />
-        <Information
-          boxShadow={cardShadow}
-          title='Department'
-          value='Product Design'
-        />
-        <Information
-          boxShadow={cardShadow}
-          title='Work History'
-          value='Google, Facebook'
-        />
-        <Information
-          boxShadow={cardShadow}
-          title='Organization'
-          value='Simmmple Web LLC'
-        />
-        <Information
-          boxShadow={cardShadow}
-          title='Birthday'
-          value='20 July 1986'
-        />
+      <SimpleGrid columns='1' gap='20px'>
+        <div>
+          <FormLabel
+            display='flex'
+            ms='4px'
+            fontSize='sm'
+            fontWeight='500'
+            color={textColor}
+          >
+            Nome
+          </FormLabel>
+          <Input
+            value={nome}
+            onChange={(event) => setNome(event.target.value)}
+            variant='auth'
+            fontSize='sm'
+            ms={{ base: "0px", md: "0px" }}
+            type='text'
+            placeholder='Nome'
+            fontWeight='500'
+            size='lg'
+            isrequired={true}
+          />
+        </div>
+        <div>
+          <FormLabel
+            display='flex'
+            ms='4px'
+            fontSize='sm'
+            fontWeight='500'
+            color={textColor}
+          >
+            Telemóvel
+          </FormLabel>
+          <Input
+            value={telemovel}
+            onChange={(event) => setTelemovel(event.target.value)}
+            variant='auth'
+            fontSize='sm'
+            type='number'
+            placeholder='+351 912 345 678'
+            fontWeight='500'
+            size='lg'
+            isrequired={true}
+          />
+        </div>
+        <div>
+          <FormControl id="country">
+            <FormLabel
+              display='flex'
+              ms='4px'
+              fontSize='sm'
+              fontWeight='500'
+              color={textColor}
+            >
+              Tipo de Cliente
+            </FormLabel>
+            <Select
+              placeholder="Selecione o tipo de cliente"
+              variant="auth"
+              border="1px"
+              value={tipoCliente}
+              onChange={(event) => setTipoCliente(event.target.value)}>
+              {tipoCliente.map((tipo, index) => (
+                <option key={tipo.tipo_cliente_id} value={tipo.tipo_cliente_id}>
+                  {tipo.tipo_cliente}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
+        <div>
+          <Button
+            isLoading={isLoading}
+            onClick={submit}
+            fontSize='sm'
+            variant='brand'
+            fontWeight='500'
+            mt="10px"
+            w='100%'
+            h='50'
+            mb='24px'>
+            Guardar
+          </Button>
+        </div>
       </SimpleGrid>
     </Card>
   );

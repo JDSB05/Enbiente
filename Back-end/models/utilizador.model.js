@@ -15,6 +15,7 @@ const Utilizador = sequelize.define('Utilizador', {
   estado: { type: DataTypes.INTEGER, allowNull: false },
   telemovel: { type: DataTypes.STRING, allowNull: true },
   TokenEmail: { type: DataTypes.STRING, allowNull: true},
+  foto:{ type: DataTypes.STRING, allowNull: true},
 }, { 
   timestamps: false,
   freezeTableName: true // adicionando a opção freezeTableName para evitar a pluralização do nome da tabela
