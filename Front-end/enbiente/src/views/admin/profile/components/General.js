@@ -9,6 +9,7 @@ export default function GeneralInformation(props) {
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const [isLoading, setIsLoading] = React.useState(false);
   const [tipoClienteValor, setTipoClienteValor] = React.useState("");
+  
   function submit() {
     setIsLoading(true);
     try {
