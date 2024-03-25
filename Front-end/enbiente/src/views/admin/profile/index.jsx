@@ -27,7 +27,7 @@ import api from "../../../services/api"
 import Banner from "../../../views/admin/profile/components/Banner";
 import General from "../../../views/admin/profile/components/General";
 import Notifications from "../../../views/admin/profile/components/Notifications";
-import Projects from "../../../views/admin/profile/components/Projects";
+import Projects from "./components/Casas";
 import Storage from "../../../views/admin/profile/components/Storage";
 import Upload from "../../../views/admin/profile/components/Upload";
 
@@ -41,6 +41,7 @@ export default function Overview() {
   const [nome1, setNome1] = useState("");
 	const [email, setEmail] = useState("");
   const [tipoCliente, setTipoCliente] = useState([]);
+  const [tipoClienteValor, setTipoClienteValor] = useState("");
   const [telemovel, setTelemovel] = useState("");
 
   useEffect(() => {
@@ -48,7 +49,7 @@ export default function Overview() {
       try {
         const response = await api.get('/tipoclientes');
         const response1 = await api.get('/utilizador/' + localStorage.getItem('utilizador_id'));
-        setTipoCliente(response.data.message);
+        setTipoCliente(response.data);
         setNome(response1.data.nome);
         setNome1(response1.data.nome)
         setTelemovel(response1.data.telemovel);
@@ -122,16 +123,16 @@ export default function Overview() {
           following='274'
         />
         <General
-          gridArea={{ base: "2 / 1 / 3 / 2", lg: "1 / 2 / 2 / 3" }}
-          minH='365px'
-          pe='20px'
-          nome={nome ? nome : ""}
-          telemovel={telemovel ? telemovel : ""}
-          tipoCliente={tipoCliente ? tipoCliente : []}
-          setNome={setNome}
-          setTelemovel={setTelemovel}
-          setTipoCliente={setTipoCliente}
-        />
+            gridArea={{ base: "2 / 1 / 3 / 2", lg: "1 / 2 / 2 / 3" }}
+            minH='365px'
+            pe='20px'
+            nome={nome ? nome : ""}
+            telemovel={telemovel ? telemovel : ""}
+            tipoCliente={tipoCliente ? tipoCliente : []} // Certifique-se de passar um array vazio
+            setNome={setNome}
+            setTelemovel={setTelemovel}
+            setTipoCliente={setTipoClienteValor}
+          />
         <Notifications
           used={25.6}
           total={50}

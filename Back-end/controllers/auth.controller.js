@@ -87,74 +87,53 @@ exports.login = async (req, res) => {
 exports.register = async (req, res) => {
   console.log("A registar");
   if (!req.body) {
-    res.status(400).send({
+    return res.status(400).send({
       message: "Conteudo não pode estar vazio!",
       success: false
     });
   }
-  // Criar novo Utilizador
-
-  // Verificar se o email não está cadastrado
   try {
     const user = await Utilizador.findOne({ where: { email: req.body.email } });
     if (user) {
       return res.status(500).send({
         success: false,
         message: "Email já está cadastrado: " + req.body.email
-
-      })
+      });
     }
   } catch (error) {
-    res.status(500).send(
-      {
-        success: false,
-        message: "Erro ao verificar email do Usuário : " + error
-      }
-    )
+    console.error("Erro ao verificar email do Usuário:", error); // Log the error
+    return res.status(500).send({
+      success: false,
+      message: "Erro ao verificar email do Usuário"
+    });
   }
-  // Define o estado = 0, até que verifique o email
-    req.body.estado = 0;
-    req.body.tipo_cliente_id = 1;
-  // Encriptar password
-  const salt = await bcrypt.genSalt();
-  req.body.password = await bcrypt.hash(req.body.password, salt);
-
-  console.log("password : " + req.body.password);
-
-  // Criar token para validar email
-  const payload =
-  {
-    email: req.body.email,
-  }
-  const token = jwt.sign(payload, "mudar", { expiresIn: "1m" })
-
-  // Definir token de validação na BD
-  req.body.TokenEmail = token
-
-  // Mandar email de verificação
-  email_sender.verificarEmail(req.body.email, token);
-
-  // Define o cargo padrão como 1 "Utilizador externo"
-  req.body.cargo_id = 1;
-
-  req.body.Foto = 'https://res.cloudinary.com/dr2x19yhh/image/upload/v1681211694/foto-padrao.jpg.jpg'
 
   try {
+    req.body.estado = 0;
+    req.body.tipo_cliente_id = 1;
+    const salt = await bcrypt.genSalt();
+    req.body.password = await bcrypt.hash(req.body.password, salt);
+    console.log("password : " + req.body.password);
+    const payload = { email: req.body.email };
+    const token = jwt.sign(payload, "mudar", { expiresIn: "1m" });
+    req.body.TokenEmail = token;
+    email_sender.verificarEmail(req.body.email, token);
+    req.body.cargo_id = 1;
+    req.body.Foto = 'https://res.cloudinary.com/dr2x19yhh/image/upload/v1681211694/foto-padrao.jpg.jpg';
     const data = await Utilizador.create(req.body);
     res.send({
       message: data,
       success: true
-
     });
-
   } catch (error) {
-    res.status(500).send(
-      {
-        message: "Erro ao criar usuário: " + error,
-        success: false
-      })
+    console.error("Erro ao criar usuário:", error); // Log the error
+    return res.status(500).send({
+      message: "Erro ao criar usuário",
+      success: false
+    });
   }
-}
+};
+
 
 exports.validarEmail = async function (req, res) {
   const code = req.query.code;

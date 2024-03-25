@@ -1,5 +1,5 @@
 // Chakra imports
-import { Text, useColorModeValue } from "@chakra-ui/react";
+import { Flex, Text, useColorModeValue, Button, Icon } from "@chakra-ui/react";
 // Assets
 import Project1 from "../../../../assets/img/profile/Project1.png";
 import Project2 from "../../../../assets/img/profile/Project2.png";
@@ -7,7 +7,8 @@ import Project3 from "../../../../assets/img/profile/Project3.png";
 // Custom components
 import Card from "../../../../components/card/Card.js";
 import React from "react";
-import Project from "../../../../views/admin/profile/components/Project";
+import Project from "./Casa";
+import { MdAdd } from "react-icons/md";
 
 export default function Projects(props) {
   // Chakra Color Mode
@@ -19,14 +20,26 @@ export default function Projects(props) {
   );
   return (
     <Card mb={{ base: "0px", "2xl": "20px" }}>
-      <Text
-        color={textColorPrimary}
-        fontWeight='bold'
-        fontSize='2xl'
-        mt='10px'
-        mb='4px'>
-        Casas
-      </Text>
+      <Flex w='100%' mb='5px'>
+        <Flex w='50%' mx='auto' me='60px' align='left' direction='column'>
+          <Text
+            color={textColorPrimary}
+            fontWeight='bold'
+            fontSize='2xl'
+            mt='10px'
+            mb='4px'>
+            Casas
+          </Text>
+        </Flex>
+        <Flex w='50%' justifyContent="right" alignItems='center' >
+          <Button
+            w='auto'
+            variant='solid'
+            >
+            <MdAdd size={15} color={textColorPrimary} />
+          </Button>
+        </Flex>
+      </Flex>
       <Project
         boxShadow={cardShadow}
         mb='20px'

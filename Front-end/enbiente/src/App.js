@@ -11,9 +11,11 @@ import { HashRouter, Route, Switch, Redirect } from 'react-router-dom';
 import AuthLayout from './layouts/auth';
 import RtlLayout from './layouts/rtl';
 import Login from './views/auth/signIn/index.jsx';
+import Alerts from './views/notfound/index';
 import  Dashboard from './layouts/admin/index';
 //import  RootLayout  from './layouts/RootLayout';
 import Registar from './views/auth/Registar';
+import ForgotPassword from 'views/auth/recuperarConta';
 /*
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -97,12 +99,15 @@ const handleModalClose = () => {
   return (
     <HashRouter>
       <Switch>
-        <Route path={`/auth`} component={AuthLayout} />
-        <Route path={`/admin`} component={Dashboard} />
-        <Route path={`/rtl`} component={RtlLayout} />
-        <Route path={`/registar`} component={Registar} />
-        <Route path={`/login`} render={() => <Login verificarAutenticacao={verificarAutenticacao} />} />
-        <Redirect from='/' to='/login' />
+        <Route path="/auth" component={AuthLayout} />
+        <Route path="/admin" component={Dashboard} />
+        <Route path="/rtl" component={RtlLayout} />
+        <Route path="/registar" component={Registar} />
+        <Route path="/login" render={() => <Login verificarAutenticacao={verificarAutenticacao} />} />
+        <Route path="/404" component={Alerts} />
+        <Route path="/recuperarconta" component={ForgotPassword} />
+        <Route exact path="/" render={() => <Redirect to="/login" />} />
+        <Route render={() => <Redirect to="/404" />} />
       </Switch>
     </HashRouter>
   );
