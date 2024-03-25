@@ -47,23 +47,7 @@ export default function Footer() {
           </Link>
           &copy;
         </Text>
-        {" "}
-        <Link
-            fontWeight='600'
-            color={linkColor}
-            href='mailto:geral@enbiente.com?subject=Plataforma AquaTrack'>
-            Suporte
-          </Link>
       </Text>
-      <List display='flex'>
-        <ListItem
-          me={{
-            base: "20px",
-            md: "44px",
-          }}>
-          
-        </ListItem>
-      </List>
     </Flex>
   );
 }

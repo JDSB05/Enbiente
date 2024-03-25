@@ -1,3 +1,4 @@
+/*eslint-disable*/
 import React, { useState } from "react";
 import illustration from "../../../assets/img/auth/auth.png";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
@@ -117,7 +118,6 @@ function Registar() {
     }
   };
 
-  console.log(process.env.REACT_APP_API_URL)
   const handleModalClose = () => {
     setShowModal(false);
     history.push("/login");

@@ -10,7 +10,6 @@ export default function GeneralInformation(props) {
   const [isLoading, setIsLoading] = React.useState(false);
   const [tipoClienteValor, setTipoClienteValor] = React.useState("");
   function submit() {
-    setTipoClienteValor(2);
     setIsLoading(true);
     try {
       console.log(nome, telemovel, tipoCliente); 
@@ -103,8 +102,9 @@ export default function GeneralInformation(props) {
               placeholder="Selecione o tipo de cliente"
               variant="auth"
               border="1px"
-              value={tipoCliente}
-              onChange={(event) => setTipoCliente(event.target.value)}>
+              value={tipoCliente.tipo_cliente_id} // Alterando para acessar diretamente o ID
+              onChange={(event) => setTipoClienteValor(event.target.value)} // Atualizando para armazenar o ID no estado
+            >
               {tipoCliente.map((tipo, index) => (
                 <option key={tipo.tipo_cliente_id} value={tipo.tipo_cliente_id}>
                   {tipo.tipo_cliente}

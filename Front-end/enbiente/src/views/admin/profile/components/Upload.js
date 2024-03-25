@@ -1,3 +1,4 @@
+/*eslint-disable*/
 // Chakra imports
 import {
   Box,
@@ -42,7 +43,8 @@ export default function Upload(props) {
             </Box>
           }
         />
-        <Flex direction='column' justifyContent="center" pe='44px'>
+        <Flex direction='column' justifyContent="center" w='100%' maxW='100%'>
+          <Flex w='100%' justifyContent="center">
           <Text
             color={textColorPrimary}
             fontWeight='bold'
@@ -51,6 +53,7 @@ export default function Upload(props) {
             mt={{ base: "20px", "2xl": "50px" }}>
             {tema}
           </Text>
+          </Flex>
           <Flex w='100%' justifyContent="center">
             <Button
               mb='50px'

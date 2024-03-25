@@ -36,8 +36,8 @@ export default function Banner(props) {
       <Text color={textColorSecondary} fontSize='sm'>
         {email}
       </Text>
-      <Flex w='max-content' mx='auto' mt='26px'>
-        <Flex mx='auto' me='60px' align='center' direction='column'>
+      <Flex w='100%' mx='auto' mt='26px'>
+        <Flex mx='auto'  align='left' direction='column' w='33%'>
           <Text color={textColorPrimary} fontSize='2xl' fontWeight='700'>
             {posts}
           </Text>
@@ -45,7 +45,7 @@ export default function Banner(props) {
             Casas
           </Text>
         </Flex>
-        <Flex mx='auto' me='60px' align='center' direction='column'>
+        <Flex mx='auto'  align='center' direction='column' w='33%'>
           <Text color={textColorPrimary} fontSize='2xl' fontWeight='700'>
             {followers}
           </Text>
@@ -53,7 +53,7 @@ export default function Banner(props) {
             Volume total consumido
           </Text>
         </Flex>
-        <Flex mx='auto' align='center' direction='column'>
+        <Flex mx='auto' align='right' direction='column' w='33%'>
           <Text color={textColorPrimary} fontSize='2xl' fontWeight='700'>
             {following}
           </Text>
