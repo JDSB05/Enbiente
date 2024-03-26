@@ -179,7 +179,7 @@ const verificarEmail = async (email, code) => {
           <body>
             <h1>Redefinir password</h1>
             <p>Olá! Aceda ao link para redefinir a password</p>
-            <a href="${website}/inserirpass?resetpassword=${code}" class="button">Validar email</a>
+            <a href="${website}/recuperarpassword?resetpassword=${code}" class="button">Validar email</a>
           </body>
         </html>
         `
