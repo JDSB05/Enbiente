@@ -32,13 +32,15 @@ export default function Projects(props) {
   );
   const [casas, setCasas] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [isOpenEditar, setIsOpenEditar] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { showSuccessToast, showErrorToast, showMessageToast } = useToast();
+  const [casa_id, setCasa_id] = useState('');
   const [nome, setNome] = useState('');
-  const utilizador_id = localStorage.getItem('utilizador_id');
   const [endereco, setEndereco] = useState('');
   const [precopormetro, setPrecopormetro] = useState('');
   const [tipo_casa, setTipoCasa] = useState('');
+  const [editedFields, setEditedFields] = useState({});
   const textColor = useColorModeValue("secondaryGray.900", "white");
   useEffect(() => {
     const fetchCasas = async () => {
@@ -53,12 +55,49 @@ export default function Projects(props) {
 
     fetchCasas();
   }, []);
+
   function handleOpenModal() {
     setIsOpen(true);
   }
+
   function handleCloseModal() {
     setIsOpen(false);
   }
+
+  function handleOpenModalEditar(casa) {
+    setNome(casa.nome);
+    setEndereco(casa.endereco);
+    setPrecopormetro(casa.precopormetro);
+    setTipoCasa(casa.tipo_casa);
+    setCasa_id(casa.casa_id);
+    setIsOpenEditar(true);
+    setEditedFields({});
+  }
+
+  function handleCloseModalEditar() {
+    setIsOpenEditar(false);
+    setNome('');
+    setEndereco('');
+    setPrecopormetro('');
+    setTipoCasa('');
+    setEditedFields({});
+  }
+
+  function handleFieldChange(field, value) {
+    setEditedFields({ ...editedFields, [field]: value });
+  }
+
+  function submitEdits() {
+    if (Object.keys(editedFields).length === 0) {
+      showMessageToast('Nenhum campo foi editado.');
+      return;
+    }
+
+    const editedData = { ...editedFields, casa_id: casa_id };
+
+    // Envie os dados para a API e trate a resposta...
+  }
+
   function submit() {
     if (!nome || !endereco || !precopormetro) {
       showErrorToast('Por favor, preencha todos os campos.');
@@ -68,7 +107,7 @@ export default function Projects(props) {
     setIsLoading(true);
     
     try {
-      api.post('/casas', { nome, utilizador_id, endereco, precopormetro, tipo_casa: 'Teste', data_criacao: new Date(), data_ultalteracao: new Date() })
+      api.post('/casas', { nome, endereco, precopormetro, tipo_casa: 'Teste', data_criacao: new Date(), data_ultalteracao: new Date() })
         .then(response => {
           console.log(response.data);
           showSuccessToast('Casa criada com sucesso');
@@ -93,6 +132,38 @@ export default function Projects(props) {
       handleCloseModal();
     }
   }
+  function submitEdits() {
+    setIsLoading(true);
+    if (Object.keys(editedFields).length === 0) {
+      showMessageToast('Nenhum campo foi editado.');
+      return;
+    }
+
+    const editedData = { ...editedFields};
+    
+    
+      api.put(`/casas/${casa_id}`, editedData)
+        .then(response => {
+          console.log(response.data);
+          showSuccessToast('Casa editada com sucesso');
+          setIsLoading(false);
+          handleCloseModalEditar();
+          setCasas(casas.map(casa => {
+            if (casa.casa_id === casa_id) {
+              return { ...casa, ...editedData };
+            }
+            return casa;
+          }));
+        })
+        .catch(error => {
+          console.log(error);
+          showErrorToast('Erro ao editar casa');
+          setIsLoading(false);
+          handleCloseModalEditar();
+        });
+    
+    
+  }
   
   return (
     <div>
@@ -114,11 +185,11 @@ export default function Projects(props) {
               variant='solid'
               onClick={handleOpenModal}
             >
-              <MdAdd size={15} color={textColorPrimary} />
+              <Icon as={MdAdd}  color={textColorPrimary} h='15px' w='15px'/>
             </Button>
           </Flex>
         </Flex>
-        <div style={{ maxHeight: '360px', overflowY: 'auto', scrollbarWidth: 'thin', scrollbarColor: '#888 transparent' }}>
+        <div style={{ height:'363px', maxHeight: '363px', width:'100%', overflowY: 'auto', scrollbarWidth: 'none', scrollbarColor: '#888 transparent' }}>
           {casas.map(casa => (
             <Project
               key={casa.casaid}
@@ -128,7 +199,8 @@ export default function Projects(props) {
               endereco={casa.endereco}
               precopormetro={casa.precopormetro}
               tipocasa={casa.tipo_casa}
-              casaid={casa.casaid}
+              casaid={casa.casa_id}
+              handleOpenModalEditar={() => handleOpenModalEditar(casa)}
             />
           ))}
         </div>
@@ -177,54 +249,147 @@ export default function Projects(props) {
                 fontSize='sm'
                 fontWeight='500'
                 color={textColor}
-              >
-                Endereço
-              </FormLabel>
-              <Input
-                value={endereco}
-                onChange={(event) => setEndereco(event.target.value)}
-                variant='auth'
-                fontSize='sm'
-                type='text'
-                placeholder='Rua 1, 1234-567 Lisboa'
-                fontWeight='500'
-                size='lg'
-                isrequired={true}
-              />
-            </div>
-            <div>
-              <FormLabel
-                display='flex'
-                ms='4px'
-                fontSize='sm'
-                fontWeight='500'
-                color={textColor}
-              >
-                Preço por metro
-              </FormLabel>
-              <Input
-                value={precopormetro}
-                onChange={(event) => setPrecopormetro(event.target.value)}
-                variant='auth'
-                fontSize='sm'
-                type='number'
-                placeholder='100'
-                fontWeight='500'
-                size='lg'
-                isrequired={true}
-              />
-            </div>
-          </ModalBody>
-          <ModalFooter>
-            <Button variant='brand' mr={3} isLoading={isLoading} onClick={submit}>
-              Criar
-            </Button>
-            <Button variant="solid" mr={3} onClick={handleCloseModal}>
-              Cancelar
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </div>
-  );
-}
+                >
+                  Endereço
+                </FormLabel>
+                <Input
+                  value={endereco}
+                  onChange={(event) => setEndereco(event.target.value)}
+                  variant='auth'
+                  fontSize='sm'
+                  type='text'
+                  placeholder='Rua 1, 1234-567 Lisboa'
+                  fontWeight='500'
+                  size='lg'
+                  isrequired={true}
+                />
+              </div>
+              <div>
+                <FormLabel
+                  display='flex'
+                  ms='4px'
+                  fontSize='sm'
+                  fontWeight='500'
+                  color={textColor}
+                >
+                  Preço por metro
+                </FormLabel>
+                <Input
+                  value={precopormetro}
+                  onChange={(event) => setPrecopormetro(event.target.value)}
+                  variant='auth'
+                  fontSize='sm'
+                  type='number'
+                  placeholder='100'
+                  fontWeight='500'
+                  size='lg'
+                  isrequired={true}
+                />
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <Button variant='brand' mr={3} isLoading={isLoading} onClick={submit}>
+                Criar
+              </Button>
+              <Button variant="solid" mr={3} onClick={handleCloseModal}>
+                Cancelar
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+        <Modal isOpen={isOpenEditar} size="2xl" onClose={handleCloseModalEditar}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Editar casa</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text
+                color={textColorPrimary}
+                fontWeight='bold'
+                fontSize='2xl'
+                mt='10px'
+                mb='4px'>
+                Insira os dados da casa
+              </Text>
+              <div>
+                <FormLabel
+                  display='flex'
+                  ms='4px'
+                  fontSize='sm'
+                  fontWeight='500'
+                  color={textColor}
+                >
+                  Nome
+                </FormLabel>
+                <Input
+                  value={editedFields.nome || nome} // Preenche com o valor editado ou o valor original
+                  onChange={(event) => handleFieldChange('nome', event.target.value)}
+                  variant='auth'
+                  fontSize='sm'
+                  ms={{ base: "0px", md: "0px" }}
+                  type='text'
+                  placeholder='Nome'
+                  fontWeight='500'
+                  size='lg'
+                  isrequired={true}
+                />
+              </div>
+              <div>
+                <FormLabel
+                  display='flex'
+                  ms='4px'
+                  fontSize='sm'
+                  fontWeight='500'
+                  color={textColor}
+                >
+                  Endereço
+                </FormLabel>
+                <Input
+                  value={editedFields.endereco || endereco} // Preenche com o valor editado ou o valor original
+                  onChange={(event) => handleFieldChange('endereco', event.target.value)}
+                  variant='auth'
+                  fontSize='sm'
+                  type='text'
+                  placeholder='Rua 1, 1234-567 Lisboa'
+                  fontWeight='500'
+                  size='lg'
+                  isrequired={true}
+                />
+              </div>
+              <div>
+                <FormLabel
+                  display='flex'
+                  ms='4px'
+                  fontSize='sm'
+                  fontWeight='500'
+                  color={textColor}
+                >
+                  Preço por metro
+                </FormLabel>
+                <Input
+                  value={editedFields.precopormetro || precopormetro} // Preenche com o valor editado ou o valor original
+                  onChange={(event) => handleFieldChange('precopormetro', event.target.value)}
+                  variant='auth'
+                  fontSize='sm'
+                  type='number'
+                  placeholder='100'
+                  fontWeight='500'
+                  size='lg'
+                  isrequired={true}
+                />
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <Button variant='brand' mr={3} isLoading={isLoading} onClick={submitEdits}>
+                Criar
+              </Button>
+              <Button variant="solid" mr={3} onClick={handleCloseModalEditar}>
+                Cancelar
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </div>
+    );
+  }
+  

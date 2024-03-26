@@ -48,6 +48,14 @@ export default function HeaderLinks(props) {
 	);
 	const borderButton = useColorModeValue('secondaryGray.500', 'whiteAlpha.200');
 	const btnRef = React.useRef();
+	function logout() {
+		localStorage.removeItem('email');
+		localStorage.removeItem('utilizador_id');
+		localStorage.removeItem('cargo');
+		localStorage.removeItem('utilizador_nome');
+		localStorage.removeItem('token');
+		window.location.href = '#/login';
+	}
 	return (
 		<Flex
 			w={{ sm: '100%', md: 'auto' }}
@@ -150,7 +158,8 @@ export default function HeaderLinks(props) {
 							_focus={{ bg: 'none' }}
 							color="red.400"
 							borderRadius="8px"
-							px="14px">
+							px="14px"
+							onClick={logout}>
 							<Text fontSize="sm">Log out</Text>
 						</MenuItem>
 					</Flex>

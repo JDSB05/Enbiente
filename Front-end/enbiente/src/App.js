@@ -15,7 +15,8 @@ import Alerts from './views/notfound/index';
 import  Dashboard from './layouts/admin/index';
 //import  RootLayout  from './layouts/RootLayout';
 import Registar from './views/auth/Registar';
-import ForgotPassword from 'views/auth/recuperarConta';
+import ForgotPassword from './views/auth/recuperarConta';
+import ConfirmPassword from './views/auth/ConfirmarPassword';
 /*
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -106,6 +107,7 @@ const handleModalClose = () => {
         <Route path="/login" render={() => <Login verificarAutenticacao={verificarAutenticacao} />} />
         <Route path="/404" component={Alerts} />
         <Route path="/recuperarconta" component={ForgotPassword} />
+        <Route path="/recuperarpassword" component={ConfirmPassword} />
         <Route exact path="/" render={() => <Redirect to="/login" />} />
         <Route render={() => <Redirect to="/404" />} />
       </Switch>
