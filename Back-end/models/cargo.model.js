@@ -9,4 +9,24 @@ const Cargo = sequelize.define('Cargo', {
     freezeTableName: true // adicionando a opção freezeTableName para evitar a pluralização do nome da tabela
   });
 
+  const createDefaultCargos = async () => {
+    try {
+      await Cargo.bulkCreate([
+        { cargo: "Administrador" },
+        { cargo: "Utilizador" },
+        { cargo: "Trabalhador" }
+      ]);
+      console.log('Registros padrão criados com sucesso.');
+    } catch (error) {
+      console.error('Erro ao criar registros padrão:', error);
+    }
+  };
+  
+  Cargo.afterSync(() => {
+    Cargo.count().then(count => {
+      if (count === 0) {
+        createDefaultCargos();
+      }
+    });
+  });
 module.exports = Cargo;
