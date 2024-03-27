@@ -29,5 +29,22 @@ Utilizador.belongsTo(Cargo, {
 Utilizador.belongsTo(TipoCliente, 
   { foreignKey: 'tipo_cliente_id',
 });
+const createDefaultUtilizador = async () => {
+  try {
+    await Utilizador.bulkCreate([
+      { nome: "Administrador", email: "admin@exemplo.com", password: "$2a$10$Qy3XF/XTKbqe2gsvR8IsSe/crOSksqWTOwxQUtiIwDJBHLOrKlCXO", cargo_id: 1, tipo_cliente_id: 1, estado: 1 },
+    ]);
+    console.log('Default records created successfully.');
+  } catch (error) {
+    console.error('Error creating default records:', error);
+  }
+};
 
+Utilizador.afterSync(() => {
+  Utilizador.count().then(count => {
+    if (count === 0) {
+      createDefaultUtilizador();
+    }
+  });
+});
 module.exports = Utilizador;

@@ -36,6 +36,8 @@ require("./routes/consumos.routes")(app)
 require("./routes/tipocliente.routes")(app)
 require("./routes/utilizador.routes")(app)
 require("./routes/auth.routes")(app)
+require("./routes/tipocasa.routes")(app)
+require("./routes/upload.routes")(app)
 //const transporter = require("./config/nodemailer")
 
 

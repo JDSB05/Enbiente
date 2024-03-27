@@ -1,10 +1,16 @@
 const Casa = require('../models/casa.model');
 const Utilizador = require('../models/utilizador.model');
+const TipoCasa = require('../models/tipocasa.model');
 
 // Controller actions
 const getAllCasas = async (req, res) => {
     try {
-        const casas = await Casa.findAll();
+        const casas = await Casa.findAll({
+            include: {
+                model: TipoCasa,
+                attributes: ['tipo_casa']
+            }
+        });
         res.json(casas);
     } catch (error) {
         res.status(500).json({ error: 'Failed to retrieve casas' });
@@ -14,7 +20,12 @@ const getAllCasas = async (req, res) => {
 const getCasaById = async (req, res) => {
     const { id } = req.params;
     try {
-        const casa = await Casa.findByPk(id);
+        const casa = await Casa.findByPk(id, {
+            include: {
+                model: TipoCasa,
+                attributes: ['tipo_casa']
+            }
+        });
         if (casa) {
             res.json(casa);
         } else {
@@ -26,33 +37,43 @@ const getCasaById = async (req, res) => {
 };
 
 const createCasa = async (req, res) => {
-    const { utilizador_id, nome, endereco, tipo_casa, data_criacao, data_ultalteracao } = req.body;
+    const { utilizador_id, nome, endereco, tipo_casa_id, precopormetro, pessoas, data_criacao, data_ultalteracao } = req.body;
     try {
         const casa = await Casa.create({
             utilizador_id,
             nome,
             endereco,
-            tipo_casa,
+            tipo_casa_id,
+            pessoas,
+            precopormetro,
             data_criacao,
             data_ultalteracao
         });
         res.status(201).json(casa);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to create casa' });
+        console.error(error);
+        res.status(500).json({ error: error, message: 'Failed to create casa'});
     }
 };
 
 const updateCasa = async (req, res) => {
     const { id } = req.params;
-    const { utilizador_id, nome, endereco, tipo_casa, data_criacao, data_ultalteracao } = req.body;
+    const { utilizador_id, nome, endereco, tipo_casa_id, precopormetro, pessoas, data_criacao, data_ultalteracao } = req.body;
     try {
-        const casa = await Casa.findByPk(id);
+        const casa = await Casa.findByPk(id, {
+            include: {
+                model: TipoCasa,
+                attributes: ['tipo_casa']
+            }
+        });
         if (casa) {
             await casa.update({
                 utilizador_id,
                 nome,
                 endereco,
-                tipo_casa,
+                tipo_casa_id,
+                pessoas,
+                precopormetro,
                 data_criacao,
                 data_ultalteracao
             });
@@ -64,6 +85,7 @@ const updateCasa = async (req, res) => {
         res.status(500).json({ error: 'Failed to update casa' });
     }
 };
+
 
 const deleteCasa = async (req, res) => {
     const { id } = req.params;
