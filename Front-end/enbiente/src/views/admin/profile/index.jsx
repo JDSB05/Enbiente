@@ -61,6 +61,33 @@ export default function Overview() {
 
     fetchData();
   }, []);
+  function handleSubirFicheiro(acceptedFiles) {
+    // Criar um objeto FormData para enviar os arquivos
+    const formData = new FormData();
+  
+    // Adicionar os arquivos aceitos ao objeto FormData
+    acceptedFiles.forEach((file, index) => {
+      formData.append(`file${index + 1}`, file);
+    });
+  
+    // Enviar os arquivos para a API
+
+
+    api.post('/upload', formData)
+      .then(response => {
+        if (response.status === 200) {
+          console.log('Arquivos enviados com sucesso!');
+          // Adicionar lógica adicional aqui, se necessário
+        } else {
+          console.error('Erro ao enviar arquivos:', response.status);
+          // Lidar com erros de envio aqui, se necessário
+        }
+      })
+      .catch(error => {
+        console.error('Erro ao enviar arquivos:', error);
+        // Lidar com erros de rede aqui, se necessário
+      });
+  }
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       {/* Main Fields */}
@@ -84,11 +111,6 @@ export default function Overview() {
           followers='9.7k'
           following='274'
         />
-        <Storage
-          gridArea={{ base: "2 / 1 / 3 / 2", lg: "1 / 2 / 2 / 3" }}
-          used={25.6}
-          total={50}
-        />
         <Upload
           gridArea={{
             base: "3 / 1 / 4 / 2",
@@ -97,6 +119,8 @@ export default function Overview() {
           minH={{ base: "auto", lg: "420px", "2xl": "365px" }}
           pe='20px'
           pb={{ base: "100px", lg: "20px" }}
+          tema='Tema'
+          handleSubirFicheiro={handleSubirFicheiro}
         />
       </Grid>
       <Grid
