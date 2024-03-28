@@ -57,6 +57,16 @@ exports.login = async (req, res) => {
       }
       const token = jwt.sign(payload, "mudar", { expiresIn: "1d" })
 
+      // Check if it's the first login
+      if (!user.primeiroLogin) {
+        user.primeiroLogin = new Date();
+      }
+
+      // Update last login
+      user.ultimoLogin = new Date();
+
+      await user.save();
+
       return res.status(200).send(
         {
           success: true,
