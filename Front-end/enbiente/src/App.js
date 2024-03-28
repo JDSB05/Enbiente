@@ -9,10 +9,10 @@ import { HashRouter, Route, Switch, Redirect } from 'react-router-dom';
 //import  Dashboard  from './pages/dashboard';
 //import { Create } from './pages/Create';
 import AuthLayout from './layouts/auth';
-import RtlLayout from './layouts/rtl';
 import Login from './views/auth/signIn/index.jsx';
 import Alerts from './views/notfound/index';
-import  Dashboard from './layouts/admin/index';
+import  AdminLayout from './layouts/admin/index';
+import UserLayout from './layouts/user/index';
 //import  RootLayout  from './layouts/RootLayout';
 import Registar from './views/auth/Registar';
 import ForgotPassword from './views/auth/recuperarConta';
@@ -101,8 +101,8 @@ const handleModalClose = () => {
     <HashRouter>
       <Switch>
         <Route path="/auth" component={AuthLayout} />
-        <Route path="/admin" component={Dashboard} />
-        <Route path="/rtl" component={RtlLayout} />
+        <Route path="/admin" component={AdminLayout} />
+        <Route path="/user" component={UserLayout} />
         <Route path="/registar" component={Registar} />
         <Route path="/login" render={() => <Login verificarAutenticacao={verificarAutenticacao} />} />
         <Route path="/404" component={Alerts} />
