@@ -10,6 +10,20 @@ export default function GeneralInformation(props) {
   const [isLoading, setIsLoading] = React.useState(false);
   const [tipoClienteValor, setTipoClienteValor] = React.useState("");
   
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await api.get('/utilizador/' + localStorage.getItem('utilizador_id'));
+        setNome(response.data.nome);
+        setTelemovel(response.data.telemovel);
+        setTipoClienteValor(response.data.tipo_cliente_id);
+      } catch (error) {
+        console.error("Erro ao buscar dados:", error);
+      }
+    };
+    fetchData();
+  }, []);
+
   function submit() {
     setIsLoading(true);
     try {
@@ -103,7 +117,7 @@ export default function GeneralInformation(props) {
               placeholder="Selecione o tipo de cliente"
               variant="auth"
               border="1px"
-              value={tipoCliente.tipo_cliente_id} // Alterando para acessar diretamente o ID
+              value={tipoClienteValor} // Alterando para acessar diretamente o ID
               onChange={(event) => setTipoClienteValor(event.target.value)} // Atualizando para armazenar o ID no estado
             >
               {tipoCliente.map((tipo, index) => (
