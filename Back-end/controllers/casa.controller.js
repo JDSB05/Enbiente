@@ -4,13 +4,25 @@ const TipoCasa = require('../models/tipocasa.model');
 
 // Controller actions
 const getAllCasas = async (req, res) => {
+    const { utilizador } = req.query;
     try {
-        const casas = await Casa.findAll({
-            include: {
-                model: TipoCasa,
-                attributes: ['tipo_casa']
-            }
-        });
+        let casas;
+        if (utilizador) {
+            casas = await Casa.findAll({
+                where: { utilizador_id: utilizador },
+                include: {
+                    model: TipoCasa,
+                    attributes: ['tipo_casa']
+                }
+            });
+        } else {
+            casas = await Casa.findAll({
+                include: {
+                    model: TipoCasa,
+                    attributes: ['tipo_casa']
+                }
+            });
+        }
         res.json(casas);
     } catch (error) {
         res.status(500).json({ error: 'Failed to retrieve casas' });

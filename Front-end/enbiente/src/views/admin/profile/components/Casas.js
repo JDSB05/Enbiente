@@ -37,11 +37,10 @@ export default function Projects(props) {
   const [pessoas, setPessoas] = useState('');
   const [tipoCasa, setTipoCasa] = useState([]);
   const [editedFields, setEditedFields] = useState({});
-  var numero = 1;
   useEffect(() => {
     const fetchCasas = async () => {
       try {
-        const response = await api.get('/casas');
+        const response = await api.get('/casas?utilizador=' + localStorage.getItem('utilizador_id'));
         setCasas(response.data);
       } catch (error) {
         console.log(error);
