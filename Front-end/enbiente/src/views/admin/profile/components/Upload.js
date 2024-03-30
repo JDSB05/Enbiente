@@ -26,6 +26,7 @@ export default function Upload(props) {
   const borderColor = useColorModeValue("secondaryGray.100", "whiteAlpha.100");
   const [uploadedFile, setUploadedFile] = useState(null);
   const [imagem, setImagem] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSelectedFile = (event) => {
     const file = event.target.files[0];
@@ -46,8 +47,10 @@ export default function Upload(props) {
   }
 
   async function handleSubirFicheiro() {
+    setIsLoading(true);
     if (!uploadedFile) {
       showErrorToast("Você precisa selecionar uma imagem!");
+      setIsLoading(false);
       return;
     }
 
@@ -62,14 +65,19 @@ export default function Upload(props) {
           setImagem(urlImagem);
           api.put("/utilizador/" + localStorage.getItem("utilizador_id"), { foto: urlImagem });
           localStorage.setItem("foto", urlImagem);
+          setIsLoading(false);
           window.location.reload();
         }
         // Lógica adicional aqui, se necessário
       } else {
         console.error("Erro ao enviar arquivo:", responseFoto?.status);
+        showErrorToast("Erro ao enviar arquivo! Recarregue a página e tente novamente.");
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Erro ao enviar arquivo:", error);
+      showErrorToast("Erro ao enviar arquivo! Recarregue a página e tente novamente.");
+      setIsLoading(false);
       // Lidar com erros de rede aqui, se necessário
     }
   }
@@ -124,6 +132,7 @@ export default function Upload(props) {
               mt={{ base: "20px", "2xl": "auto" }}
               variant='brand'
               fontWeight='500'
+              isLoading={isLoading}
               onClick={(event) => handleSubirFicheiro(event)}>
               Salvar
             </Button>
