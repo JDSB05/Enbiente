@@ -28,6 +28,7 @@ import { FaEthereum } from 'react-icons/fa';
 import routes from '../../routes.js';
 import { ThemeEditor } from './ThemeEditor';
 import  FixedPlugin  from '../fixedPlugin/FixedPlugin';
+import { Redirect, Switch } from 'react-router-dom/cjs/react-router-dom.min';
 export default function HeaderLinks(props) {
 	const { secondary } = props;
 	const { colorMode, toggleColorMode } = useColorMode();
@@ -46,6 +47,7 @@ export default function HeaderLinks(props) {
 		'14px 17px 40px 4px rgba(112, 144, 176, 0.18)',
 		'14px 17px 40px 4px rgba(112, 144, 176, 0.06)'
 	);
+	const cargo = localStorage.getItem('cargo');
 	const borderButton = useColorModeValue('secondaryGray.500', 'whiteAlpha.200');
 	const btnRef = React.useRef();
 	const fotolink = localStorage.getItem('foto');
@@ -57,6 +59,11 @@ export default function HeaderLinks(props) {
 		localStorage.removeItem('token');
 		localStorage.removeItem('foto');
 		window.location.href = '#/login';
+	}
+	function gotoPerfil() {
+		if (cargo === '1') window.location.href = '#/admin/profile';
+		else if (cargo === '2') window.location.href = '#/user/profile';
+		else if (cargo === '3') window.location.href = '#/admin/profile';
 	}
 	return (
 		<Flex
@@ -150,7 +157,7 @@ export default function HeaderLinks(props) {
 						</Text>
 					</Flex>
 					<Flex flexDirection="column" p="10px">
-						<MenuItem _hover={{ bg: 'none' }} _focus={{ bg: 'none' }} borderRadius="8px" px="14px">
+						<MenuItem _hover={{ bg: 'none' }} _focus={{ bg: 'none' }} borderRadius="8px" px="14px" onClick={gotoPerfil}>
 							<Text fontSize="sm">Definições do perfil</Text>
 						</MenuItem>
 						<MenuItem _hover={{ bg: 'none' }} _focus={{ bg: 'none' }} borderRadius="8px" px="14px">
