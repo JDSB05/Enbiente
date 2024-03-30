@@ -1,14 +1,19 @@
-// Chakra imports
 import { Button, Flex, Input, useColorModeValue } from "@chakra-ui/react";
 // Assets
 import React from "react";
 import { useDropzone } from "react-dropzone";
 
-function Dropzone(props) {
-  const { content, ...rest } = props;
-  const { getRootProps, getInputProps } = useDropzone();
+const Dropzone = (props) => {
+  const { content, handleSelectedFile, ...rest } = props; // Adicionei onChange às props
+  const { getRootProps, getInputProps } = useDropzone({
+    ...rest,
+    onDrop: (acceptedFiles) => {
+      handleSelectedFile({ target: { files: acceptedFiles } }); // Call handleSelectedFile here
+    },
+  });
   const bg = useColorModeValue("gray.100", "navy.700");
   const borderColor = useColorModeValue("secondaryGray.100", "whiteAlpha.100");
+  
   return (
     <Flex
       align='center'
@@ -23,8 +28,10 @@ function Dropzone(props) {
       cursor='pointer'
       {...getRootProps({ className: "dropzone" })}
       {...rest}>
-      <Input variant='main' {...getInputProps()} />
-      <Button variant='no-effects'>{content}</Button>
+
+      {/* Adicione o onChange ao componente Input */}
+      <Input variant='main' onChange={handleSelectedFile} {...getInputProps()} />
+      <Button variant='no-effects' >{content}</Button>
     </Flex>
   );
 }

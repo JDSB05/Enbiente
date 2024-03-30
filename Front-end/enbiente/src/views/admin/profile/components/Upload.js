@@ -5,50 +5,73 @@ import {
   Icon,
   Text,
   useColorModeValue,
+  Input
 } from "@chakra-ui/react";
 import Card from "../../../../components/card/Card.js";
-import React from "react";
+import React, { useState } from "react";
 import { MdUpload } from "react-icons/md";
 import Dropzone from "../../../../views/admin/profile/components/Dropzone";
 import api from "../../../../services/api";
+import { useToast } from "../../../../components/toasts/toast.js";
 
 export default function Upload(props) {
-  const { tema, uploadedFile, ...rest } = props;
+  const { tema, ...rest } = props;
 
   // Chakra Color Mode
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const brandColor = useColorModeValue("brand.500", "white");
+  const { showErrorToast } = useToast();
 
-  function handleSubirFicheiro(acceptedFiles) {
-    // Verificar se acceptedFiles não é undefined antes de iterá-lo
-    if (!acceptedFiles) {
-      console.error('Nenhum arquivo aceito foi fornecido.');
+  const bg = useColorModeValue("gray.100", "navy.700");
+  const borderColor = useColorModeValue("secondaryGray.100", "whiteAlpha.100");
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const [imagem, setImagem] = useState(null);
+
+  const handleSelectedFile = (event) => {
+    const file = event.target.files[0];
+    console.log("Ficheiro selecionado:", event.target.files[0]);
+    if (file && file.type.startsWith("image/")) {
+      if (file.size > 5000000) {
+        showErrorToast("O arquivo deve ter menos de 5MB, escolha outro ficheiro!");
+        event.target.value = "";
+      } else {
+        setUploadedFile(file);
+        const temporaryUrl = URL.createObjectURL(file);
+        console.log("Imagem selecionada:", file);
+      }
+    } else {
+      showErrorToast("Utilize o formato de ficheiro correto!");
+      event.target.value = "";
+    }
+  }
+
+  async function handleSubirFicheiro() {
+    if (!uploadedFile) {
+      showErrorToast("Você precisa selecionar uma imagem!");
       return;
     }
 
-    // Criar um objeto FormData para enviar os arquivos
     const formData = new FormData();
+    formData.append("imagem", uploadedFile);
+    try {
+      const responseFoto = await api.post("/imagem", formData);
 
-    // Adicionar os arquivos aceitos ao objeto FormData
-    acceptedFiles.forEach((file, index) => {
-      formData.append(`file${index + 1}`, file);
-    });
-
-    // Enviar os arquivos para a API
-    api.post('/upload', formData)
-      .then(response => {
-        if (response.status === 200) {
-          console.log('Arquivos enviados com sucesso!');
-          // Adicionar lógica adicional aqui, se necessário
-        } else {
-          console.error('Erro ao enviar arquivos:', response.status);
-          // Lidar com erros de envio aqui, se necessário
+      if (responseFoto && responseFoto.status === 200) {
+        if (responseFoto.data.message) {
+          const urlImagem = responseFoto.data.message;
+          setImagem(urlImagem);
+          api.put("/utilizador/" + localStorage.getItem("utilizador_id"), { foto: urlImagem });
+          localStorage.setItem("foto", urlImagem);
+          window.location.reload();
         }
-      })
-      .catch(error => {
-        console.error('Erro ao enviar arquivos:', error);
-        // Lidar com erros de rede aqui, se necessário
-      });
+        // Lógica adicional aqui, se necessário
+      } else {
+        console.error("Erro ao enviar arquivo:", responseFoto?.status);
+      }
+    } catch (error) {
+      console.error("Erro ao enviar arquivo:", error);
+      // Lidar com erros de rede aqui, se necessário
+    }
   }
 
   return (
@@ -59,17 +82,26 @@ export default function Upload(props) {
           me='36px'
           maxH={{ base: "60%", lg: "50%", "2xl": "100%" }}
           minH={{ base: "60%", lg: "50%", "2xl": "100%" }}
+          handleSelectedFile={handleSelectedFile}
           content={
             <Box>
-              <Icon as={MdUpload} w='80px' h='80px' color={brandColor} />
-              <Flex justify='center' mx='auto' mb='12px'>
+              {uploadedFile ? (
                 <Text fontSize='xl' fontWeight='700' color={brandColor}>
-                  Subir ficheiro
+                  Imagem Carregada!
                 </Text>
-              </Flex>
-              <Text fontSize='sm' fontWeight='500' color='secondaryGray.500'>
-                PNG, JPG e GIF são permitidos
-              </Text>
+              ) : (
+                <Box>
+                  <Icon as={MdUpload} w='80px' h='80px' color={brandColor} />
+                  <Flex justify='center' mx='auto' mb='12px'>
+                    <Text fontSize='xl' fontWeight='700' color={brandColor}>
+                      Subir ficheiro
+                    </Text>
+                  </Flex>
+                  <Text fontSize='sm' fontWeight='500' color='secondaryGray.500'>
+                    PNG, JPG e GIF são permitidos
+                  </Text>
+                </Box>
+              )}
             </Box>
           }
         />
@@ -78,7 +110,7 @@ export default function Upload(props) {
             <Text
               color={textColorPrimary}
               fontWeight='bold'
-              textAlign='center'  
+              textAlign='center'
               fontSize='2xl'
               mt={{ base: "20px", "2xl": "50px" }}>
               {tema}
@@ -92,9 +124,10 @@ export default function Upload(props) {
               mt={{ base: "20px", "2xl": "auto" }}
               variant='brand'
               fontWeight='500'
-              onClick={() => handleSubirFicheiro(uploadedFile)}>
+              onClick={(event) => handleSubirFicheiro(event)}>
               Salvar
             </Button>
+
           </Flex>
         </Flex>
       </Flex>

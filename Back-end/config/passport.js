@@ -13,7 +13,7 @@ const opts = {
 passport.use(new JwtStrategy(opts, async function(jwt_payload, done) {
     try {
         const user = await UserModel.findByPk(jwt_payload.id, {
-            attributes: ['utilizador_id', 'cargo_id', 'email', 'nome', 'email']
+            attributes: ['utilizador_id', 'cargo_id', 'email', 'nome', 'foto']
         });
         if (user) {
             return done(null, { message: user, success: true });

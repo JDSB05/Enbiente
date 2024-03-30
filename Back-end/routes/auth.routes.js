@@ -39,11 +39,11 @@ router.get('/checktoken', (req, res, next) => {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
     
-    const { utilizador_id, cargo_id, email, nome } = user.message;
+    const { utilizador_id, cargo_id, email, nome, foto } = user.message;
     console.log(user.message); // Log user details
     res.status(200).json({
       success: true,
-      message: { utilizador_id, cargo_id, email, nome, email }
+      message: { utilizador_id, cargo_id, email, nome, email, foto }
     });
   })(req, res, next);
 });

@@ -4,8 +4,9 @@ import Card from "../../../../components/card/Card.js";
 import React from "react";
 
 export default function Banner(props) {
-  const { banner, avatar, nome, email, posts, followers, following } = props;
+  const { banner, avatar, nome, email, posts, followers, following, fotolink } = props;
   // Chakra Color Mode
+
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "gray.400";
   const borderColor = useColorModeValue(
@@ -24,6 +25,7 @@ export default function Banner(props) {
       <Avatar
         mx='auto'
         name={nome}
+        src={fotolink}
         h='87px'
         w='87px'
         mt='-43px'

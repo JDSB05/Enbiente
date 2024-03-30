@@ -129,7 +129,6 @@ exports.register = async (req, res) => {
     req.body.TokenEmail = token;
     email_sender.verificarEmail(req.body.email, token);
     req.body.cargo_id = 1;
-    req.body.Foto = 'https://res.cloudinary.com/dr2x19yhh/image/upload/v1681211694/foto-padrao.jpg.jpg';
     const data = await Utilizador.create(req.body);
     res.send({
       message: data,

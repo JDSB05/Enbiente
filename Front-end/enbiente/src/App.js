@@ -73,6 +73,7 @@ const handleModalClose = () => {
         localStorage.setItem('utilizador_id', response.data.message.utilizador_id);
         localStorage.setItem('cargo', response.data.message.cargo_id);
         localStorage.setItem('email', response.data.message.email);
+        localStorage.setItem('foto', response.data.message.foto);
         if (!isAuthenticated) {
           setIsAuthenticated(true);
         }
