@@ -85,7 +85,7 @@ const updateUtilizador = async (req, res) => {
     }
 
     // Extract updated data from request body
-    const { nome, email, password, cargo_id, tipo_cliente_id, primeiroLogin, ultimoLogin, estado, telemovel } = req.body;
+    const { nome, email, password, cargo_id, tipo_cliente_id, primeiroLogin, ultimoLogin, estado, telemovel, foto } = req.body;
 
     // Update the Utilizador
     await utilizador.update({
@@ -97,7 +97,8 @@ const updateUtilizador = async (req, res) => {
       primeiroLogin,
       ultimoLogin,
       estado,
-      telemovel
+      telemovel,
+      foto
     });
 
     // Send the updated Utilizador as response

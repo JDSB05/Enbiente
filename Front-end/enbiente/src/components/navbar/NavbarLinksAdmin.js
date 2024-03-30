@@ -48,12 +48,14 @@ export default function HeaderLinks(props) {
 	);
 	const borderButton = useColorModeValue('secondaryGray.500', 'whiteAlpha.200');
 	const btnRef = React.useRef();
+	const fotolink = localStorage.getItem('foto');
 	function logout() {
 		localStorage.removeItem('email');
 		localStorage.removeItem('utilizador_id');
 		localStorage.removeItem('cargo');
 		localStorage.removeItem('utilizador_nome');
 		localStorage.removeItem('token');
+		localStorage.removeItem('foto');
 		window.location.href = '#/login';
 	}
 	return (
@@ -125,6 +127,7 @@ export default function HeaderLinks(props) {
 						_hover={{ cursor: 'pointer' }}
 						color="white"
 						name={nome === 'Francisca' ? 'Princesa' : nome}
+						src={fotolink}
 						bg="#11047A"
 						size="sm"
 						w="40px"

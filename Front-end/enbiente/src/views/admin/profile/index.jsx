@@ -43,6 +43,8 @@ export default function Overview() {
   const [tipoCliente, setTipoCliente] = useState([]);
   const [tipoClienteValor, setTipoClienteValor] = useState("");
   const [telemovel, setTelemovel] = useState("");
+  const [imagem, setImagem] = useState("");
+  const fotolink = localStorage.getItem('foto');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,33 +63,7 @@ export default function Overview() {
 
     fetchData();
   }, []);
-  function handleSubirFicheiro(acceptedFiles) {
-    // Criar um objeto FormData para enviar os arquivos
-    const formData = new FormData();
   
-    // Adicionar os arquivos aceitos ao objeto FormData
-    acceptedFiles.forEach((file, index) => {
-      formData.append(`file${index + 1}`, file);
-    });
-  
-    // Enviar os arquivos para a API
-
-
-    api.post('/upload', formData)
-      .then(response => {
-        if (response.status === 200) {
-          console.log('Arquivos enviados com sucesso!');
-          // Adicionar lógica adicional aqui, se necessário
-        } else {
-          console.error('Erro ao enviar arquivos:', response.status);
-          // Lidar com erros de envio aqui, se necessário
-        }
-      })
-      .catch(error => {
-        console.error('Erro ao enviar arquivos:', error);
-        // Lidar com erros de rede aqui, se necessário
-      });
-  }
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       {/* Main Fields */}
@@ -107,6 +83,7 @@ export default function Overview() {
           avatar={avatar}
           nome={nome1}
           email={email}
+          fotolink={fotolink}
           posts='17'
           followers='9.7k'
           following='274'
@@ -119,8 +96,8 @@ export default function Overview() {
           minH={{ base: "auto", lg: "420px", "2xl": "365px" }}
           pe='20px'
           pb={{ base: "100px", lg: "20px" }}
-          tema='Tema'
-          handleSubirFicheiro={handleSubirFicheiro}
+          tema='Faça upload de uma foto de perfil'
+          foto={imagem}
         />
       </Grid>
       <Grid
