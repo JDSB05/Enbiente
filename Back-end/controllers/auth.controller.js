@@ -8,8 +8,6 @@ const auth = require('../config/passport')
 const email_sender = require("../config/email-body");
 const { func } = require('joi');
 
-  const website = process.env.WEBSITE || 'https://enbiente.netlify.app'
-
 exports.login = async (req, res) => {
 
   let user;
@@ -336,43 +334,43 @@ exports.resetPassword = async function (req, res) {
 };
 
 
-exports.disableUser  =  async (req, res) =>
-{
+exports.disableUser = async (req, res) => {
   const utilizador_id = req.params.utilizador_id;
-  if(!utilizador_id)
-  {
-    req.status(400).send(
-      {
-        success: false,
-        message: "utilizador_id não fornecido"
-      }
-    )
+  if (!utilizador_id) {
+    return res.status(400).send({
+      success: false,
+      message: "utilizador_id não fornecido"
+    });
   }
   try {
     const allowedFields = ['estado']; // definir os campos permitidos
-    user = await Utilizador.findOne({ where: { utilizador_id : utilizador_id } });
+    const user = await Utilizador.findOne({ where: { utilizador_id: utilizador_id } });
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: `Impossível encontrar o usuário de id: ${utilizador_id}.`
+      });
+    }
     const updates = Object.keys(req.body).filter(field => allowedFields.includes(field)); // filtra somente os campos permitidos
     const result = await Utilizador.update(req.body, {
       where: { utilizador_id: utilizador_id },
       fields: updates // utiliza apenas os campos permitidos
     });
-      if (result[0] === 0) {
-        res.status(404).send({
-          success: false,
-          message: `Impossível encontrar o usuário de id: ${utilizador_id}.`
-        });
-      } else {
-        res.send({
-          success: true,
-          message: "Usuário mudado de estado com sucesso!"
-        })
-      }
-    } catch (error) {
-      res.status(500).send({
+    if (result[0] === 0) {
+      return res.status(404).send({
         success: false,
-        message: `Erro ao mudar estado do usuário: ${error} `
-      })
+        message: `Impossível encontrar o usuário de id: ${utilizador_id}.`
+      });
     }
-
+    return res.send({
+      success: true,
+      message: "Usuário mudado de estado com sucesso!"
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: `Erro ao mudar estado do usuário: ${error}`
+    });
   }
+}
 

@@ -15,8 +15,6 @@ router.post('/', utilizadorController.createUtilizador);
 // Update a casa by id
 router.put('/:id', utilizadorController.updateUtilizador);
 
-// Delete a casa by id
-router.delete('/:id', utilizadorController.deleteUtilizador);
 
 module.exports = app => {
     app.use("/api/utilizador", router);

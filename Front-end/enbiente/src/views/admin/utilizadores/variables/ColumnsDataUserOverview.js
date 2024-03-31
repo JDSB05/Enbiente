@@ -1,27 +1,31 @@
 export const columnsDataUsersOverview = [
     {
-      Header: "USER NAME",
-      accessor: "name",
+      Header: "Foto",
+      accessor: "foto",
     },
     {
-      Header: "EMAIL",
+      Header: "Nome",
+      accessor: "nome",
+    },
+    {
+      Header: "Email",
       accessor: "email",
     },
     {
-      Header: "USERNAME",
-      accessor: "username",
+      Header: "Telemovel",
+      accessor: "telemovel",
     },
     {
-      Header: "JOIN DATE",
-      accessor: "date",
+      Header: "Ultimo Login",
+      accessor: "ultimoLogin",
     },
     {
-      Header: "USER TYPE",
-      accessor: "type",
+      Header: "Estado",
+      accessor: "estado",
     },
     {
-      Header: "ACTIONS",
-      accessor: "actions",
+      Header: "",
+      accessor: "a",
     },
   ];
   

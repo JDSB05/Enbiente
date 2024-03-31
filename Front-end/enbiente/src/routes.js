@@ -8,7 +8,7 @@ import {
   MdLock,
   MdOutlineShoppingCart,
 } from "react-icons/md";
-
+import { FaUserGroup } from "react-icons/fa6";
 // Admin Imports
 import MainDashboard from "./views/admin/default";
 import NFTMarketplace from "./views/admin/marketplace";
@@ -83,7 +83,7 @@ const routes = [
     name: "Utilizadores",
     layout: "/admin",
     path: "/utilizadores",
-    icon: <Icon as={MdPerson} width='20px' height='20px' color='inherit' />,
+    icon: <Icon as={FaUserGroup} width='20px' height='20px' color='inherit' />,
     component: UsersOverview,
   },
 ];
