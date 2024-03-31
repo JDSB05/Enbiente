@@ -25,7 +25,7 @@ module.exports = app => {
 
   router.route("/requestresetpassword").post(authController.requestResetPassword)
 
-  router.route("/disableuser/:nusuario").put(authController.disableUser);
+  router.route("/disableuser/:utilizador_id").put(authController.disableUser);
 
 // Rota de verificação de token
 router.get('/checktoken', (req, res, next) => {

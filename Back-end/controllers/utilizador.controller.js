@@ -33,15 +33,29 @@ const createUtilizador = async (req, res) => {
 // Controller for getting all Utilizadors
 const getAllUtilizadores = async (req, res) => {
   try {
-    // Retrieve all Utilizadors from the database
-    const utilizadors = await Utilizador.findAll();
+    // Retrieve the orderby parameter from the query string
+    const orderby = req.query.orderby;
+    const utilizador_id = req.query.utilizador_id;
+
+    // Set the order option based on the orderby parameter
+    const order = orderby === 'ASC' ? 'DESC' : 'ASC';
+
+    // Set the where condition based on the utilizador_id parameter
+    const where = utilizador_id ? { utilizador_id } : {};
+
+    // Retrieve all Utilizadors from the database with the specified order and where condition
+    const utilizadores = await Utilizador.findAll({
+      attributes: { exclude: ['password', 'TokenEmail'] },
+      order: [['utilizador_id', order]],
+      where
+    });
 
     // Send the Utilizadors as response
-    res.json(utilizadors);
+    res.json(utilizadores);
   } catch (error) {
     // Handle error
     console.error(error);
-    res.status(500).json({ error: "Failed to retrieve Utilizadors" });
+    res.status(500).json({ error: "Failed to retrieve Utilizadores" });
   }
 };
 
@@ -85,18 +99,13 @@ const updateUtilizador = async (req, res) => {
     }
 
     // Extract updated data from request body
-    const { nome, email, password, cargo_id, tipo_cliente_id, primeiroLogin, ultimoLogin, estado, telemovel, foto } = req.body;
+    const { nome, cargo_id, tipo_cliente_id, telemovel, foto } = req.body;
 
     // Update the Utilizador
     await utilizador.update({
       nome,
-      email,
-      password,
       cargo_id,
       tipo_cliente_id,
-      primeiroLogin,
-      ultimoLogin,
-      estado,
       telemovel,
       foto
     });
@@ -110,36 +119,11 @@ const updateUtilizador = async (req, res) => {
   }
 };
 
-// Controller for deleting a Utilizador by ID
-const deleteUtilizador = async (req, res) => {
-  try {
-    // Extract Utilizador ID from request parameters
-    const { id } = req.params;
 
-    // Find the Utilizador by ID
-    const utilizador = await Utilizador.findByPk(id);
-
-    // Check if Utilizador exists
-    if (!utilizador) {
-      return res.status(404).json({ error: "Utilizador not found" });
-    }
-
-    // Delete the Utilizador
-    await utilizador.destroy();
-
-    // Send success message as response
-    res.json({ message: "Utilizador deleted successfully" });
-  } catch (error) {
-    // Handle error
-    console.error(error);
-    res.status(500).json({ error: "Failed to delete Utilizador" });
-  }
-};
 
 module.exports = {
   createUtilizador,
   getAllUtilizadores,
   getUtilizadorById,
-  updateUtilizador,
-  deleteUtilizador
+  updateUtilizador
 };
