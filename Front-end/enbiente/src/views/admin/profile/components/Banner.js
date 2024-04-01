@@ -4,7 +4,7 @@ import Card from "../../../../components/card/Card.js";
 import React from "react";
 
 export default function Banner(props) {
-  const { banner, avatar, nome, email, posts, followers, following, fotolink } = props;
+  const { banner, nome, email, casas, volumetotalconsumido, eurosgastos, fotolink } = props;
   // Chakra Color Mode
 
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
@@ -14,7 +14,7 @@ export default function Banner(props) {
     "#111C44 !important"
   );
   return (
-    <Card mb={{ base: "0px", lg: "20px" }} align='center'>
+    <Card mb={{ base: "0px", lg: "20px" }} maxH={{base:"auto", lg:"100%"}} align='center'>
       <Box
         bg={`url(${banner})`}
         bgSize='cover'
@@ -41,7 +41,7 @@ export default function Banner(props) {
       <Flex w='100%' mx='auto' mt='26px'>
         <Flex mx='auto'  align='left' direction='column' w='33%'>
           <Text color={textColorPrimary} fontSize='2xl' fontWeight='700'>
-            {posts}
+            {casas}
           </Text>
           <Text color={textColorSecondary} fontSize='sm' fontWeight='400'>
             Casas
@@ -49,7 +49,7 @@ export default function Banner(props) {
         </Flex>
         <Flex mx='auto'  align='center' direction='column' w='33%'>
           <Text color={textColorPrimary} fontSize='2xl' fontWeight='700'>
-            {followers}
+            {volumetotalconsumido}
           </Text>
           <Text color={textColorSecondary} fontSize='sm' fontWeight='400'>
             Volume total consumido
@@ -57,7 +57,7 @@ export default function Banner(props) {
         </Flex>
         <Flex mx='auto' align='right' direction='column' w='33%'>
           <Text color={textColorPrimary} fontSize='2xl' fontWeight='700'>
-            {following}
+            {eurosgastos}
           </Text>
           <Text color={textColorSecondary} fontSize='sm' fontWeight='400'>
             Euros gastos

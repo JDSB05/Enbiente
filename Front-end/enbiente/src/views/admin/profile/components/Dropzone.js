@@ -31,7 +31,7 @@ const Dropzone = (props) => {
 
       {/* Adicione o onChange ao componente Input */}
       <Input variant='main' onChange={handleSelectedFile} {...getInputProps()} />
-      <Button variant='no-effects' >{content}</Button>
+      <Button variant='no-effects' h='auto' >{content}</Button>
     </Flex>
   );
 }
