@@ -13,7 +13,7 @@ import { FaUserGroup } from "react-icons/fa6";
 import MainDashboard from "./views/admin/default";
 import NFTMarketplace from "./views/admin/marketplace";
 import Profile from "./views/admin/profile";
-import DataTables from "./views/admin/dataTables";
+import Consumos from "./views/admin/consumos";
 import UsersOverview from "./views/admin/utilizadores";
 
 // Auth Imports
@@ -56,14 +56,14 @@ const routes = [
     layout: "/admin",
     icon: <Icon as={MdBarChart} width='20px' height='20px' color='inherit' />,
     path: "/data-tables",
-    component: DataTables,
+    component: Consumos,
   },
   {
     name: "Consumos",
     layout: "/user",
     icon: <Icon as={MdBarChart} width='20px' height='20px' color='inherit' />,
     path: "/data-tables",
-    component: DataTables,
+    component: Consumos,
   },
   {
     name: "Perfil",

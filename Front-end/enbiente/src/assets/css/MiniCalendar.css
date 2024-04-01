@@ -100,9 +100,15 @@ abbr[title] {
   border-bottom-right-radius: 10px;
   color: white;
 }
+.react-calendar__tile:disabled{
+  cursor: not-allowed;
+}
 
 /* DARK MODE */
-
+body.chakra-ui-dark .react-calendar__tile:disabled{
+  background-color: rgba(82, 82, 82, 0.453);
+  cursor: not-allowed;
+}
 body.chakra-ui-dark .react-calendar {
   border-radius: 30px;
 }

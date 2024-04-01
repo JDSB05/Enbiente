@@ -1,10 +1,12 @@
 const Consumo = require('../models/consumos.model');
 const Casa = require('../models/casa.model');
+const Utilizador = require('../models/utilizador.model');
 const sequelize  = require('sequelize'); // Add this line to import the Op object from Sequelize
 // Controller actions
 const getAllConsumos = async (req, res) => {
     const tipo = req.query.tipo;
     const casa = req.query.casa;
+    const utilizador = req.query.utilizador_id;
     try {
         let consumos;
         let consumoTotals = 0;
@@ -77,18 +79,38 @@ const getAllConsumos = async (req, res) => {
         }
         
         else if (tipo === 'consumosporcasa' && casa) {
+            
             consumos = await Consumo.findAll({
+                include: {
+                    model: Casa,
+                    attributes: ['nome', 'precopormetro'], // Incluir nome e precopormetro da Casa
+                    where: {
+                        utilizador_id: utilizador
+                    }
+                },
                 where: {
                     casa_id: casa
                 },
-                attributes: ['casa_id', 'data_consumo', 'volume_consumido', 'valor'],
+                attributes: ['casa_id', 'data_consumo', 'volume_consumido'],
                 raw: true,  
             });
             res.json(consumos);
         }else {
             // Caso contrário, buscar todos os consumos
-            consumos = await Consumo.findAll();
-            res.json(consumos);
+            console.log('utilizador: ');
+            console.log(utilizador);
+            consumos = await Consumo.findAll({
+                include: {
+                  model: Casa,
+                  attributes: ['nome' , 'precopormetro'], // Incluir nome e precopormetro da Casa
+                  where: {
+                    utilizador_id: utilizador // Filtrar casas pelo utilizador_id
+                  }
+                },
+                attributes: ['casa_id', 'data_consumo', 'volume_consumido'],
+                raw: true,
+              });
+              res.json(consumos);
         }
 
         console.log('consumos: ');
