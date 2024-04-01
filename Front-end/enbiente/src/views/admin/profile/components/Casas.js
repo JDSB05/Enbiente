@@ -167,7 +167,7 @@ export default function Projects(props) {
 
   return (
     <div>
-      <Card mb={{ base: "0px", "2xl": "20px" }}>
+      <Card mb={{ base: "0px", "2xl": "20px" }} height='95.5%'>
         <Flex w='100%' mb='5px'>
           <Flex w='50%' mx='auto' me='60px' align='left' direction='column'>
             <Text
@@ -190,7 +190,7 @@ export default function Projects(props) {
             </Button>
           </Flex>
         </Flex>
-        <div style={{ height: '363px', maxHeight: '363px', width: '100%', overflowY: 'auto', scrollbarWidth: 'none', scrollbarColor: '#888 transparent' }}>
+        <div style={{ height: 'fill-content', width: '100%', overflowY: '50%', scrollbarWidth: 'none', scrollbarColor: '#888 transparent' }}>
           {casas.length === 0 ? (
             <Flex justifyContent='center' alignItems='center' h='100%'>
               <Text color={textColorPrimary} fontWeight='bold' fontSize='2xl' mt='10px' mb='4px'>

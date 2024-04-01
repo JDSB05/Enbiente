@@ -69,7 +69,7 @@ export default function Overview() {
       {/* Main Fields */}
       <Grid
         templateColumns={{
-          base: "1fr",
+          base: "2fr",
           lg: "1.34fr 1fr 1.62fr",
         }}
         templateRows={{
@@ -88,17 +88,18 @@ export default function Overview() {
           followers='9.7k'
           following='274'
         />
-        <Upload
-          gridArea={{
-            base: "3 / 1 / 4 / 2",
-            lg: "1 / 3 / 2 / 4",
-          }}
-          minH={{ base: "auto", lg: "420px", "2xl": "365px" }}
-          pe='20px'
-          pb={{ base: "100px", lg: "20px" }}
-          tema='Faça upload de uma foto de perfil'
-          foto={imagem}
-        />
+        <General
+            gridArea={{ base: "2 / 1 / 4 / 4", lg: "1 / 2 / 2 / 4" }}
+            minH='365px'
+            marginBottom='20px'
+            nome={nome ? nome : ""}
+            telemovel={telemovel ? telemovel : ""}
+            tipoCliente={tipoCliente ? tipoCliente : []} // Certifique-se de passar um array vazio
+            setNome={setNome}
+            setTelemovel={setTelemovel}
+            setTipoCliente={setTipoClienteValor}
+          />
+        
       </Grid>
       <Grid
         mb='20px'
@@ -123,17 +124,17 @@ export default function Overview() {
           followers='9.7k'
           following='274'
         />
-        <General
-            gridArea={{ base: "2 / 1 / 3 / 2", lg: "1 / 2 / 2 / 3" }}
-            minH='365px'
-            pe='20px'
-            nome={nome ? nome : ""}
-            telemovel={telemovel ? telemovel : ""}
-            tipoCliente={tipoCliente ? tipoCliente : []} // Certifique-se de passar um array vazio
-            setNome={setNome}
-            setTelemovel={setTelemovel}
-            setTipoCliente={setTipoClienteValor}
-          />
+        <Upload
+          gridArea={{
+            base: "2 / 1 / 1 / 2",
+            lg: "1 / 2 / 1 / 2",
+          }}
+          minH={{ base: "auto", lg: "420px", "2xl": "365px" }}
+          pe='20px'
+          pb={{ base: "100px", lg: "20px" }}
+          tema='Faça upload de uma foto de perfil'
+          foto={imagem}
+        />
         <Notifications
           used={25.6}
           total={50}

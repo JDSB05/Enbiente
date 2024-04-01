@@ -5,7 +5,8 @@ import {
   Icon,
   Text,
   useColorModeValue,
-  Input
+  Input, 
+  Image
 } from "@chakra-ui/react";
 import Card from "../../../../components/card/Card.js";
 import React, { useState } from "react";
@@ -86,17 +87,15 @@ export default function Upload(props) {
     <Card {...rest} mb='20px' align='center' p='20px'>
       <Flex h='100%' direction={{ base: "column", "2xl": "row" }}>
         <Dropzone
-          w={{ base: "100%", "2xl": "268px" }}
+          w={{ base: "100%", "2xl": "100%" }}
           me='36px'
-          maxH={{ base: "60%", lg: "50%", "2xl": "100%" }}
-          minH={{ base: "60%", lg: "50%", "2xl": "100%" }}
+          maxH={{ base: "auto", lg: "auto", "2xl": "100%" }}
+          minH={{ base: "auto", lg: "auto", "2xl": "100%" }}
           handleSelectedFile={handleSelectedFile}
           content={
-            <Box>
+            <Box w='auto' h='auto'  alignContent='center' justifyContent='center'>
               {uploadedFile ? (
-                <Text fontSize='xl' fontWeight='700' color={brandColor}>
-                  Imagem Carregada!
-                </Text>
+                <Image src={URL.createObjectURL(uploadedFile)} h='300px'  w='300px' objectFit='contain'alt="Imagem carregada" />
               ) : (
                 <Box>
                   <Icon as={MdUpload} w='80px' h='80px' color={brandColor} />

@@ -61,7 +61,56 @@ function SignIn({ verificarAutenticacao }) {
   const [show, setShow] = React.useState(false);
   const handleClick = () => setShow(!show);
   const [isLoading, setIsLoading] = React.useState(false);
+  let [lembrarConta, setLembrarConta] = React.useState(localStorage.getItem("lembrarConta") === "true");
   
+  React.useEffect(() => {
+    async function checkAuthentication() {
+      const token = localStorage.getItem("token");
+      if (lembrarConta && token) {
+        try {
+          await verificarAutenticacao();
+          const currentHour = new Date().getHours();
+          let greeting = "Boa noite"; // Default greeting
+          if (currentHour >= 5 && currentHour < 12) {
+            greeting = "Bom dia";
+          } else if (currentHour >= 12 && currentHour < 18) {
+            greeting = "Boa tarde";
+          }
+          const nome = localStorage.getItem("utilizador_nome");
+          showSuccessToast(`${greeting}, ${nome}. Seja bem-vind@!`);
+          const cargo = localStorage.getItem("cargo");
+          if (cargo === "1") {
+            history.push("/admin/dashboard");
+          } else if (cargo === "2") {
+            history.push("/user/dashboard");
+          }
+        } catch (error) {
+          // Handle errors, such as authentication failure
+          console.error(error);
+        }
+      } else {
+        // Clear local storage if not remembering account
+        localStorage.removeItem("token");
+        localStorage.removeItem("utilizador_nome");
+        localStorage.removeItem("cargo");
+        localStorage.removeItem("utilizador_id");
+        localStorage.removeItem("foto");
+        localStorage.removeItem("email");
+      }
+    }
+  
+    checkAuthentication();
+  }, [verificarAutenticacao, history, showSuccessToast]);
+
+  const handleLembrarConta = () => {
+    if (lembrarConta) {
+      setLembrarConta(false);
+      localStorage.removeItem("lembrarConta");
+    } else {
+      setLembrarConta(true);
+      localStorage.setItem("lembrarConta", true);
+    }
+  };
   const submit = async (event) => {
     event.preventDefault();
     if (!email || !password) {
@@ -195,6 +244,8 @@ function SignIn({ verificarAutenticacao }) {
               <FormControl display='flex' alignItems='center'>
                 <Checkbox
                   id='remember-login'
+                  value={lembrarConta}
+                  onChange={() => handleLembrarConta()}
                   colorScheme='brandScheme'
                   me='10px'
                 />
