@@ -21,13 +21,18 @@ import {
   ModalBody,
   ModalCloseButton,
   Input,
+  Select
 } from "@chakra-ui/react";
 // Custom components
 import Card from "../../../../components/card/Card";
 import { AndroidLogo, AppleLogo, WindowsLogo } from "../../../../components/icons/Icons";
 import { MdAdd } from "react-icons/md";
 import Menu from "../../../../components/menu/MainMenu";
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
+import  { useToast } from '../../../../components/toasts/toast';
+import api from "../../../../services/api";
+import MiniCalendar from "components/calendar/MiniCalendar";
+import { Redirect } from "react-router-dom/cjs/react-router-dom.min";
 import {
   useGlobalFilter,
   usePagination,
@@ -36,10 +41,30 @@ import {
 } from "react-table";
 
 export default function DevelopmentTable(props) {
+  const { showSuccessToast, showErrorToast, showMessageToast } = useToast();
   const { columnsData, tableData } = props;
-
+  const [casaList, setCasaList] = React.useState([]);
+  const [casaValor, setCasaValor] = React.useState("");
+  const [dataVolumeConsumido, setDataVolumeConsumido] = React.useState(new Date());
+  const [volumeConsumido, setVolumeConsumido] = React.useState("");
+  const [editedFields, setEditedFields] = React.useState({});
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => tableData, [tableData]);
+  useEffect(() => {
+    async function getCasas() {
+      try {
+        const response = await api.get("/casas?utilizador_id=" + localStorage.getItem("utilizador_id"));
+        setCasaList(response.data);
+      } catch (error) {
+        showErrorToast("Erro ao carregar casas");
+      }
+    }
+    getCasas();
+  }, []);
+
+  function handleFieldChange(field, value) {
+    setEditedFields({ ...editedFields, [field]: value });
+  }
 
   const tableInstance = useTable(
     {
@@ -59,23 +84,46 @@ export default function DevelopmentTable(props) {
     prepareRow,
     initialState,
   } = tableInstance;
+
   initialState.pageSize = 11;
 
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const iconColor = useColorModeValue("secondaryGray.500", "white");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
   const textColorPrimary = useColorModeValue("brand.500", "brand.300");
+
   const [isOpen, setIsOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+
   function handleOpenModal() {
     setIsOpen(true);
   };
+
   function handleCloseModal() {
     setIsOpen(false);
+    setCasaValor("");
+    setDataVolumeConsumido(new Date());
+    setVolumeConsumido("");
   };
+  function formatarMes(data) {
+    const opcoes = { month: 'long' }; // ou use 'short' para a abreviação do mês
+    return new Date(data).toLocaleDateString('pt-BR', opcoes);
+  }
   function submit() {
-    setIsOpen(false);
-    
+      setIsLoading(true);
+      api.post("/consumos", {
+        casa_id: casaValor,
+        data_consumo: dataVolumeConsumido,
+        volume_consumido: volumeConsumido
+      }).then(() => {
+        showSuccessToast("Consumo criado com sucesso");
+        setIsLoading(false);
+        handleCloseModal();
+        window.location.reload();
+      }).catch(() => {
+        showErrorToast("Erro ao criar consumo");
+        setIsLoading(false);
+      });
   }
   return (
     <div>
@@ -135,19 +183,20 @@ export default function DevelopmentTable(props) {
                   if (cell.column.Header === "Mês") {
                     data = (
                       <Text color={textColor} fontSize='sm' fontWeight='700'>
-                        {cell.value}
+                        {formatarMes(cell.value)}
                       </Text>
                     );
                   } else if (cell.column.Header === "Casa") {
                     data = (
                       <Text color={textColor} fontSize='sm' fontWeight='700'>
-                        {cell.value}
+                        {cell.row.original['Casa.nome']}
                       </Text>
                     );
                   } else if (cell.column.Header === "Data") {
+                    let date = new Date(cell.row.original.data_consumo).toLocaleString()
                     data = (
                       <Text color={textColor} fontSize='sm' fontWeight='700'>
-                        {cell.value}
+                        {date}
                       </Text>
                     );
                   } else if (cell.column.Header === "Eficiência") {
@@ -187,21 +236,19 @@ export default function DevelopmentTable(props) {
         </Tbody>
       </Table>
     </Card>
-    <Modal isOpen={isOpen} size="2xl" onClose={handleCloseModal}>
+    <Modal isOpen={isOpen} size="xl" onClose={handleCloseModal} >
     <ModalOverlay />
     <ModalContent>
       <ModalHeader>Criar consumo</ModalHeader>
       <ModalCloseButton />
       <ModalBody>
-        Codigo para criar consumo
-        {/* 
         <Text
-          color={textColorPrimary}
+          color={textColor}
           fontWeight='bold'
           fontSize='2xl'
           mt='10px'
           mb='4px'>
-          Insira os dados da casa
+          Insira os dados do consumo
         </Text>
         <div>
           <FormLabel
@@ -213,64 +260,20 @@ export default function DevelopmentTable(props) {
           >
             Casa
           </FormLabel>
-          <Input
-            value={nome}
-            onChange={(event) => setNome(event.target.value)}
-            variant='auth'
-            fontSize='sm'
-            ms={{ base: "0px", md: "0px" }}
-            type='text'
-            placeholder='Nome'
-            fontWeight='500'
-            size='lg'
-            isRequired={true}
-          />
-        </div>
-        <div>
-          <FormLabel
-            display='flex'
-            ms='4px'
-            fontSize='sm'
-            fontWeight='500'
-            color={textColor}
-          >
-            Endereço
-          </FormLabel>
-          <Input
-            value={endereco}
-            onChange={(event) => setEndereco(event.target.value)}
-            variant='auth'
-            fontSize='sm'
-            type='text'
-            placeholder='Rua 1, 1234-567 Lisboa'
-            fontWeight='500'
-            size='lg'
-            isRequired={true}
-          />
-        </div>
-        <div>
-          <FormLabel
-            display='flex'
-            ms='4px'
-            fontSize='sm'
-            fontWeight='500'
-            color={textColor}
-          >
-            Tipo de casa
-          </FormLabel>
           <Select
-            placeholder="Selecione o tipo de casa"
-            variant="auth"
-            border="1px"
-            value={tipoCasaValor}
-            onChange={(event) => setTipoCasaValor(event.target.value)}
-          >
-            {tipoCasa.map((tipo, index) => (
-              <option key={tipo.tipo_casa_id} value={tipo.tipo_casa_id}>
-                {tipo.tipo_casa}
-              </option>
-            ))}
-          </Select>
+                placeholder="Selecione a casa"
+                variant="auth"
+                border="1px"
+                value={casaValor}
+                marginBottom='1%'
+                onChange={(event) => { setCasaValor(event.target.value); handleFieldChange("casa_id", event.target.value);}}
+              >
+                {casaList.map((casa, index) => (
+                  <option key={casa.casa_id} value={casa.casa_id}>
+                    {casa.nome}, {casa.endereco}
+                  </option>
+                ))}
+              </Select>
         </div>
         <div>
           <FormLabel
@@ -280,18 +283,16 @@ export default function DevelopmentTable(props) {
             fontWeight='500'
             color={textColor}
           >
-            Pessoas
+            Data do consumo
           </FormLabel>
-          <Input
-            value={pessoas}
-            onChange={(event) => setPessoas(event.target.value)}
-            variant='auth'
-            fontSize='sm'
-            type='number'
-            placeholder='Número de pessoas'
-            fontWeight='500'
-            size='lg'
+          <MiniCalendar
+            selectRange={false}
+            onChange={(value, event) => setDataVolumeConsumido(value)}
+            value={dataVolumeConsumido}
+            justifyContent="center"
             isRequired={true}
+            maxDate={new Date()}
+            mb='5px'
           />
         </div>
         <div>
@@ -302,15 +303,15 @@ export default function DevelopmentTable(props) {
             fontWeight='500'
             color={textColor}
           >
-            Preço por metro
+            Volume consumido (m³)
           </FormLabel>
           <Input
-            value={precopormetro}
-            onChange={(event) => setPrecopormetro(event.target.value)}
+            value={volumeConsumido}
+            onChange={(event) => setVolumeConsumido(event.target.value)}
             variant='auth'
             fontSize='sm'
             type='number'
-            placeholder='100'
+            placeholder='12.1'
             fontWeight='500'
             size='lg'
             isRequired={true}
@@ -326,144 +327,8 @@ export default function DevelopmentTable(props) {
         </Button>
       </ModalFooter>
     </ModalContent>
-  </Modal><Modal isOpen={isOpen} size="2xl" onClose={handleCloseModal}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Criar casa</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Text
-              color={textColorPrimary}
-              fontWeight='bold'
-              fontSize='2xl'
-              mt='10px'
-              mb='4px'>
-              Insira os dados da casa
-            </Text>
-            <div>
-              <FormLabel
-                display='flex'
-                ms='4px'
-                fontSize='sm'
-                fontWeight='500'
-                color={textColor}
-              >
-                Nome
-              </FormLabel>
-              <Input
-                value={nome}
-                onChange={(event) => setNome(event.target.value)}
-                variant='auth'
-                fontSize='sm'
-                ms={{ base: "0px", md: "0px" }}
-                type='text'
-                placeholder='Nome'
-                fontWeight='500'
-                size='lg'
-                isRequired={true}
-              />
-            </div>
-            <div>
-              <FormLabel
-                display='flex'
-                ms='4px'
-                fontSize='sm'
-                fontWeight='500'
-                color={textColor}
-              >
-                Endereço
-              </FormLabel>
-              <Input
-                value={endereco}
-                onChange={(event) => setEndereco(event.target.value)}
-                variant='auth'
-                fontSize='sm'
-                type='text'
-                placeholder='Rua 1, 1234-567 Lisboa'
-                fontWeight='500'
-                size='lg'
-                isRequired={true}
-              />
-            </div>
-            <div>
-              <FormLabel
-                display='flex'
-                ms='4px'
-                fontSize='sm'
-                fontWeight='500'
-                color={textColor}
-              >
-                Tipo de casa
-              </FormLabel>
-              <Select
-                placeholder="Selecione o tipo de casa"
-                variant="auth"
-                border="1px"
-                value={tipoCasaValor}
-                onChange={(event) => setTipoCasaValor(event.target.value)}
-              >
-                {tipoCasa.map((tipo, index) => (
-                  <option key={tipo.tipo_casa_id} value={tipo.tipo_casa_id}>
-                    {tipo.tipo_casa}
-                  </option>
-                ))}
-              </Select>
-            </div>
-            <div>
-              <FormLabel
-                display='flex'
-                ms='4px'
-                fontSize='sm'
-                fontWeight='500'
-                color={textColor}
-              >
-                Pessoas
-              </FormLabel>
-              <Input
-                value={pessoas}
-                onChange={(event) => setPessoas(event.target.value)}
-                variant='auth'
-                fontSize='sm'
-                type='number'
-                placeholder='Número de pessoas'
-                fontWeight='500'
-                size='lg'
-                isRequired={true}
-              />
-            </div>
-            <div>
-              <FormLabel
-                display='flex'
-                ms='4px'
-                fontSize='sm'
-                fontWeight='500'
-                color={textColor}
-              >
-                Preço por metro
-              </FormLabel>
-              <Input
-                value={precopormetro}
-                onChange={(event) => setPrecopormetro(event.target.value)}
-                variant='auth'
-                fontSize='sm'
-                type='number'
-                placeholder='100'
-                fontWeight='500'
-                size='lg'
-                isRequired={true}
-              />
-            </div>*/}
-          </ModalBody>
-          <ModalFooter>
-            <Button variant='brand' mr={3} isLoading={isLoading} onClick={submit}>
-              Criar
-            </Button>
-            <Button variant="solid" mr={3} onClick={handleCloseModal}>
-              Cancelar
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+  </Modal>
+  
       </div>
   );
 }

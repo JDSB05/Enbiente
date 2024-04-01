@@ -22,24 +22,46 @@
 
 // Chakra imports
 import { Box, SimpleGrid } from "@chakra-ui/react";
-import DevelopmentTable from "../../../views/admin/dataTables/components/DevelopmentTable";
-import CheckTable from "../../../views/admin/dataTables/components/CheckTable";
-import ColumnsTable from "../../../views/admin/dataTables/components/ColumnsTable";
-import ComplexTable from "../../../views/admin/dataTables/components/ComplexTable";
+import DevelopmentTable from "./components/Consumos";
+import CheckTable from "../../../views/admin/consumos/components/CheckTable";
+import ColumnsTable from "../../../views/admin/consumos/components/ColumnsTable";
+import ComplexTable from "../../../views/admin/consumos/components/ComplexTable";
 import {
   columnsDataDevelopment,
   columnsDataCheck,
   columnsDataColumns,
   columnsDataComplex,
-} from "../../../views/admin/dataTables/variables/columnsData";
-import tableDataDevelopment from "../../../views/admin/dataTables/variables/tableDataDevelopment.json";
-import tableDataCheck from "../../../views/admin/dataTables/variables/tableDataCheck.json";
-import tableDataColumns from "../../../views/admin/dataTables/variables/tableDataColumns.json";
-import tableDataComplex from "../../../views/admin/dataTables/variables/tableDataComplex.json";
-import React from "react";
-
+} from "../../../views/admin/consumos/variables/columnsData";
+import tableDataDevelopment from "../../../views/admin/consumos/variables/tableDataDevelopment.json";
+import tableDataCheck from "../../../views/admin/consumos/variables/tableDataCheck.json";
+import tableDataColumns from "../../../views/admin/consumos/variables/tableDataColumns.json";
+import tableDataComplex from "../../../views/admin/consumos/variables/tableDataComplex.json";
+import React, {useEffect} from "react";
+import api from "../../../services/api"
+import { useToast } from '../../../components/toasts/toast';
 export default function Settings() {
-  // Chakra Color Mode
+  const [consumos, setConsumos] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+  const { showSuccessToast, showErrorToast, showMessageToast } = useToast();
+
+  useEffect(() => {
+    async function getConsumos() {
+      setLoading(true);
+      try {
+        const response = await api.get("/consumos?utilizador_id=" + localStorage.getItem("utilizador_id"));
+        setConsumos(response.data);
+        console.log(response.data)
+      } catch (error) {
+        showErrorToast("Erro ao carregar consumos");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (consumos.length === 0) {
+      getConsumos();
+    }
+  }, []);
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       <SimpleGrid
@@ -48,7 +70,7 @@ export default function Settings() {
         spacing={{ base: "20px", xl: "20px" }}>
         <DevelopmentTable
           columnsData={columnsDataDevelopment}
-          tableData={tableDataDevelopment}
+          tableData={consumos}
         />  
       </SimpleGrid>
     </Box>
