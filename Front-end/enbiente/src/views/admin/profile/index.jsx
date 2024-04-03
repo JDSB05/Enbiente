@@ -22,6 +22,7 @@
 
 // Chakra imports
 import { Box, Grid } from "@chakra-ui/react";
+import "../../../index.css";
 import api from "../../../services/api"
 // Custom components
 import Banner from "../../../views/admin/profile/components/Banner";
@@ -45,17 +46,27 @@ export default function Overview() {
   const [telemovel, setTelemovel] = useState("");
   const [imagem, setImagem] = useState("");
   const fotolink = localStorage.getItem('foto');
-
+  let utilizador = localStorage.getItem('utilizador_id');
+  const [quantidadeCasas, setQuantidadeCasas] = useState(0);
+  const [volumeTotalConsumido, setVolumeTotalConsumido] = useState(0);
+  const [eurosGastos, setEurosGastos] = useState(0);
+  const [isLoadingData, setIsLoadingData] = useState(false);
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await api.get('/tipoclientes');
-        const response1 = await api.get('/utilizador/' + localStorage.getItem('utilizador_id'));
+        const response1 = await api.get('/utilizador/' + utilizador);
+        const response2 = await api.get('/consumos?tipo=consumototal&utilizador_id=' + utilizador);
+        console.log(response2.data)
         setTipoCliente(response.data);
         setNome(response1.data.nome);
         setNome1(response1.data.nome)
         setTelemovel(response1.data.telemovel);
         setEmail(response1.data.email);
+        setQuantidadeCasas(response2.data.quantidadeCasas);
+        setVolumeTotalConsumido(response2.data.totalConsumido);
+        setEurosGastos(response2.data.eurosGastos);
+        setIsLoadingData(false);
       } catch (error) {
         console.error("Erro ao buscar dados:", error);
       }
@@ -63,30 +74,31 @@ export default function Overview() {
 
     fetchData();
   }, []);
-  
+  if (isLoadingData)
+  return (<Box pl={{ base: "45%", md: "45%", xl: "45%" }} pt={{ base: "45%", md: "45%", xl: "25%" }}><div className="loader"></div></Box>)
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       {/* Main Fields */}
       <Grid
         templateColumns={{
           base: "2fr",
-          lg: "1.34fr 1fr 1.62fr",
+          lg: "1.34fr 2.62fr",
         }}
         templateRows={{
-          base: "repeat(3, 1fr)",
+          base: "repeat(2, 1fr)",
           lg: "1fr",
         }}
         gap={{ base: "20px", xl: "20px" }}>
         <Banner
-          gridArea='1 / 1 / 2 / 2'
+          gridArea={{ base: "1 / 1 / 1 / 1", lg: '1 / 1 / 2 / 2' }}
           banner={banner}
           avatar={avatar}
           nome={nome1}
           email={email}
           fotolink={fotolink}
-          posts='17'
-          followers='9.7k'
-          following='274'
+          volumetotalconsumido={volumeTotalConsumido + " m³"}
+          casas={quantidadeCasas}
+          eurosgastos={eurosGastos + " €"}
         />
         <General
             gridArea={{ base: "2 / 1 / 4 / 4", lg: "1 / 2 / 2 / 4" }}

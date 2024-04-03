@@ -1,28 +1,28 @@
 
 
 // Chakra imports
-import { Flex } from "@chakra-ui/react";
+import { Flex, Box } from "@chakra-ui/react";
 import Card from "components/card/Card";
 import React, {useEffect} from "react";
 import SearchTableUsers from "./components/SearchTableUsersOverview";
 import { columnsDataUsersOverview } from "./variables/ColumnsDataUserOverview";
 import api from "../../../services/api";
+import "../../../index.css";
 import { useToast } from '../../../components/toasts/toast';
 export default function UsersOverview() {
   const [users, setUsers] = React.useState([]);
-  const [loading, setLoading] = React.useState(false);
+  const [isLoadingData, setIsLoadingData] = React.useState(true);
   const { showSuccessToast, showErrorToast, showMessageToast } = useToast();
 
   useEffect(() => {
     async function getUsers() {
-      setLoading(true);
       try {
         const response = await api.get("/utilizador");
         setUsers(response.data);
       } catch (error) {
         showErrorToast("Erro ao carregar utilizadores");
       } finally {
-        setLoading(false);
+        setIsLoadingData(false);
       }
     }
 
@@ -30,6 +30,8 @@ export default function UsersOverview() {
       getUsers();
     }
   }, []);
+  if (isLoadingData)
+  return (<Box pl={{ base: "45%", md: "45%", xl: "45%" }} pt={{ base: "45%", md: "45%", xl: "25%" }}><div className="loader"></div></Box>)
   return (
     <Flex direction='column' pt={{ sm: "125px", lg: "75px" }}>
       <Card px='0px'>

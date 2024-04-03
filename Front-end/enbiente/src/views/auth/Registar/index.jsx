@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import illustration from "../../../assets/img/auth/auth.png";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { RiEyeCloseLine } from "react-icons/ri";
-import { useHistory } from "react-router-dom";
+import { NavLink, useHistory } from "react-router-dom";
 import api from "../../../services/api";
 import { useToast } from '../../../components/toasts/toast';
 import {
@@ -280,6 +280,18 @@ function Registar() {
               Criar conta
             </Button>
           </FormControl>
+          <Text color={textColorDetails} fontWeight='400' fontSize='14px'>
+              Já tem uma conta?
+              <NavLink to='/login'>
+                <Text
+                  color={textColorBrand}
+                  as='span'
+                  ms='5px'
+                  fontWeight='500'>
+                  Iniciar Sessão
+                </Text>
+              </NavLink>
+            </Text>
         </Flex>
       </Flex>
       <Modal isOpen={showModal} onClose={handleModalClose}>
