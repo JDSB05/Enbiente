@@ -50,7 +50,7 @@ export default function Overview() {
   const [quantidadeCasas, setQuantidadeCasas] = useState(0);
   const [volumeTotalConsumido, setVolumeTotalConsumido] = useState(0);
   const [eurosGastos, setEurosGastos] = useState(0);
-  const [isLoadingData, setIsLoadingData] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(true);
   useEffect(() => {
     const fetchData = async () => {
       try {
