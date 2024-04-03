@@ -43,6 +43,7 @@ import {
   MdBarChart,
   MdFileCopy,
 } from "react-icons/md";
+import "../../../index.css";
 import CheckTable from "../../../views/admin/default/components/CheckTable";
 import ComplexTable from "../../../views/admin/default/components/ComplexTable";
 import DailyTraffic from "../../../views/admin/default/components/DailyTraffic";
@@ -65,14 +66,15 @@ export default function UserReports() {
   const brandColor = useColorModeValue("brand.500", "white");
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
   const [dadosMensuais, setDadosMensuais] = useState([]); 
-  const [poupado, setPoupado] = useState("");
+  const [consumidoNesteMes, setConsumidoNesteMes] = useState("");
   const [poupadoeuros, setPoupadoeuros] = useState("");
   const [valorMesAtual, setValorMesAtual] = useState("");
-  const [poupadoGrowth, setPoupadoGrowth] = useState("");
-  const [volumeMes, setVolumeMes] = useState("");
-  const [balance, setBalance] = useState("");
+  const [valorMesAnterior, setValorMesAnterior] = useState("");
+  const [poupadoPercentagem, setPoupadoPercentagem] = useState("");
   const [newTasks, setNewTasks] = useState("");
   const [totalProjects, setTotalProjects] = useState("");
+  let utilizador_id = localStorage.getItem('utilizador_id');
+  const [isLoadingData, setIsLoadingData] = React.useState(true);
 
   useEffect(() => {
     fetchData();
@@ -80,29 +82,29 @@ export default function UserReports() {
 
   const fetchData = async () => {
     try {
-      const response = await api.get("/consumos?tipo=ultimosconsumos");
+      const response = await api.get("/consumos?tipo=ultimosconsumos&utilizador_id=" + utilizador_id);
       const data = response.data;
-  
+      console.log(data);
       const poupadoValue = parseFloat(data.lastMonthWaterValue); // Convert to number
-      setPoupado(poupadoValue.toFixed(2) + "€"); // Format as currency string
-      setValorMesAtual(data.lastMonthWaterValue + "€");
-      setVolumeMes(data.lastMonthConsumoTotal + " m³");
+      setConsumidoNesteMes(data.totalConsumoMesAtual + " m³")
+      setValorMesAtual(data.totalEurosPagarMesAtual + "€");
+      setValorMesAnterior(data. totalEurosPoupadosMesAnterior + "€");
       const poupadoAnterior = parseFloat(data.penultimateMonthWaterValue); // replace with the actual value of poupado do mês anterior
       const poupadoGrowthValue = (((poupadoValue - poupadoAnterior) / poupadoAnterior) * 100).toFixed(2);
-      setPoupadoGrowth(poupadoGrowthValue);
+      setPoupadoPercentagem(poupadoGrowthValue);
       setPoupadoeuros((poupadoAnterior-poupadoValue).toFixed(2) + "€");
       setNewTasks(data.newTasks);
       setTotalProjects(data.totalProjects);
-      response = await api.get("/consumos?tipo=consumosmensais");
+      setIsLoadingData(false);
+      response = await api.get("/consumos?tipo=consumosmensais&utilizador_id=" + utilizador_id);
       console.log(response);
       setDadosMensuais(response.data);
-
-  
     } catch (error) {
       console.log(error);
     }
   };
-
+  if (isLoadingData)
+  return (<Box pl={{ base: "45%", md: "45%", xl: "45%" }} pt={{ base: "45%", md: "45%", xl: "25%" }}><div className="loader"></div></Box>)
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       <SimpleGrid
@@ -127,7 +129,7 @@ export default function UserReports() {
             />
           }
           name="Consumido neste mês"
-          value={volumeMes}
+          value={consumidoNesteMes}
         />
         <MiniStatistics
           startContent={
@@ -148,7 +150,7 @@ export default function UserReports() {
           name="Valor do mês atual"
           value={valorMesAtual}
         />
-        <MiniStatistics growth={poupadoGrowth} name="Poupado" value={poupadoeuros} />
+        <MiniStatistics growth={poupadoPercentagem} name="Poupado" value={poupadoeuros} />
         <MiniStatistics
           startContent={
             <IconBox
@@ -192,18 +194,7 @@ export default function UserReports() {
           tableData={tableDataCheck}
         />
         <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap="20px">
-          <DailyTraffic />
           <PieCard />
-        </SimpleGrid>
-      </SimpleGrid>
-      <SimpleGrid columns={{ base: 1, md: 1, xl: 2 }} gap="20px" mb="20px">
-        <ComplexTable
-          columnsData={columnsDataComplex}
-          tableData={tableDataComplex}
-        />
-        <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap="20px">
-          <Tasks />
-          <MiniCalendar h="100%" minW="100%" selectRange={false} />
         </SimpleGrid>
       </SimpleGrid>
     </Box>

@@ -66,7 +66,7 @@ function SignIn({ verificarAutenticacao }) {
   React.useEffect(() => {
     async function checkAuthentication() {
       const token = localStorage.getItem("token");
-      if (lembrarConta && token) {
+      if (token) {
         try {
           await verificarAutenticacao();
           const currentHour = new Date().getHours();
@@ -88,29 +88,13 @@ function SignIn({ verificarAutenticacao }) {
           // Handle errors, such as authentication failure
           console.error(error);
         }
-      } else {
-        // Clear local storage if not remembering account
-        localStorage.removeItem("token");
-        localStorage.removeItem("utilizador_nome");
-        localStorage.removeItem("cargo");
-        localStorage.removeItem("utilizador_id");
-        localStorage.removeItem("foto");
-        localStorage.removeItem("email");
       }
     }
   
     checkAuthentication();
   }, [verificarAutenticacao, history, showSuccessToast]);
 
-  const handleLembrarConta = () => {
-    if (lembrarConta) {
-      setLembrarConta(false);
-      localStorage.removeItem("lembrarConta");
-    } else {
-      setLembrarConta(true);
-      localStorage.setItem("lembrarConta", true);
-    }
-  };
+  
   const submit = async (event) => {
     event.preventDefault();
     if (!email || !password) {
@@ -241,23 +225,6 @@ function SignIn({ verificarAutenticacao }) {
               </InputRightElement>
             </InputGroup>
             <Flex justifyContent='space-between' align='center' mb='24px'>
-              <FormControl display='flex' alignItems='center'>
-                <Checkbox
-                  id='remember-login'
-                  value={lembrarConta}
-                  onChange={() => handleLembrarConta()}
-                  colorScheme='brandScheme'
-                  me='10px'
-                />
-                <FormLabel
-                  htmlFor='remember-login'
-                  mb='0'
-                  fontWeight='normal'
-                  color={textColor}
-                  fontSize='sm'>
-                  Manter a conta iniciada
-                </FormLabel>
-              </FormControl>
               <NavLink to='/recuperarconta'>
                 <Text
                   color={textColorBrand}

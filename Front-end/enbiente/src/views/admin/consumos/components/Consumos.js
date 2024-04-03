@@ -53,7 +53,7 @@ export default function DevelopmentTable(props) {
   useEffect(() => {
     async function getCasas() {
       try {
-        const response = await api.get("/casas?utilizador_id=" + localStorage.getItem("utilizador_id"));
+        const response = await api.get('/casas?utilizador=' + localStorage.getItem('utilizador_id'));
         setCasaList(response.data);
       } catch (error) {
         showErrorToast("Erro ao carregar casas");
@@ -111,6 +111,16 @@ export default function DevelopmentTable(props) {
   }
   function submit() {
       setIsLoading(true);
+      if (!casaValor || !dataVolumeConsumido || !volumeConsumido) {
+        showErrorToast("Preencha todos os campos");
+        setIsLoading(false);
+        return;
+      }
+      if (volumeConsumido < 0  || volumeConsumido == 0 ) {
+        showErrorToast("Verifique o volume consumido");
+        setIsLoading(false);
+        return;
+      }
       api.post("/consumos", {
         casa_id: casaValor,
         data_consumo: dataVolumeConsumido,

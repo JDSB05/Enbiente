@@ -39,7 +39,7 @@ const routes = [
   {
     name: "Loja",
     layout: "/admin",
-    path: "/nft-marketplace",
+    path: "/loja",
     icon: (
       <Icon
         as={MdOutlineShoppingCart}
@@ -55,14 +55,14 @@ const routes = [
     name: "Consumos",
     layout: "/admin",
     icon: <Icon as={MdBarChart} width='20px' height='20px' color='inherit' />,
-    path: "/data-tables",
+    path: "/consumos",
     component: Consumos,
   },
   {
     name: "Consumos",
     layout: "/user",
     icon: <Icon as={MdBarChart} width='20px' height='20px' color='inherit' />,
-    path: "/data-tables",
+    path: "/consumos",
     component: Consumos,
   },
   {

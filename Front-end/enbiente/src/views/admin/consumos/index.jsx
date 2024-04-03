@@ -37,16 +37,15 @@ import tableDataCheck from "../../../views/admin/consumos/variables/tableDataChe
 import tableDataColumns from "../../../views/admin/consumos/variables/tableDataColumns.json";
 import tableDataComplex from "../../../views/admin/consumos/variables/tableDataComplex.json";
 import React, {useEffect} from "react";
+import "../../../index.css";
 import api from "../../../services/api"
 import { useToast } from '../../../components/toasts/toast';
 export default function Settings() {
   const [consumos, setConsumos] = React.useState([]);
-  const [loading, setLoading] = React.useState(false);
   const { showSuccessToast, showErrorToast, showMessageToast } = useToast();
-
+  const [isLoadingData, setIsLoadingData] = React.useState(true);
   useEffect(() => {
     async function getConsumos() {
-      setLoading(true);
       try {
         const response = await api.get("/consumos?utilizador_id=" + localStorage.getItem("utilizador_id"));
         setConsumos(response.data);
@@ -54,7 +53,7 @@ export default function Settings() {
       } catch (error) {
         showErrorToast("Erro ao carregar consumos");
       } finally {
-        setLoading(false);
+        setIsLoadingData(false);
       }
     }
 
@@ -62,6 +61,8 @@ export default function Settings() {
       getConsumos();
     }
   }, []);
+  if (isLoadingData)
+  return (<Box pl={{ base: "45%", md: "45%", xl: "45%" }} pt={{ base: "45%", md: "45%", xl: "25%" }}><div className="loader"></div></Box>)
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       <SimpleGrid

@@ -2,6 +2,7 @@ import React from "react";
 import { SimpleGrid, Text, useColorModeValue, Input, FormLabel, FormControl, Select, Button } from "@chakra-ui/react";
 import Card from "../../../../components/card/Card.js";
 import api from "../../../../services/api.js";
+import { useToast } from '../../../../components/toasts/toast';
 
 export default function GeneralInformation(props) {
   const { nome, telemovel, tipoCliente, setNome, setTelemovel, setTipoCliente, ...rest } = props;
@@ -9,6 +10,7 @@ export default function GeneralInformation(props) {
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const [isLoading, setIsLoading] = React.useState(false);
   const [tipoClienteValor, setTipoClienteValor] = React.useState("");
+  const { showErrorToast, showSuccessToast, showMessageToast } = useToast();
   
   React.useEffect(() => {
     const fetchData = async () => {
@@ -19,6 +21,7 @@ export default function GeneralInformation(props) {
         setTipoClienteValor(response.data.tipo_cliente_id);
       } catch (error) {
         console.error("Erro ao buscar dados:", error);
+        showErrorToast("Erro ao buscar dados do usuário.");
       }
     };
     fetchData();
@@ -26,18 +29,60 @@ export default function GeneralInformation(props) {
 
   function submit() {
     setIsLoading(true);
+
+    
+    if (nome.trim() === "") {
+      setIsLoading(false);
+      showErrorToast("Por favor, insira um nome válido.");
+      return;
+  }
+    // Verificar se o nome está vazio
+    if (nome === "") {
+        setIsLoading(false);
+        showErrorToast("Por favor, insira seu nome.");
+        return;
+    }
+
+    // Verificar se o número de telefone está vazio
+    if (telemovel === "") {
+        setIsLoading(false);
+        showErrorToast("Por favor, insira um número de telefone.");
+        return;
+    }
+
+    // Verificar se o número de telefone é um número válido
+    if (isNaN(telemovel) || !/^\d+$/.test(telemovel)) {
+        setIsLoading(false);
+        showErrorToast("Por favor, insira um número de telefone válido.");
+        return;
+    }
+
+    // Verificar se o número de telefone está dentro do intervalo esperado
+    if (telemovel.length < 9 || telemovel.length > 12) {
+        setIsLoading(false);
+        showErrorToast("O número de telefone deve ter entre 9 e 12 dígitos.");
+        return;
+    }
+
+    // Verificar se o tipo de cliente está selecionado
+    if (tipoClienteValor === "") {
+        setIsLoading(false);
+        showErrorToast("Por favor, selecione um tipo de cliente.");
+        return;
+    }
     try {
       console.log(nome, telemovel, tipoCliente); 
       
       api.put('/utilizador/' + localStorage.getItem('utilizador_id'), { nome: nome, telemovel: telemovel, tipo_cliente_id: parseInt(tipoClienteValor)})
         .then(() => {
-          console.log("Dados do usuário atualizados com sucesso!");
+          showSuccessToast("Dados do usuário atualizados com sucesso.");
           setIsLoading(false);
           localStorage.setItem('utilizador_nome', nome);
           window.location.reload();
         })
         .catch(error => {
           console.error("Erro ao atualizar dados do usuário:", error);
+          showErrorToast("Erro ao atualizar dados do usuário.");
           setIsLoading(false);
         });
     } catch (error) {
@@ -80,6 +125,7 @@ export default function GeneralInformation(props) {
             isrequired={true}
           />
         </div>
+        <SimpleGrid columns='2' gap='20px'>
         <div>
           <FormLabel
             display='flex'
@@ -128,6 +174,7 @@ export default function GeneralInformation(props) {
             </Select>
           </FormControl>
         </div>
+        </SimpleGrid>
         <div>
           <Button
             isLoading={isLoading}

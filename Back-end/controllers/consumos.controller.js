@@ -1,7 +1,8 @@
 const Consumo = require('../models/consumos.model');
 const Casa = require('../models/casa.model');
 const Utilizador = require('../models/utilizador.model');
-const sequelize  = require('sequelize'); // Add this line to import the Op object from Sequelize
+const sequelize = require('sequelize'); // Add this line to import the Op object from Sequelize
+const TipoCasa = require('../models/tipocasa.model');
 // Controller actions
 const getAllConsumos = async (req, res) => {
     const tipo = req.query.tipo;
@@ -17,69 +18,70 @@ const getAllConsumos = async (req, res) => {
 
         // Verificar se há query de tipo
         if (tipo === 'ultimosconsumos') {
-            // Se houver, buscar consumos com ordenação e limite
-            consumos = await Consumo.findAll({
-                order: [['casa_id', 'ASC'],['data_consumo', 'DESC']],
-                include: {
-                    model: Casa,
-                    attributes: ['precopormetro'], // Incluir precopormetro da Casa
-                },
-                attributes: ['casa_id', 'data_consumo', 'volume_consumido'],
-                raw: true,
-            });
-
-            // Calcular os totais de consumo e valor total da água
-            consumos.forEach(consumo => {
-                const casaPrecopormetro = consumo['Casa.precopormetro']; // Obter o precopormetro da casa
-                consumoTotals += consumo.volume_consumido;
-                const consumoMonth = new Date(consumo.data_consumo).getMonth();
-                const currentDate = new Date();
-                const currentMonth = currentDate.getMonth();
-                const lastMonth = currentMonth - 1;
-                const penultimateMonth = currentMonth - 2;
-
-                if (consumoMonth === lastMonth) {
-                    lastMonthConsumoTotal += consumo.volume_consumido;
-                    lastMonthWaterValue += consumo.volume_consumido * casaPrecopormetro;
-                } else if (consumoMonth === penultimateMonth) {
-                    penultimateMonthConsumoTotal += consumo.volume_consumido;
-                    penultimateMonthWaterValue += consumo.volume_consumido * casaPrecopormetro;
+            try {
+                let totalConsumoMesAtual = 0;
+                let totalEurosPagarMesAtual = 0;
+                let totalEurosPoupadosMesAnterior = 0;
+                let consumoMesAnterior = 0;
+                let lastMonthVolume = 0;
+                let lastMonthHasConsumption = false;
+        
+                // Buscar todos os consumos com ordenação e limite
+                const consumos = await Consumo.findAll({
+                    order: [['casa_id', 'ASC'], ['data_consumo', 'DESC']],
+                    include: {
+                        model: Casa,
+                        attributes: ['precopormetro'], // Incluir precopormetro da Casa
+                        where: {
+                            utilizador_id: utilizador
+                        }
+                    },
+                    attributes: ['casa_id', 'data_consumo', 'volume_consumido'],
+                    raw: true,
+                });
+        
+                // Iterar sobre os consumos para calcular as diferenças e os euros a pagar
+                consumos.forEach(consumo => {
+                    const casaPrecopormetro = consumo['Casa.precopormetro']; // Obter o precopormetro da casa
+                    const consumoMes = new Date(consumo.data_consumo).getMonth();
+                    const currentDate = new Date();
+                    const currentMonth = currentDate.getMonth();
+                    const lastMonth = currentMonth - 1;
+        
+                    // Verificar se o consumo pertence ao mês atual
+                    if (consumoMes === currentMonth) {
+                        totalConsumoMesAtual += consumo.volume_consumido;
+                    } else if (consumoMes === lastMonth) {
+                        lastMonthVolume += consumo.volume_consumido;
+                        lastMonthHasConsumption = true;
+                    }
+                });
+        
+                // Calcular os euros a pagar no último mês
+                if (lastMonthHasConsumption) {
+                    const diferencaVolume = totalConsumoMesAtual - lastMonthVolume;
+                    totalEurosPagarMesAtual = diferencaVolume * consumos[0]['Casa.precopormetro'];
                 }
-            });
-
-            res.json({
-                consumos,
-                consumoTotals: consumoTotals.toFixed(3),
-                lastMonthConsumoTotal: lastMonthConsumoTotal !== 0 ? lastMonthConsumoTotal.toFixed(3) : 'Sem dados',
-                penultimateMonthConsumoTotal: penultimateMonthConsumoTotal !== 0 ? penultimateMonthConsumoTotal.toFixed(3) : 'Sem dados',
-                lastMonthWaterValue: lastMonthWaterValue.toFixed(2),
-                penultimateMonthWaterValue: penultimateMonthWaterValue.toFixed(2),
-            });
-        }else if (tipo === 'consumosanuais') {
-            const consumosAnuais = await Consumo.findAll({
-                attributes: [
-                    [sequelize.fn('SUM', sequelize.literal('volume_consumido * "Casa"."precopormetro"')), 'preçovolumetotal'],
-                    [sequelize.fn('SUM', sequelize.col('volume_consumido')), 'volumetotalconsumido'],
-                    [sequelize.fn('TO_CHAR', sequelize.col('data_consumo'), 'YYYY-MM'), 'data']
-                ],
-                include: {
-                    model: Casa,
-                    attributes: []
-                },
-                group: [sequelize.fn('TO_CHAR', sequelize.col('data_consumo'), 'YYYY-MM')],
-                raw: true
-            });
-
-            consumosAnuais.forEach(consumo => {
-                consumo['preçovolumetotal'] = parseFloat(consumo['preçovolumetotal'].toFixed(2));
-                consumo['volumetotalconsumido'] = parseFloat(consumo['volumetotalconsumido'].toFixed(3));
-            });
         
-            res.json(consumosAnuais);
+                // Calcular os euros poupados em relação ao mês anterior
+                if (lastMonthHasConsumption && totalConsumoMesAtual < lastMonthVolume) {
+                    const diferencaVolume = lastMonthVolume - totalConsumoMesAtual;
+                    totalEurosPoupadosMesAnterior = diferencaVolume * consumos[0]['Casa.precopormetro'];
+                    console.log('totalEurosPoupadosMesAnterior: ', totalEurosPoupadosMesAnterior);
+                }
+        
+                res.json({
+                    totalConsumoMesAtual,
+                    totalEurosPagarMesAtual,
+                    totalEurosPoupadosMesAnterior
+                });
+            } catch (error) {
+                console.error('Erro ao buscar os últimos consumos:', error);
+                res.status(500).json({ error: 'Internal server error' });
+            }
         }
-        
         else if (tipo === 'consumosporcasa' && casa) {
-            
+
             consumos = await Consumo.findAll({
                 include: {
                     model: Casa,
@@ -92,29 +94,75 @@ const getAllConsumos = async (req, res) => {
                     casa_id: casa
                 },
                 attributes: ['casa_id', 'data_consumo', 'volume_consumido'],
-                raw: true,  
+                raw: true,
             });
             res.json(consumos);
-        }else {
+        } else if (tipo === 'consumototal') {
+            try {
+                // Encontrar todas as casas pertencentes ao utilizador
+                const casas = await Casa.findAll({
+                    attributes: ['casa_id', 'precopormetro'], // Adicionamos 'precopormetro' para poder calcular os euros gastos
+                    where: {
+                        utilizador_id: utilizador
+                    },
+                    raw: true
+                });
+
+                // Verificar se existem casas associadas ao utilizador
+                if (casas.length === 0) {
+                    return res.json({ totalConsumido: 0, eurosGastos: 0, quantidadeCasas: 0 });
+                }
+
+                // Contar a quantidade de casas
+                const quantidadeCasas = casas.length;
+
+                let totalConsumido = 0;
+                let eurosGastos = 0;
+
+                // Iterar sobre todas as casas
+                for (const casa of casas) {
+                    // Encontrar o último consumo da casa atual
+                    const ultimoConsumo = await Consumo.findOne({
+                        where: {
+                            casa_id: casa.casa_id
+                        },
+                        order: [['data_consumo', 'DESC']], // Ordenamos por data descendentemente para obter o último consumo
+                        raw: true
+                    });
+
+                    if (ultimoConsumo) {
+                        totalConsumido += ultimoConsumo.volume_consumido; // Adicionamos o volume consumido ao total
+                        eurosGastos += ultimoConsumo.volume_consumido * casa.precopormetro; // Calculamos os euros gastos
+                    }
+                }
+
+                res.json({ totalConsumido, eurosGastos, quantidadeCasas });
+                console.log(quantidadeCasas, totalConsumido, eurosGastos);
+            } catch (error) {
+                console.error('Erro ao calcular consumo total:', error);
+                res.status(500).json({ error: 'Internal server error' });
+            }
+        }
+        else {
             // Caso contrário, buscar todos os consumos
-            console.log('utilizador: ');
-            console.log(utilizador);
             consumos = await Consumo.findAll({
                 include: {
-                  model: Casa,
-                  attributes: ['nome' , 'precopormetro'], // Incluir nome e precopormetro da Casa
-                  where: {
-                    utilizador_id: utilizador // Filtrar casas pelo utilizador_id
-                  }
+                    model: Casa,
+                    attributes: ['nome', 'precopormetro'], // Incluir nome e precopormetro da Casa
+                    where: {
+                        utilizador_id: utilizador // Filtrar casas pelo utilizador_id
+                    },
+                    include: {
+                        model: TipoCasa,
+                        attributes: ['tipo_casa', 'fator'] // Incluir tipo_casa e fator do TipoCasa
+                    }
                 },
                 attributes: ['casa_id', 'data_consumo', 'volume_consumido'],
                 raw: true,
-              });
-              res.json(consumos);
+            });
+            res.json(consumos);
+            console.log(consumos);
         }
-
-        console.log('consumos: ');
-        console.log(consumos);
     } catch (error) {
         console.error('Erro ao processar requisição:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -125,7 +173,17 @@ const getAllConsumos = async (req, res) => {
 const getConsumoById = async (req, res) => {
     const { id } = req.params;
     try {
-        const consumo = await Consumo.findByPk(id);
+        const consumo = await Consumo.findByPk(id,
+            {
+                include: {
+                    model: Casa,
+                    attributes: ['nome', 'endereco', 'pessoas', 'tipo_casa_id', 'precopormetro'], // Incluir nome, endereco, pessoas, tipo_casa_id e precopormetro da Casa
+                    include: {
+                        model: TipoCasa,
+                        attributes: ['tipo_casa'] // Incluir nome, email e telemovel do Utilizador
+                    }
+                }
+            });
         if (consumo) {
             res.json(consumo);
             console.log(consumo);
@@ -139,9 +197,9 @@ const getConsumoById = async (req, res) => {
 };
 
 const createConsumo = async (req, res) => {
-    const { casa_id, data_consumo, volume_consumido, valor } = req.body;
+    const { casa_id, data_consumo, volume_consumido } = req.body;
     try {
-        const consumo = await Consumo.create({ casa_id, data_consumo, volume_consumido, valor });
+        const consumo = await Consumo.create({ casa_id, data_consumo, volume_consumido });
         res.status(201).json(consumo);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });

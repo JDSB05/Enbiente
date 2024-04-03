@@ -6,3 +6,7 @@ body {
 option {
   color: black;
 }
+
+body.chakra-ui-dark option {
+  color: rgb(255, 255, 255);
+}
