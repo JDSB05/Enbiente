@@ -71,9 +71,9 @@ const getAllConsumos = async (req, res) => {
                 }
         
                 res.json({
-                    totalConsumoMesAtual,
-                    totalEurosPagarMesAtual,
-                    totalEurosPoupadosMesAnterior
+                    totalConsumoMesAtual: totalConsumoMesAtual.toFixed(3),
+                    totalEurosPagarMesAtual: totalEurosPagarMesAtual.toFixed(2),
+                    totalEurosPoupadosMesAnterior: totalEurosPoupadosMesAnterior.toFixed(2)
                 });
             } catch (error) {
                 console.error('Erro ao buscar os últimos consumos:', error);
@@ -137,7 +137,6 @@ const getAllConsumos = async (req, res) => {
                 }
 
                 res.json({ totalConsumido, eurosGastos, quantidadeCasas });
-                console.log(quantidadeCasas, totalConsumido, eurosGastos);
             } catch (error) {
                 console.error('Erro ao calcular consumo total:', error);
                 res.status(500).json({ error: 'Internal server error' });
