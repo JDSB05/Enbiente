@@ -150,7 +150,7 @@ export default function UserReports() {
           name="Valor do mês atual"
           value={valorMesAtual}
         />
-        <MiniStatistics growth={poupadoPercentagem} name="Poupado" value={poupadoeuros} />
+        <MiniStatistics growth={poupadoPercentagem ? poupadoPercentagem : "Sem dados"} name="Poupado" value={poupadoeuros ? poupadoeuros : "Sem dados"} />
         <MiniStatistics
           startContent={
             <IconBox
