@@ -43,7 +43,7 @@ import {
   MdBarChart,
   MdFileCopy,
 } from "react-icons/md";
-import "../../../index.css";
+
 import CheckTable from "../../../views/admin/default/components/CheckTable";
 import ComplexTable from "../../../views/admin/default/components/ComplexTable";
 import DailyTraffic from "../../../views/admin/default/components/DailyTraffic";
@@ -108,7 +108,7 @@ export default function UserReports() {
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       <SimpleGrid
-        columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }}
+        columns={{ base: 1, md: 2, lg: 3, "2xl": 4   }}
         gap="20px"
         mb="20px"
       >
@@ -150,7 +150,7 @@ export default function UserReports() {
           name="Valor do mês atual"
           value={valorMesAtual}
         />
-        <MiniStatistics growth={poupadoPercentagem ? poupadoPercentagem : "Sem dados"} name="Poupado" value={poupadoeuros ? poupadoeuros : "Sem dados"} />
+        <MiniStatistics growth={poupadoPercentagem ? poupadoPercentagem : "Sem dados"} name="Poupado" value={isNaN(poupadoeuros) || !poupadoeuros ? "Sem dados" : poupadoeuros} />
         <MiniStatistics
           startContent={
             <IconBox
@@ -163,39 +163,14 @@ export default function UserReports() {
           name="New Tasks"
           value={newTasks}
         />
-        <MiniStatistics
-          startContent={
-            <IconBox
-              w="56px"
-              h="56px"
-              bg={boxBg}
-              icon={
-                <Icon
-                  w="32px"
-                  h="32px"
-                  as={MdFileCopy}
-                  color={brandColor}
-                />
-              }
-            />
-          }
-          name="Total Projects"
-          value={totalProjects}
-        />
       </SimpleGrid>
 
-      <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap="20px" mb="20px">
+      <SimpleGrid columns={{ base: 1, md: 1, xl: 1 }} gap="20px" mb="20px">
         <TotalSpent data={dadosMensuais} />
-        <WeeklyRevenue />
       </SimpleGrid>
       <SimpleGrid columns={{ base: 1, md: 1, xl: 2 }} gap="20px" mb="20px">
-        <CheckTable
-          columnsData={columnsDataCheck}
-          tableData={tableDataCheck}
-        />
-        <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap="20px">
+          <WeeklyRevenue />
           <PieCard />
-        </SimpleGrid>
       </SimpleGrid>
     </Box>
   );

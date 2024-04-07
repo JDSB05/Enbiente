@@ -37,21 +37,6 @@ const routes = [
     component: MainDashboard,
   },
   {
-    name: "Loja",
-    layout: "/admin",
-    path: "/loja",
-    icon: (
-      <Icon
-        as={MdOutlineShoppingCart}
-        width='20px'
-        height='20px'
-        color='inherit'
-      />
-    ),
-    component: NFTMarketplace,
-    secondary: true,
-  },
-  {
     name: "Consumos",
     layout: "/admin",
     icon: <Icon as={MdBarChart} width='20px' height='20px' color='inherit' />,

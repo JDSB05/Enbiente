@@ -29,6 +29,7 @@ app.use(session({
     saveUninitialized: false
   }));
 // Obtenção de todas os rotas
+app.use(passport.authenticate('session'))
 require("./routes/cargos.routes")(app)
 require("./routes/alerta.routes")(app)
 require("./routes/casa.routes")(app)

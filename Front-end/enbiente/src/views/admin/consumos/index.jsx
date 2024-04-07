@@ -37,7 +37,6 @@ import tableDataCheck from "../../../views/admin/consumos/variables/tableDataChe
 import tableDataColumns from "../../../views/admin/consumos/variables/tableDataColumns.json";
 import tableDataComplex from "../../../views/admin/consumos/variables/tableDataComplex.json";
 import React, {useEffect} from "react";
-import "../../../index.css";
 import api from "../../../services/api"
 import { useToast } from '../../../components/toasts/toast';
 export default function Settings() {

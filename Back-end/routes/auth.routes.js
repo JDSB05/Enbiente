@@ -28,24 +28,10 @@ module.exports = app => {
   router.route("/disableuser/:utilizador_id").put(authController.disableUser);
 
 // Rota de verificação de token
-router.get('/checktoken', (req, res, next) => {
-  passport.authenticate('jwt', { session: false }, (err, user, info) => {
-    if (err) {
-      console.error(err); // Log the error
-      return res.status(500).json({ success: false, message: "Internal Server Error" });
-    }
-    if (!user) {
-      console.error(info.message); // Log the authentication failure message
-      return res.status(401).json({ success: false, message: "Unauthorized" });
-    }
-    
-    const { utilizador_id, cargo_id, email, nome, foto } = user.message;
-    console.log(user.message); // Log user details
-    res.status(200).json({
-      success: true,
-      message: { utilizador_id, cargo_id, email, nome, email, foto }
-    });
-  })(req, res, next);
+router.get('/checktoken', passport.authenticate('jwt', { session: false }), (req, res) => {
+  const { utilizador_id, cargo_id, email, nome, foto } = req.user;
+  res.status(200).json({success: true,
+    message:{ utilizador_id, cargo_id, email, nome, email, foto }});
 });
   app.use("/api/auth", router);
 };

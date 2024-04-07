@@ -1,5 +1,6 @@
 const express = require('express');
 const utilizadorController = require('../controllers/utilizador.controller');
+const middleware = require('../config/middleware');
 
 const router = express.Router();
 
@@ -13,7 +14,7 @@ router.get('/:id', utilizadorController.getUtilizadorById);
 router.post('/', utilizadorController.createUtilizador);
 
 // Update a casa by id
-router.put('/:id', utilizadorController.updateUtilizador);
+router.put('/:utilizador_id', middleware.jwtAuthMiddleware, utilizadorController.updateUtilizador);
 
 
 module.exports = app => {

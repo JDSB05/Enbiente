@@ -26,18 +26,8 @@ export default function Conversion(props) {
         w='100%'
         mb='8px'>
         <Text color={textColor} fontSize='md' fontWeight='600' mt='4px'>
-          Your Pie Chart
+          Percentagem de consumos
         </Text>
-        <Select
-          fontSize='sm'
-          variant='subtle'
-          defaultValue='monthly'
-          width='unset'
-          fontWeight='700'>
-          <option value='daily'>Daily</option>
-          <option value='monthly'>Monthly</option>
-          <option value='yearly'>Yearly</option>
-        </Select>
       </Flex>
 
       <PieChart
@@ -54,8 +44,9 @@ export default function Conversion(props) {
         p='15px'
         px='20px'
         mt='15px'
-        mx='auto'>
-        <Flex direction='column' py='5px'>
+        mx='auto'
+        justifyContent='center'>
+        <Flex direction='column'  py='5px'>
           <Flex align='center'>
             <Box h='8px' w='8px' bg='brand.500' borderRadius='50%' me='4px' />
             <Text

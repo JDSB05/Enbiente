@@ -3,20 +3,35 @@ const Utilizador = require('../models/utilizador.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken')
 const auth = require('../config/passport')
+const Joi = require('joi');
 
 //const transporter = require("../config/nodemailer")
 const email_sender = require("../config/email-body");
 const { func } = require('joi');
 
+
 exports.login = async (req, res) => {
+  if (!req.body.email) {
+    return res.status(400).send({
+      success: false,
+      message: "O email está vazio."
+    })
+  }
+
+  if (!req.body.password) {
+    return res.status(400).send({
+      success: false,
+      message: "A password está vazia."
+    })
+  }
 
   let user;
   try {
     user = await Utilizador.findOne({ where: { email: req.body.email } });
     if (!user) {
-      return res.status(404).send({
+      return res.status(401).send({
         success: false,
-        message: "Email ou password incorretas"
+        message: "O email ou a password estão incorretos."
 
       })
     }
@@ -24,22 +39,17 @@ exports.login = async (req, res) => {
     res.status(500).send(
       {
         success: false,
-        message: "Erro ao verificar email : " + error
+        message: "Erro ao verificar o email: " + error
       }
     )
   }
 
-
-  // Usuário encontrado
-  console.log("usuario encontrado: " + user.email);
-
   // Verifica se o usuário está ativado.
-  if(user.estado === 0)
-  {
-    res.status(500).send(
+  if (user.estado === 0) {
+    res.status(401).send(
       {
         success: false,
-        message: "Utilizador desativado!"
+        message: "A conta está desativada. Por favor, verifique o seu email ou contacte a adminstração."
       }
     )
   }
@@ -54,7 +64,6 @@ exports.login = async (req, res) => {
         id: user.utilizador_id
       }
       const token = jwt.sign(payload, "mudar", { expiresIn: "1d" })
-
       // Check if it's the first login
       if (!user.primeiroLogin) {
         user.primeiroLogin = new Date();
@@ -64,7 +73,6 @@ exports.login = async (req, res) => {
       user.ultimoLogin = new Date();
 
       await user.save();
-
       return res.status(200).send(
         {
           success: true,
@@ -74,7 +82,7 @@ exports.login = async (req, res) => {
     else {
       return res.status(401).send(
         {
-          message: "Email ou password incorretas",
+          message: "O email ou a password estão incorretos.",
           success: false
         })
     }
@@ -82,65 +90,108 @@ exports.login = async (req, res) => {
   } catch (error) {
     res.status(500).send(
       {
-
         message: "Erro de autenticação: " + error,
         success: false
-
       }
-
     );
   }
 }
-
 exports.register = async (req, res) => {
-  console.log("A registar");
-  if (!req.body) {
+
+  const schema = Joi.object({
+    nome: Joi.string().min(3).required().messages({
+      'string.base': 'O nome deve ser uma string válida',
+      'string.empty': 'O nome não pode estar vazio',
+      'string.min': 'O nome deve ter no mínimo {#limit} caracteres'
+    }),
+    email: Joi.string().email().required().messages({
+      'string.base': 'O e-mail deve ser uma string válida',
+      'string.empty': 'O e-mail não pode estar vazio',
+      'string.email': 'O e-mail deve ser um endereço de e-mail válido'
+    }),
+    password: Joi.string().min(6).regex(/^(?=.*[a-zA-Z])(?=.*[0-9])/).required().messages({
+      'string.base': 'A palavra-passe deve ser uma string válida',
+      'string.empty': 'A palavra-passe não pode estar vazia',
+      'string.min': 'A palavra-passe deve ter no mínimo {#limit} caracteres',
+      'string.pattern.base': 'A palavra-passe deve conter pelo menos uma letra e um número'
+    })
+  });
+  
+  const { error } = schema.validate(req.body, { abortEarly: false });
+  
+  if (error) {
+    // Se houver erros de validação, mapear as mensagens de erro e retornar uma resposta com os erros
+    const errorMessages = error.details.map(detail => detail.message);
     return res.status(400).send({
-      message: "Conteudo não pode estar vazio!",
+      message: errorMessages[0],
       success: false
     });
   }
+  
+  // Criar novo Utilizador
+
+
+
+  // Verificar se o email não está cadastrado
   try {
     const user = await Utilizador.findOne({ where: { email: req.body.email } });
     if (user) {
       return res.status(500).send({
         success: false,
-        message: "Email já está cadastrado: " + req.body.email
-      });
+        message: "O email já está registado."
+
+      })
     }
   } catch (error) {
-    console.error("Erro ao verificar email do Usuário:", error); // Log the error
-    return res.status(500).send({
-      success: false,
-      message: "Erro ao verificar email do Usuário"
-    });
+    res.status(500).send(
+      {
+        success: false,
+        message: "Erro ao verificar o email do utilizador: " + error
+      }
+    )
   }
+  // Define o estado = 0, até que verifique o email
+  req.body.estado = 0;
+  // Encriptar password
+  const salt = await bcrypt.genSalt();
+  req.body.password = await bcrypt.hash(req.body.password, salt);
+
+
+  // Criar token para validar email
+  const payload =
+  {
+    email: req.body.email,
+  }
+  const token = jwt.sign(payload, "mudar", { expiresIn: "15m" })
+
+  // Definir token de validação na BD
+  req.body.TokenEmail = token
+
+  // Mandar email de verificação
+  email_sender.verificarEmail(req.body.email, token);
+
+  // Define o cargo padrão como 1 "Admin" (Mudar depois para 2 "Utilizador normal")
+  req.body.cargo_id = 1;
+
+  //Define o tipo de cliente padrão como 1 "Particular"
+  req.body.tipo_cliente_id = 1;
 
   try {
-    req.body.estado = 0;
-    req.body.tipo_cliente_id = 1;
-    const salt = await bcrypt.genSalt();
-    req.body.password = await bcrypt.hash(req.body.password, salt);
-    console.log("password : " + req.body.password);
-    const payload = { email: req.body.email };
-    const token = jwt.sign(payload, "mudar", { expiresIn: "1m" });
-    req.body.TokenEmail = token;
-    email_sender.verificarEmail(req.body.email, token);
-    req.body.cargo_id = 1;
     const data = await Utilizador.create(req.body);
     res.send({
       message: data,
       success: true
-    });
-  } catch (error) {
-    console.error("Erro ao criar usuário:", error); // Log the error
-    return res.status(500).send({
-      message: "Erro ao criar usuário",
-      success: false
-    });
-  }
-};
 
+    });
+
+  } catch (error) {
+    res.status(500).send(
+      {
+        message: "Erro ao criar o utilizador: " + error,
+        success: false
+      })
+  }
+}
 
 exports.validarEmail = async function (req, res) {
   const code = req.query.code;

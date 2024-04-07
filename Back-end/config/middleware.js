@@ -4,15 +4,18 @@ const rateLimit = require('express-rate-limit');
 exports.jwtAuthMiddleware = (req, res, next) => {
     passport.authenticate('jwt', { session: false }, (err, user, info) => {
       if (err) {
-        // Se houver erro, passa o erro para o próximo middleware (ou middleware de tratamento de erro) 
+        // Se houver erro, passa o erro para o próximo middleware (ou middleware de tratamento de erro)
+        console.log("Erro: ", err);
         return next(err);
       }
       if (!user) {
         // Se não houver usuário, retorna uma mensagem de erro
+        console.log("Utilizador não encontrado: ", info);
         return res.status(401).json({ success: false, message: 'Acesso negado! É preciso um token válido.' });
       }
       // Se o usuário for encontrado, adiciona o usuário ao objeto request e passa para o próximo middleware
       req.user = user;
+      
       return next();
     })(req, res, next);
   };
