@@ -12,6 +12,10 @@ export const columnsDataDevelopment = [
     accessor: "dataconsumo",
   },
   {
+    Header: "Consumo",
+    accessor: "volume_consumido",
+  },
+  {
     Header: "Eficiência",
     accessor: "eficiencia",
   },

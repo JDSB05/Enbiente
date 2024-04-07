@@ -22,7 +22,7 @@
 
 // Chakra imports
 import { Box, Grid } from "@chakra-ui/react";
-import "../../../index.css";
+
 import api from "../../../services/api"
 // Custom components
 import Banner from "../../../views/admin/profile/components/Banner";
@@ -88,7 +88,9 @@ export default function Overview() {
           base: "repeat(2, 1fr)",
           lg: "1fr",
         }}
-        gap={{ base: "20px", xl: "20px" }}>
+        gap={{ base: "0px", md: "20px", xl: "20px" }}
+        columnGap={{ base: "0px", md: "20px", xl: "20px" }}
+        rowGap={{ base: "20px", xl:"0px"}}>
         <Banner
           gridArea={{ base: "1 / 1 / 1 / 1", lg: '1 / 1 / 2 / 2' }}
           banner={banner}

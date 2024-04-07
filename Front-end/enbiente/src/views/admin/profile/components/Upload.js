@@ -33,8 +33,8 @@ export default function Upload(props) {
     const file = event.target.files[0];
     console.log("Ficheiro selecionado:", event.target.files[0]);
     if (file && file.type.startsWith("image/")) {
-      if (file.size > 5000000) {
-        showErrorToast("O arquivo deve ter menos de 5MB, escolha outro ficheiro!");
+      if (file.size > 10000000) {
+        showErrorToast("O arquivo deve ter menos de 10MB, escolha outro ficheiro!");
         event.target.value = "";
       } else {
         setUploadedFile(file);

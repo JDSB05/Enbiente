@@ -69,24 +69,24 @@ function SignIn({ verificarAutenticacao }) {
       if (token) {
         try {
           await verificarAutenticacao();
-          const currentHour = new Date().getHours();
-          let greeting = "Boa noite"; // Default greeting
-          if (currentHour >= 5 && currentHour < 12) {
-            greeting = "Bom dia";
-          } else if (currentHour >= 12 && currentHour < 18) {
-            greeting = "Boa tarde";
-          }
-          const nome = localStorage.getItem("utilizador_nome");
-          showSuccessToast(`${greeting}, ${nome}. Seja bem-vind@!`);
-          const cargo = localStorage.getItem("cargo");
-          if (cargo === "1") {
-            history.push("/admin/dashboard");
-          } else if (cargo === "2") {
-            history.push("/user/dashboard");
-          }
         } catch (error) {
-          // Handle errors, such as authentication failure
           console.error(error);
+          localStorage.removeItem("token");
+        }
+        const currentHour = new Date().getHours();
+        let greeting = "Boa noite"; // Default greeting
+        if (currentHour >= 5 && currentHour < 12) {
+          greeting = "Bom dia";
+        } else if (currentHour >= 12 && currentHour < 18) {
+          greeting = "Boa tarde";
+        }
+        const nome = localStorage.getItem("utilizador_nome");
+        showSuccessToast(`${greeting}, ${nome}. Seja bem-vind@!`);
+        const cargo = localStorage.getItem("cargo");
+        if (cargo === "1") {
+          history.push("/admin/dashboard");
+        } else if (cargo === "2") {
+          history.push("/user/dashboard");
         }
       }
     }

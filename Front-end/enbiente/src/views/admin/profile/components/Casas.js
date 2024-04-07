@@ -167,53 +167,52 @@ export default function Projects(props) {
 
   return (
     <div>
-      <Card mb={{ base: "0px", "2xl": "20px" }} height='95.5%'>
-        <Flex w='100%' mb='5px'>
-          <Flex w='50%' mx='auto' me='60px' align='left' direction='column'>
-            <Text
-              color={textColorPrimary}
-              fontWeight='bold'
-              fontSize='2xl'
-              mt='10px'
-              mb='4px'>
-              Casas
-            </Text>
-          </Flex>
-          <Flex w='50%' justifyContent="right" alignItems='center' >
-            <Button
-              w='auto'
-              variant='solid'
-              onClick={handleOpenModal}
-            >
-              <Icon as={MdAdd} color={textColorPrimary} h='15px' w='15px'
-            />
-            </Button>
-          </Flex>
-        </Flex>
-        <div style={{ height: 'fill-content', width: '100%', overflowY: '50%', scrollbarWidth: 'none', scrollbarColor: '#888 transparent' }}>
-          {casas.length === 0 ? (
-            <Flex justifyContent='center' alignItems='center' h='100%'>
-              <Text color={textColorPrimary} fontWeight='bold' fontSize='2xl' mt='10px' mb='4px'>
-                Não existem casas
-              </Text>
-            </Flex>
-          ) : (
-            casas.map(casa => (
-              <Project
-                key={casa.casa_id}
-                boxShadow={cardShadow}
-                mb='20px'
-                nome={casa.nome}
-                endereco={casa.endereco}
-                precopormetro={casa.precopormetro}
-                tipocasa={casa.TipoCasa.tipo_casa}
-                casaid={casa.casa_id}
-                handleOpenModalEditar={() => handleOpenModalEditar(casa)}
-              />
-            ))
-          )}
-        </div>
-      </Card>
+<Card mb={{ base: "0px", "2xl": "20px" }}>
+  <Flex w='100%' mb='5px'>
+    <Flex w='50%' mx='auto' me='60px' align='left' direction='column'>
+      <Text
+        color={textColorPrimary}
+        fontWeight='bold'
+        fontSize='2xl'
+        mt='10px'
+        mb='4px'>
+        Casas
+      </Text>
+    </Flex>
+    <Flex w='50%' justifyContent="right" alignItems='center' >
+      <Button
+        w='auto'
+        variant='solid'
+        onClick={handleOpenModal}
+      >
+        <Icon as={MdAdd} color={textColorPrimary} h='15px' w='15px' />
+      </Button>
+    </Flex>
+  </Flex>
+  <div style={{ width: '100%', maxHeight: '40vh', overflowY: 'auto', scrollbarWidth: 'none', scrollbarColor: '#888 transparent'  }}>
+    {casas.length === 0 ? (
+      <Flex justifyContent='center' alignItems='center' h='100%'>
+        <Text color={textColorPrimary} fontWeight='bold' fontSize='2xl' mt='10px' mb='4px'>
+          Não existem casas
+        </Text>
+      </Flex>
+    ) : (
+      casas.map(casa => (
+        <Project
+          key={casa.casa_id}
+          boxShadow={cardShadow}
+          mb='20px'
+          nome={casa.nome}
+          endereco={casa.endereco}
+          precopormetro={casa.precopormetro}
+          tipocasa={casa.TipoCasa.tipo_casa}
+          casaid={casa.casa_id}
+          handleOpenModalEditar={() => handleOpenModalEditar(casa)}
+        />
+      ))
+    )}
+  </div>
+</Card>
       <Modal isOpen={isOpen} size="2xl" onClose={handleCloseModal}>
         <ModalOverlay />
         <ModalContent>

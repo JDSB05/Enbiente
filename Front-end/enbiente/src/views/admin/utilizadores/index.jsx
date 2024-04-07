@@ -7,7 +7,6 @@ import React, {useEffect} from "react";
 import SearchTableUsers from "./components/SearchTableUsersOverview";
 import { columnsDataUsersOverview } from "./variables/ColumnsDataUserOverview";
 import api from "../../../services/api";
-import "../../../index.css";
 import { useToast } from '../../../components/toasts/toast';
 export default function UsersOverview() {
   const [users, setUsers] = React.useState([]);

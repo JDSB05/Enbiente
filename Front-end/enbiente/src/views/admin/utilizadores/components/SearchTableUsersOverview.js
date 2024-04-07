@@ -524,7 +524,7 @@ import {
               </FormLabel>
               <Input
                 value={telemovel}
-                onChange={(event) => { setTelemovel(event.target.value); handleFieldChange("telemovel", parseInt(event.target.value));}}
+                onChange={(event) => { setTelemovel(event.target.value.toString()); handleFieldChange("telemovel", event.target.value.toString());}}
                 variant='auth'
                 fontSize='sm'
                 type='number'
