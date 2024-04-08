@@ -22,7 +22,7 @@ export default function Upload(props) {
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const brandColor = useColorModeValue("brand.500", "white");
   const { showErrorToast } = useToast();
-
+  const { showSuccessToast } = useToast();
   const bg = useColorModeValue("gray.100", "navy.700");
   const borderColor = useColorModeValue("secondaryGray.100", "whiteAlpha.100");
   const [uploadedFile, setUploadedFile] = useState(null);
@@ -64,10 +64,13 @@ export default function Upload(props) {
         if (responseFoto.data.message) {
           const urlImagem = responseFoto.data.message;
           setImagem(urlImagem);
-          api.put("/utilizador/" + localStorage.getItem("utilizador_id"), { foto: urlImagem });
+          await api.put("/utilizador/" + localStorage.getItem("utilizador_id"), { foto: urlImagem });
           localStorage.setItem("foto", urlImagem);
           setIsLoading(false);
-          window.location.reload();
+          showSuccessToast("Imagem enviada com sucesso!");
+          setTimeout(() => {
+            window.location.reload();
+          }, 1800);
         }
         // Lógica adicional aqui, se necessário
       } else {
