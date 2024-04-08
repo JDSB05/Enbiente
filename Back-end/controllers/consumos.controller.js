@@ -34,7 +34,7 @@ const getAllConsumos = async (req, res) => {
                     attributes: ['casa_id', 'data_consumo', 'volume_consumido'],
                     raw: true,
                 });
-        
+                console.log("Consumos vindos da base de dados:", consumos);
                 // Iterar sobre os consumos para calcular as diferenças e os euros a pagar
                 consumos.forEach(consumo => {
                     const casaPrecopormetro = consumo['Casa.precopormetro']; // Obter o precopormetro da casa
@@ -42,7 +42,10 @@ const getAllConsumos = async (req, res) => {
                     const currentDate = new Date();
                     const currentMonth = currentDate.getMonth();
                     const lastMonth = currentMonth - 1;
-        
+                    console.log('Mês atual:', currentMonth);
+                    console.log('Mês anterior:', lastMonth);
+                    console.log('Mês do consumo:', consumoMes);
+
                     // Verificar se o consumo pertence ao mês atual
                     if (consumoMes === currentMonth) {
                         totalConsumoMesAtual += consumo.volume_consumido;
@@ -50,6 +53,8 @@ const getAllConsumos = async (req, res) => {
                         lastMonthVolume += consumo.volume_consumido;
                         lastMonthHasConsumption = true;
                     }
+                    console.log('Total de consumo no mês atual:', totalConsumoMesAtual);
+                    console.log('Total de consumo no mês anterior:', lastMonthVolume);
                 });
         
                 // Calcular os euros a pagar no último mês
@@ -76,7 +81,10 @@ const getAllConsumos = async (req, res) => {
                     totalConsumoMesAtual,
                     totalEurosPagarMesAtual,
                     totalEurosPoupadosMesAnterior
-                });
+                }); 
+                console.log("Consumo total do mês atual:", totalConsumoMesAtual);
+                console.log("Euros a pagar no mês atual:", totalEurosPagarMesAtual);
+                console.log("Euros poupados no mês anterior:", totalEurosPoupadosMesAnterior);
             } catch (error) {
                 console.error('Erro ao buscar os últimos consumos:', error);
                 res.status(500).json({ error: 'Internal server error' });
