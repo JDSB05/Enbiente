@@ -41,11 +41,12 @@ const getAllConsumos = async (req, res) => {
                     const consumoMes = new Date(consumo.data_consumo).getMonth();
                     const currentDate = new Date();
                     const currentMonth = currentDate.getMonth();
-                    const lastMonth = currentMonth - 1;
+                    const lastMonth = (currentMonth - 1 + 12) % 12; // Para lidar com o mês anterior quando o mês atual é janeiro
+                
                     console.log('Mês atual:', currentMonth);
                     console.log('Mês anterior:', lastMonth);
                     console.log('Mês do consumo:', consumoMes);
-
+                
                     // Verificar se o consumo pertence ao mês atual
                     if (consumoMes === currentMonth) {
                         totalConsumoMesAtual += consumo.volume_consumido;
