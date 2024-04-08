@@ -14,70 +14,60 @@ const getAllConsumos = async (req, res) => {
         // Verificar se há query de tipo
         if (tipo === 'ultimosconsumos') {
             try {
-                let totalConsumoMesAtual = 0;
-                let totalEurosPagarMesAtual = 0;
-                let totalEurosPoupadosMesAnterior = 0;
-                let consumoMesAnterior = 0;
-                let lastMonthVolume = 0;
-                let lastMonthHasConsumption = false;
-        
-                // Buscar todos os consumos com ordenação e limite
                 const consumos = await Consumo.findAll({
                     order: [['casa_id', 'ASC'], ['data_consumo', 'DESC']],
                     include: {
-                        model: Casa,
-                        attributes: ['precopormetro'], // Incluir precopormetro da Casa
-                        where: {
-                            utilizador_id: utilizador
-                        }
+                      model: Casa,
+                      attributes: ['precopormetro'], // Incluir precopormetro da Casa
+                      where: {
+                        utilizador_id: utilizador,
+                      },
                     },
                     attributes: ['casa_id', 'data_consumo', 'volume_consumido'],
                     raw: true,
-                });
-                console.log("Consumos vindos da base de dados:", consumos);
-                // Iterar sobre os consumos para calcular as diferenças e os euros a pagar
-                consumos.forEach(consumo => {
-                    const casaPrecopormetro = consumo['Casa.precopormetro']; // Obter o precopormetro da casa
+                  });
+              
+                  // Obter data atual e mês atual
+                  const currentDate = new Date();
+                  const currentMonth = currentDate.getMonth();
+              
+                  // Variáveis para armazenar os resultados
+                  let totalConsumoMesAtual = 0;
+                  let totalEurosPagarMesAtual = 0;
+                  let totalEurosPoupadosMesAnterior = 0;
+                  let lastMonthVolume = 0;
+                  let lastMonthHasConsumption = false;
+              
+                  // Iterar sobre os consumos para calcular as diferenças e os euros a pagar
+                  consumos.forEach(consumo => {
                     const consumoMes = new Date(consumo.data_consumo).getMonth();
-                    const currentDate = new Date();
-                    const currentMonth = currentDate.getMonth();
-                    const lastMonth = (currentMonth - 1 + 12) % 12; // Para lidar com o mês anterior quando o mês atual é janeiro
-                
-                    console.log('Mês atual:', currentMonth);
-                    console.log('Mês anterior:', lastMonth);
-                    console.log('Mês do consumo:', consumoMes);
-                
-                    // Verificar se o consumo pertence ao mês atual
+              
+                    // Calcular o total de consumo no mês atual
                     if (consumoMes === currentMonth) {
-                        totalConsumoMesAtual += consumo.volume_consumido;
-                    } else if (consumoMes === lastMonth) {
-                        lastMonthVolume += consumo.volume_consumido;
-                        lastMonthHasConsumption = true;
+                      totalConsumoMesAtual += consumo.volume_consumido;
+                    } else if (consumoMes === (currentMonth - 1 + 12) % 12) {
+                      // Mês anterior
+                      lastMonthVolume += consumo.volume_consumido;
+                      lastMonthHasConsumption = true;
                     }
-                    console.log('Total de consumo no mês atual:', totalConsumoMesAtual);
-                    console.log('Total de consumo no mês anterior:', lastMonthVolume);
-                });
-        
-                // Calcular os euros a pagar no último mês
-                if (lastMonthHasConsumption) {
-                    const diferencaVolume = totalConsumoMesAtual - lastMonthVolume;
+                  });
+              
+                  // Calcular os euros a pagar no último mês
+                  if (lastMonthHasConsumption) {
+                    const lastMonthDays = new Date(currentMonth, 0).getDate();
+                    const currentMonthDays = new Date(currentMonth + 1, 0).getDate();
+                    const diferencaVolume = (totalConsumoMesAtual / currentMonthDays) - (lastMonthVolume / lastMonthDays);
                     totalEurosPagarMesAtual = diferencaVolume * consumos[0]['Casa.precopormetro'];
-                }
-        
-                // Calcular os euros poupados em relação ao mês anterior
-                if (lastMonthHasConsumption && totalConsumoMesAtual < lastMonthVolume) {
-                    console.log('Total de consumo no mês anterior:', lastMonthVolume);
-                    console.log('Total de consumo no mês atual:', totalConsumoMesAtual);
-        
+                  }
+              
+                  // Calcular os euros poupados em relação ao mês anterior
+                  if (lastMonthHasConsumption && totalConsumoMesAtual < lastMonthVolume) {
                     const diferencaVolume = lastMonthVolume - totalConsumoMesAtual;
-                    console.log('Diferença de volume entre os meses:', diferencaVolume);
-        
                     const precoPorMetro = consumos[0]['Casa.precopormetro'];
-                    console.log('Preço por metro da casa:', precoPorMetro);
-        
                     totalEurosPoupadosMesAnterior = diferencaVolume * precoPorMetro;
-                }
-        
+                  }
+              
+                  // Retornar os resultados
                 res.json({
                     totalConsumoMesAtual,
                     totalEurosPagarMesAtual,
