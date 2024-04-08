@@ -10,11 +10,6 @@ const getAllConsumos = async (req, res) => {
     const utilizador = req.query.utilizador_id;
     try {
         let consumos;
-        let consumoTotals = 0;
-        let lastMonthConsumoTotal = 0;
-        let penultimateMonthConsumoTotal = 0;
-        let lastMonthWaterValue = 0;
-        let penultimateMonthWaterValue = 0;
 
         // Verificar se há query de tipo
         if (tipo === 'ultimosconsumos') {
@@ -65,15 +60,22 @@ const getAllConsumos = async (req, res) => {
         
                 // Calcular os euros poupados em relação ao mês anterior
                 if (lastMonthHasConsumption && totalConsumoMesAtual < lastMonthVolume) {
+                    console.log('Total de consumo no mês anterior:', lastMonthVolume);
+                    console.log('Total de consumo no mês atual:', totalConsumoMesAtual);
+        
                     const diferencaVolume = lastMonthVolume - totalConsumoMesAtual;
-                    totalEurosPoupadosMesAnterior = diferencaVolume * consumos[0]['Casa.precopormetro'];
-                    console.log('totalEurosPoupadosMesAnterior: ', totalEurosPoupadosMesAnterior);
+                    console.log('Diferença de volume entre os meses:', diferencaVolume);
+        
+                    const precoPorMetro = consumos[0]['Casa.precopormetro'];
+                    console.log('Preço por metro da casa:', precoPorMetro);
+        
+                    totalEurosPoupadosMesAnterior = diferencaVolume * precoPorMetro;
                 }
         
                 res.json({
-                    totalConsumoMesAtual: totalConsumoMesAtual.toFixed(3),
-                    totalEurosPagarMesAtual: totalEurosPagarMesAtual.toFixed(2),
-                    totalEurosPoupadosMesAnterior: totalEurosPoupadosMesAnterior.toFixed(2)
+                    totalConsumoMesAtual,
+                    totalEurosPagarMesAtual,
+                    totalEurosPoupadosMesAnterior
                 });
             } catch (error) {
                 console.error('Erro ao buscar os últimos consumos:', error);

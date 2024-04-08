@@ -64,13 +64,14 @@ export default function Upload(props) {
         if (responseFoto.data.message) {
           const urlImagem = responseFoto.data.message;
           setImagem(urlImagem);
-          await api.put("/utilizador/" + localStorage.getItem("utilizador_id"), { foto: urlImagem });
+          await api.put("/utilizador/" + localStorage.getItem("utilizador_id"), { foto: urlImagem }).then((response) => {
           localStorage.setItem("foto", urlImagem);
+          }).catch((error) => {
+            console.error("Erro ao atualizar foto do utilizador:", error)
+            showErrorToast("Erro ao atualizar foto do utilizador! Recarregue a página e tente novamente.");
+          });
           setIsLoading(false);
-          showSuccessToast("Imagem enviada com sucesso!");
-          setTimeout(() => {
-            window.location.reload();
-          }, 1800);
+          window.location.reload();
         }
         // Lógica adicional aqui, se necessário
       } else {
