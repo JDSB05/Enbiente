@@ -86,7 +86,7 @@ export default function UserReports() {
       const data = response.data;
       console.log(data);
       const poupadoValue = parseFloat(data.lastMonthWaterValue); // Convert to number
-      setConsumidoNesteMes(data.totalConsumoMesAtual + " m³")
+      setConsumidoNesteMes(data.totalConsumoMesAtual)
       setValorMesAtual(data.totalEurosPagarMesAtual + "€");
       setValorMesAnterior(data. totalEurosPoupadosMesAnterior + "€");
       const poupadoAnterior = parseFloat(data.penultimateMonthWaterValue); // replace with the actual value of poupado do mês anterior
@@ -129,7 +129,7 @@ export default function UserReports() {
             />
           }
           name="Consumido neste mês"
-          value={consumidoNesteMes}
+          value={consumidoNesteMes + " m³"}
         />
         <MiniStatistics
           startContent={
@@ -170,7 +170,7 @@ export default function UserReports() {
       </SimpleGrid>
       <SimpleGrid columns={{ base: 1, md: 1, xl: 2 }} gap="20px" mb="20px">
           <WeeklyRevenue />
-          <PieCard />
+          <PieCard  volumeconsumido={consumidoNesteMes}/>
       </SimpleGrid>
     </Box>
   );
