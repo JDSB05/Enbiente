@@ -38,7 +38,7 @@ export default function Footer() {
         {" "}
         &copy; {1900 + new Date().getYear()}
         <Text as='span' fontWeight='500' ms='4px'>
-          AquaTrack. Todos os direitos reservados. Plataforma feita para
+          Hydro Check. Todos os direitos reservados. Plataforma feita para
           <Link
             mx='3px'
             color={textColor}
@@ -60,7 +60,7 @@ export default function Footer() {
             marginLeft={{ base: "0px", lg: "20px" }}
             fontWeight='500'
             color={textColor}
-            href='mailto:geral@enbiente.com?subject=Plataforma AquaTrack'>
+            href='mailto:geral@enbiente.com?subject=Plataforma Hydro Check'>
             Suporte
           </Link>
         </ListItem>
