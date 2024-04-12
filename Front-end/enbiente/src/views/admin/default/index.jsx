@@ -72,37 +72,32 @@ export default function UserReports() {
   const [valorMesAnterior, setValorMesAnterior] = useState("");
   const [poupadoPercentagem, setPoupadoPercentagem] = useState("");
   const [newTasks, setNewTasks] = useState("");
-  const [totalProjects, setTotalProjects] = useState("");
   let utilizador_id = localStorage.getItem('utilizador_id');
   const [isLoadingData, setIsLoadingData] = React.useState(true);
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+       const response = await api.get("/consumos?tipo=ultimosconsumos&utilizador_id=" + utilizador_id);
+       const response2 = await api.get("/consumos?tipo=consumosmensais&utilizador_id=" + utilizador_id);
+       const data = response.data;
+       setConsumidoNesteMes(data.totalConsumoMesAtual)
+       setValorMesAtual(data.totalEurosPagarMesAtual);
+       setValorMesAnterior(parseFloat(data.totalEurosPoupadosMesAnterior));
+       setPoupadoPercentagem(parseFloat(((valorMesAtual - valorMesAnterior) / valorMesAnterior) * 100).toFixed(2));
+       setPoupadoeuros((valorMesAnterior-valorMesAtual).toFixed(2));
+       setNewTasks(null);
+       setDadosMensuais(response2.data);
+       setIsLoadingData(false);
+       
+     } catch (error) {
+       console.log(error);
+     }
+   };
     fetchData();
   }, []);
 
-  const fetchData = async () => {
-    try {
-      const response = await api.get("/consumos?tipo=ultimosconsumos&utilizador_id=" + utilizador_id);
-      const data = response.data;
-      console.log(data);
-      const poupadoValue = parseFloat(data.lastMonthWaterValue); // Convert to number
-      setConsumidoNesteMes(data.totalConsumoMesAtual)
-      setValorMesAtual(data.totalEurosPagarMesAtual + "€");
-      setValorMesAnterior(data. totalEurosPoupadosMesAnterior + "€");
-      const poupadoAnterior = parseFloat(data.penultimateMonthWaterValue); // replace with the actual value of poupado do mês anterior
-      const poupadoGrowthValue = (((poupadoValue - poupadoAnterior) / poupadoAnterior) * 100).toFixed(2);
-      setPoupadoPercentagem(poupadoGrowthValue);
-      setPoupadoeuros((poupadoAnterior-poupadoValue).toFixed(2) + "€");
-      setNewTasks(data.newTasks);
-      setTotalProjects(data.totalProjects);
-      setIsLoadingData(false);
-      response = await api.get("/consumos?tipo=consumosmensais&utilizador_id=" + utilizador_id);
-      console.log(response);
-      setDadosMensuais(response.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  
   if (isLoadingData)
   return (<Box pl={{ base: "45%", md: "45%", xl: "45%" }} pt={{ base: "45%", md: "45%", xl: "25%" }}><div className="loader"></div></Box>)
   return (
@@ -148,9 +143,9 @@ export default function UserReports() {
             />
           }
           name="Valor do mês atual"
-          value={valorMesAtual}
+          value={valorMesAtual + "€"}
         />
-        <MiniStatistics growth={poupadoPercentagem ? poupadoPercentagem : "Sem dados"} name="Poupado" value={isNaN(poupadoeuros) || !poupadoeuros ? "Sem dados" : poupadoeuros} />
+        <MiniStatistics growth={poupadoPercentagem} name="Poupado" value={poupadoeuros + "€"} />
         <MiniStatistics
           startContent={
             <IconBox
