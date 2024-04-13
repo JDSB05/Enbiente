@@ -89,7 +89,7 @@ const getAllConsumos = async (req, res) => {
                 console.log('Total de euros poupados do mês anterior:', totalEurosPoupadosMesAnterior);
         
                 // Agora você pode usar a variável totalConsumoMesAtual conforme necessário
-                res.status(200).json({ totalConsumoMesAtual, totalEurosPagarMesAtual: totalEurosPagarMesAtual.toFixed(2), totalEurosPoupadosMesAnterior: totalEurosPoupadosMesAnterior.toFixed(2) });
+                res.status(200).json({ totalConsumoMesAtual: totalConsumoMesAtual.toFixed(3), totalEurosPagarMesAtual: totalEurosPagarMesAtual.toFixed(2), totalEurosPoupadosMesAnterior: totalEurosPoupadosMesAnterior.toFixed(2) });
             } catch (error) {
                 console.error('Erro ao buscar consumos:', error);
                 res.status(500).send('Erro ao buscar consumos');
