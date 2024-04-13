@@ -45,7 +45,7 @@ const getAllConsumos = async (req, res) => {
                     if (consumosCasa.length >= 2) {
                         const ultimoConsumo = consumosCasa[0];
                         const penultimoConsumo = consumosCasa[1];
-                        const ultimoMes = new Date(ultimoConsumo.data_consumo).getMonth();
+                        const ultimoMes = new Date(ultimoConsumo.data_consumo).getMonth() + 1;
                         console.log('Ultimo mes:', ultimoMes);
                         const penultimoMes = new Date(penultimoConsumo.data_consumo).getMonth();
                         console.log('Penultimo mes:', penultimoMes);
