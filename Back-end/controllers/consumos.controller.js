@@ -69,15 +69,14 @@ const getAllConsumos = async (req, res) => {
                 for (const casa_id in consumosPorCasa) {
                     const consumosCasa = consumosPorCasa[casa_id];
                     if (consumosCasa.length >= 3) { // Considerar apenas se houver pelo menos três consumos
-                        const penultimoConsumo = consumosCasa[1];
-                        const antepenultimoConsumo = consumosCasa[2];
-                        const penultimoMes = new Date(penultimoConsumo.data_consumo).getMonth();
-                        const antepenultimoMes = new Date(antepenultimoConsumo.data_consumo).getMonth();
-                        if (penultimoMes === (antepenultimoMes + 1)) {
+                        const penultimoConsumo = consumosCasa.find(consumo => moment(consumo.data_consumo).month() === moment().subtract(1, 'month').month());
+                        const antepenultimoConsumo = consumosCasa.find(consumo => moment(consumo.data_consumo).month() === moment().subtract(2, 'month').month());
+                        if (penultimoConsumo && antepenultimoConsumo) {
                             diferencaVolumeConsumidoAnterior[casa_id] = penultimoConsumo.volume_consumido - antepenultimoConsumo.volume_consumido;
                         }
                     }
                 }
+
                 // Calcular o total de euros poupados do mês anterior
                 const totalEurosPoupadosMesAnterior = Object.entries(diferencaVolumeConsumidoAnterior).reduce((acc, [casa_id, diferencaVolume]) => {
                     const precoPorMetro = consumosPorCasa[casa_id][0]['Casa.precopormetro']; // Acessando o precopormetro da casa correspondente
