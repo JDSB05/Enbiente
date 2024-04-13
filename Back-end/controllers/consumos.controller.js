@@ -1,3 +1,4 @@
+const moment = require('moment');
 const Consumo = require('../models/consumos.model');
 const Casa = require('../models/casa.model');
 const Utilizador = require('../models/utilizador.model');
@@ -43,17 +44,14 @@ const getAllConsumos = async (req, res) => {
                 for (const casa_id in consumosPorCasa) {
                     const consumosCasa = consumosPorCasa[casa_id];
                     if (consumosCasa.length >= 2) {
-                        const ultimoConsumo = consumosCasa[0];
-                        const penultimoConsumo = consumosCasa[1];
-                        console.log('Último consumo:', ultimoConsumo.data_consumo);
-                        console.log('Date do ultimo consumo:', new Date(ultimoConsumo.data_consumo));
-                        const ultimoMes = new Date(ultimoConsumo.data_consumo).getMonth();
-                        console.log('Ultimo mes:', ultimoMes);
-                        const penultimoMes = new Date(penultimoConsumo.data_consumo).getMonth();
-                        console.log('Penultimo mes:', penultimoMes);
-                        if (ultimoMes === (penultimoMes + 1)) {
-                            diferencaVolumeConsumido[casa_id] = ultimoConsumo.volume_consumido - penultimoConsumo.volume_consumido;
-                            console.log('Diferença de volume consumido:', diferencaVolumeConsumido[casa_id]);
+                        const ultimoConsumoMesAtual = consumosCasa.find(consumo => moment(consumo.data_consumo).month() === moment().month());
+                        console.log("Mes do ultimo consumo" + moment(ultimoConsumoMesAtual.data_consumo).month())
+                        console.log('Ultimo consumo do mês atual:', ultimoConsumoMesAtual);
+                        const penultimoConsumoMesAnterior = consumosCasa.find(consumo => moment(consumo.data_consumo).month() === (moment().month() - 1 + 12) % 12);
+                        console.log("Mes do penultimo consumo" + moment(penultimoConsumoMesAnterior.data_consumo).month())
+                        console.log('Penultimo consumo do mês anterior:', penultimoConsumoMesAnterior);
+                        if (ultimoConsumoMesAtual && penultimoConsumoMesAnterior) {
+                            diferencaVolumeConsumido[casa_id] = ultimoConsumoMesAtual.volume_consumido - penultimoConsumoMesAnterior.volume_consumido;
                         }
                     }
                 }
