@@ -46,9 +46,12 @@ const getAllConsumos = async (req, res) => {
                         const ultimoConsumo = consumosCasa[0];
                         const penultimoConsumo = consumosCasa[1];
                         const ultimoMes = new Date(ultimoConsumo.data_consumo).getMonth();
+                        console.log('Ultimo mes:', ultimoMes);
                         const penultimoMes = new Date(penultimoConsumo.data_consumo).getMonth();
+                        console.log('Penultimo mes:', penultimoMes);
                         if (ultimoMes === (penultimoMes + 1)) {
                             diferencaVolumeConsumido[casa_id] = ultimoConsumo.volume_consumido - penultimoConsumo.volume_consumido;
+                            console.log('Diferença de volume consumido:', diferencaVolumeConsumido[casa_id]);
                         }
                     }
                 }
