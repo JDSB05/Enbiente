@@ -1,24 +1,3 @@
-/*!
-  _   _  ___  ____  ___ ________  _   _   _   _ ___   
- | | | |/ _ \|  _ \|_ _|__  / _ \| \ | | | | | |_ _| 
- | |_| | | | | |_) || |  / / | | |  \| | | | | || | 
- |  _  | |_| |  _ < | | / /| |_| | |\  | | |_| || |
- |_| |_|\___/|_| \_\___/____\___/|_| \_|  \___/|___|
-                                                                                                                                                                                                                                                                                                                                       
-=========================================================
-* Horizon UI - v1.1.0
-=========================================================
-
-* Product Page: https://www.horizon-ui.com/
-* Copyright 2023 Horizon UI (https://www.horizon-ui.com/)
-
-* Designed and Coded by Simmmple
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 
 // Chakra imports
 import { Box, SimpleGrid } from "@chakra-ui/react";
@@ -39,10 +18,12 @@ import tableDataComplex from "../../../views/admin/consumos/variables/tableDataC
 import React, {useEffect} from "react";
 import api from "../../../services/api"
 import { useToast } from '../../../components/toasts/toast';
+import { useUser } from '../../../UserProvider';
 export default function Settings() {
   const [consumos, setConsumos] = React.useState([]);
   const { showSuccessToast, showErrorToast, showMessageToast } = useToast();
   const [isLoadingData, setIsLoadingData] = React.useState(true);
+  const { updateComponent } = useUser();
   useEffect(() => {
     async function getConsumos() {
       try {
@@ -55,11 +36,8 @@ export default function Settings() {
         setIsLoadingData(false);
       }
     }
-
-    if (consumos.length === 0) {
       getConsumos();
-    }
-  }, []);
+  }, [updateComponent]);
   if (isLoadingData)
   return (<Box pl={{ base: "45%", md: "45%", xl: "45%" }} pt={{ base: "45%", md: "45%", xl: "25%" }}><div className="loader"></div></Box>)
   return (

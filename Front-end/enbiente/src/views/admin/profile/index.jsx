@@ -1,29 +1,7 @@
-/*!
-  _   _  ___  ____  ___ ________  _   _   _   _ ___   
- | | | |/ _ \|  _ \|_ _|__  / _ \| \ | | | | | |_ _| 
- | |_| | | | | |_) || |  / / | | |  \| | | | | || | 
- |  _  | |_| |  _ < | | / /| |_| | |\  | | |_| || |
- |_| |_|\___/|_| \_\___/____\___/|_| \_|  \___/|___|
-                                                                                                                                                                                                                                                                                                                                       
-=========================================================
-* Horizon UI - v1.1.0
-=========================================================
-
-* Product Page: https://www.horizon-ui.com/
-* Copyright 2023 Horizon UI (https://www.horizon-ui.com/)
-
-* Designed and Coded by Simmmple
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
 // Chakra imports
 import { Box, Grid } from "@chakra-ui/react";
-
-import api from "../../../services/api"
+import { useUser } from "../../../UserProvider.js";
+import api from "../../../services/api";
 // Custom components
 import Banner from "../../../views/admin/profile/components/Banner";
 import General from "../../../views/admin/profile/components/General";
@@ -40,17 +18,19 @@ import React, { useState, useEffect } from "react";
 export default function Overview() {
   const [nome, setNome] = useState("");
   const [nome1, setNome1] = useState("");
-	const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("");
   const [tipoCliente, setTipoCliente] = useState([]);
   const [tipoClienteValor, setTipoClienteValor] = useState("");
   const [telemovel, setTelemovel] = useState("");
   const [imagem, setImagem] = useState("");
+  const { fotoUsuario } = useUser(); // Usando apenas o fotoUsuario do contexto
   const fotolink = localStorage.getItem('foto');
-  let utilizador = localStorage.getItem('utilizador_id');
+  const utilizador = localStorage.getItem('utilizador_id'); // Obtendo o id do utilizador do localStorage
   const [quantidadeCasas, setQuantidadeCasas] = useState(0);
   const [volumeTotalConsumido, setVolumeTotalConsumido] = useState(0);
   const [eurosGastos, setEurosGastos] = useState(0);
   const [isLoadingData, setIsLoadingData] = useState(true);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -73,9 +53,16 @@ export default function Overview() {
     };
 
     fetchData();
-  }, []);
-  if (isLoadingData)
-  return (<Box pl={{ base: "45%", md: "45%", xl: "45%" }} pt={{ base: "45%", md: "45%", xl: "25%" }}><div className="loader"></div></Box>)
+  }, [utilizador]);
+
+  if (isLoadingData) {
+    return (
+      <Box pl={{ base: "45%", md: "45%", xl: "45%" }} pt={{ base: "45%", md: "45%", xl: "25%" }}>
+        <div className="loader"></div>
+      </Box>
+    );
+  }
+
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       {/* Main Fields */}
@@ -97,23 +84,22 @@ export default function Overview() {
           avatar={avatar}
           nome={nome1}
           email={email}
-          fotolink={fotolink}
+          fotolink={fotoUsuario || fotolink} // Aqui, usamos o fotoUsuario do contexto
           volumetotalconsumido={volumeTotalConsumido + " m³"}
           casas={quantidadeCasas}
           eurosgastos={eurosGastos + " €"}
         />
         <General
-            gridArea={{ base: "2 / 1 / 4 / 4", lg: "1 / 2 / 2 / 4" }}
-            minH='365px'
-            marginBottom='20px'
-            nome={nome ? nome : ""}
-            telemovel={telemovel ? telemovel : ""}
-            tipoCliente={tipoCliente ? tipoCliente : []} // Certifique-se de passar um array vazio
-            setNome={setNome}
-            setTelemovel={setTelemovel}
-            setTipoCliente={setTipoClienteValor}
-          />
-        
+          gridArea={{ base: "2 / 1 / 4 / 4", lg: "1 / 2 / 2 / 4" }}
+          minH='365px'
+          marginBottom='20px'
+          nome={nome ? nome : ""}
+          telemovel={telemovel ? telemovel : ""}
+          tipoCliente={tipoCliente ? tipoCliente : []} // Certifique-se de passar um array vazio
+          setNome={setNome}
+          setTelemovel={setTelemovel}
+          setTipoCliente={setTipoClienteValor}
+        />
       </Grid>
       <Grid
         mb='20px'

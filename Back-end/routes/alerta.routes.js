@@ -13,8 +13,6 @@ router.route("/").post(Alerta.createAlerta);
 // PUT update an existing alerta
 router.route("/:id").put(Alerta.updateAlerta);
 
-// DELETE an alerta
-router.route("/:id").delete(Alerta.deleteAlerta);
 
 module.exports = app => {
     app.use("/api/alertas", router);

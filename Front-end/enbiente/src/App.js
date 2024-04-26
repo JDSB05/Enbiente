@@ -10,9 +10,11 @@ import Registar from './views/auth/Registar';
 import Login from './views/auth/signIn/index.jsx';
 import ForgotPassword from './views/auth/recuperarConta';
 import ConfirmPassword from './views/auth/ConfirmarPassword';
+import ProtectedRoute from './ProtectedRoutes';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [cargo, setCargo] = useState(undefined);
 
   const verificarAutenticacao = useCallback(async () => {
     const token = localStorage.getItem('token');
@@ -26,11 +28,14 @@ function App() {
         localStorage.setItem('cargo', cargo_id);
         localStorage.setItem('email', email);
         localStorage.setItem('foto', foto);
-
         setIsAuthenticated(true);
+        setCargo(cargo_id);
       } catch (error) {
         console.error('Erro ao verificar autenticação', error);
+        localStorage.removeItem('token');
+        window.location.pathname = '/login';
         setIsAuthenticated(false);
+        throw new Error('Erro ao verificar autenticação');
       }
     } else {
       setIsAuthenticated(false);
@@ -44,9 +49,17 @@ function App() {
   return (
     <HashRouter>
       <Switch>
-        <Route path="/auth" component={AuthLayout} />
-        <Route path="/admin" component={AdminLayout} />
-        <Route path="/user" component={UserLayout} />
+        <Route path='/admin' render={() => (
+        <ProtectedRoute isAuthenticated={cargo == 1 ? isAuthenticated : false}>
+          <AdminLayout />
+        </ProtectedRoute>
+      )} />
+        <Route path='/user' render={() => (
+        <ProtectedRoute isAuthenticated={isAuthenticated}>
+          <UserLayout />
+        </ProtectedRoute>
+      )} />
+        <Route path='/auth' component={AuthLayout} />
         <Route path="/registar" component={Registar} />
         <Route path="/login" render={() => <Login verificarAutenticacao={verificarAutenticacao} />} />
         <Route path="/404" component={Alerts} />

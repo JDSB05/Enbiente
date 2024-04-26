@@ -4,17 +4,19 @@ import { Box, Flex, Text, Select, useColorModeValue } from "@chakra-ui/react";
 import Card from "../../../../components/card/Card.js";
 import PieChart from "../../../../components/charts/PieChart";
 import { VSeparator } from "../../../../components/separator/Separator";
-import React from "react";
+import React, {useState, useEffect} from "react";
+import { wait } from "@testing-library/user-event/dist/utils/index.js";
 
 export default function Conversion(props) {
   const {volumeconsumido, ...rest } = props;
 
-  // Chakra Color Mode
-  const higienePessoal = volumeconsumido * 0.20;
-  const lavagemRoupa = volumeconsumido * 0.20;
-  const lavagemLoica = volumeconsumido * 0.20;
-  const descargaSanitaria = volumeconsumido * 0.30;
-  const outros = volumeconsumido * 0.10;
+  // Chakra Color Mode 
+  const [higienePessoal, setHigienePessoal] = useState("");
+  const [lavagemRoupa, setLavagemRoupa] = useState("");
+  const [lavagemLoica, setLavagemLoica] = useState("");
+  const [descargaSanitaria, setDescargaSanitaria] = useState("");
+  const [outros, setOutros] = useState("");
+  const [dadosProntos, setDadosProntos] = useState(false);
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const cardColor = useColorModeValue("white", "navy.700");
   const cardShadow = useColorModeValue(
@@ -59,7 +61,21 @@ export default function Conversion(props) {
       theme: "dark",
     },
   };
-  const pieChartData = [higienePessoal, lavagemRoupa , descargaSanitaria , lavagemLoica, outros ];
+  useEffect(() => {
+    // Verificar se volumeconsumido não é nulo ou indefinido
+    if (volumeconsumido) {
+      // Atualizar os estados com os valores calculados
+      setHigienePessoal(parseFloat((volumeconsumido * 0.20).toFixed(3)));
+      setLavagemRoupa(parseFloat((volumeconsumido * 0.20).toFixed(3)));
+      setLavagemLoica(parseFloat((volumeconsumido * 0.20).toFixed(3)));
+      setDescargaSanitaria(parseFloat((volumeconsumido * 0.30).toFixed(3)));
+      setOutros(parseFloat((volumeconsumido * 0.10).toFixed(3)));
+
+      // Definir dadosProntos como true para indicar que os dados estão prontos
+      setDadosProntos(true);
+    }
+  }, [volumeconsumido]); // Dependência do useEffect
+  const pieChartData = [higienePessoal, lavagemRoupa, descargaSanitaria, lavagemLoica, outros];
 
   return (
     <Card p='20px' align='center' direction='column' w='100%' {...rest}>
@@ -74,12 +90,15 @@ export default function Conversion(props) {
         </Text>
       </Flex>
 
-      <PieChart
-        h='100%'
-        w='100%'
-        chartData={pieChartData}
-        chartOptions={pieChartOptions}
-      />
+      {dadosProntos ? (
+        <PieChart
+          h='100%'
+          w='100%'
+          chartData={pieChartData}
+          chartOptions={pieChartOptions}
+        />
+      ) : "Sem dados disponíveis"}
+      {console.log(pieChartData)}
       <Card
         bg={cardColor}
         flexDirection='row'
@@ -103,7 +122,7 @@ export default function Conversion(props) {
             </Text>
           </Flex>
           <Text fontSize='md' color={textColor} fontWeight='700'>
-            20% ({higienePessoal} m³)
+            {higienePessoal} m³
           </Text>
         </Flex>
         <VSeparator mx={{ base: "20px", xl: "20px", "2xl": "20px" }} />
@@ -119,7 +138,7 @@ export default function Conversion(props) {
             </Text>
           </Flex>
           <Text fontSize='md' color={textColor} fontWeight='700'>
-            20% ({lavagemRoupa} m³)          
+            {lavagemRoupa} m³       
           </Text>
         </Flex>
         <VSeparator mx={{ base: "20px", xl: "20px", "2xl": "20px" }} />
@@ -135,7 +154,7 @@ export default function Conversion(props) {
             </Text>
           </Flex>
           <Text fontSize='md' color={textColor} fontWeight='700'>
-            30% ({descargaSanitaria} m³)
+            {descargaSanitaria} m³
           </Text>
         </Flex>
         <VSeparator mx={{ base: "20px", xl: "20px", "2xl": "20px" }} />
@@ -151,7 +170,7 @@ export default function Conversion(props) {
             </Text>
           </Flex>
           <Text fontSize='md' color={textColor} fontWeight='700'>
-            20% ({lavagemLoica} m³)
+            {lavagemLoica} m³
           </Text>
         </Flex>
         <VSeparator mx={{ base: "20px", xl: "20px", "2xl": "20px" }} />
@@ -167,7 +186,7 @@ export default function Conversion(props) {
             </Text>
           </Flex>
           <Text fontSize='md' color={textColor} fontWeight='700'>
-            10% ({outros} m³)
+            {outros} m³
           </Text>
         </Flex>
       </Card>

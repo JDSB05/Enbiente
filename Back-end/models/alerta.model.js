@@ -9,7 +9,7 @@ const Alerta = sequelize.define('Alerta', {
     tipo_alerta: { type: DataTypes.STRING, allowNull: false },
     mensagem_alerta: { type: DataTypes.STRING, allowNull: false },
     data_alerta: { type: DataTypes.DATE, allowNull: false },
-    estado: { type: DataTypes.STRING, allowNull: false }
+    estado: { type: DataTypes.BOOLEAN, allowNull: false }
 }, { 
     timestamps: false,
     freezeTableName: true // adicionando a opção freezeTableName para evitar a pluralização do nome da tabela

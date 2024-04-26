@@ -12,13 +12,6 @@ import Card from "../../../../components/card/Card.js";
 import LineChart from "../../../../components/charts/LineChart";
 import React from "react";
 import { IoCheckmarkCircle } from "react-icons/io5";
-import { MdBarChart, MdOutlineCalendarToday } from "react-icons/md";
-// Assets
-import { RiArrowUpSFill } from "react-icons/ri";
-import {
-  lineChartDataTotalSpent,
-  lineChartOptionsTotalSpent,
-} from "../../../../variables/charts";
 
 export default function TotalSpent(props) {
   const { data, ...rest } = props;
@@ -39,6 +32,107 @@ export default function TotalSpent(props) {
     { bg: "secondaryGray.300" },
     { bg: "whiteAlpha.100" }
   );
+  const getMonthArray = () => {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+    const monthArray = [];
+
+    for (let i = 0; i < 12; i++) {
+      const month = (currentMonth - i + 12) % 12;
+      const year = currentYear - Math.floor((currentMonth - i) / 12);
+      const monthString = new Date(year, month).toLocaleString('default', { month: 'short' });
+      monthArray.push(`${monthString}`);
+    }
+
+    return monthArray.reverse();
+  };
+
+  // Example usage
+  const months = getMonthArray();
+  const lineChartOptionsTotalSpent = {
+    chart: {
+      toolbar: {
+        show: false,
+      },
+      dropShadow: {
+        enabled: true,
+        top: 13,
+        left: 0,
+        blur: 10,
+        opacity: 0.1,
+        color: "#4318FF",
+      },
+    },
+    colors: ["#4318FF", "#39B8FF"],
+    markers: {
+      size: 0,
+      colors: "white",
+      strokeColors: "#7551FF",
+      strokeWidth: 3,
+      strokeOpacity: 0.9,
+      strokeDashArray: 0,
+      fillOpacity: 1,
+      discrete: [],
+      shape: "circle",
+      radius: 2,
+      offsetX: 0,
+      offsetY: 0,
+      showNullDataPoints: true,
+    },
+    tooltip: {
+      theme: "dark",
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    stroke: {
+      curve: "smooth",
+      type: "line",
+    },
+    xaxis: {
+      type: "numeric",
+      categories: months,
+      labels: {
+        style: {
+          colors: "#A3AED0",
+          fontSize: "12px",
+          fontWeight: "500",
+        },
+      },
+      axisBorder: {
+        show: false,
+      },
+      axisTicks: {
+        show: false,
+      },
+    },
+    yaxis: {
+      show: false,
+    },
+    legend: {
+      show: false,
+    },
+    grid: {
+      show: false,
+      column: {
+        color: ["#7551FF", "#39B8FF"],
+        opacity: 0.5,
+      },
+    },
+    color: ["#7551FF", "#39B8FF"],
+  };
+  const lineChartDataTotalSpent = [
+    {
+      name: "Revenue",
+      data: [50, 64, 48, 66, 49, 68, 50, 64, 48, 66, 49, 68],
+    },
+    {
+      name: "Profit",
+      data: [30, 40, 24, 46, 20, 46],
+    },
+  ];
+  
   return (
     <Card
       justifyContent='center'
@@ -49,34 +143,9 @@ export default function TotalSpent(props) {
       {...rest}>
       <Flex justify='space-between' ps='0px' pe='20px' pt='5px'>
         <Flex align='center' w='100%'>
-          <Button
-            bg={boxBg}
-            fontSize='sm'
-            fontWeight='500'
-            color={textColorSecondary}
-            borderRadius='7px'>
-            <Icon
-              as={MdOutlineCalendarToday}
-              color={textColorSecondary}
-              me='4px'
-            />
-            Consumo por mês
-          </Button>
-          <Button
-            ms='auto'
-            align='center'
-            justifyContent='center'
-            bg={bgButton}
-            _hover={bgHover}
-            _focus={bgFocus}
-            _active={bgFocus}
-            w='37px'
-            h='37px'
-            lineHeight='100%'
-            borderRadius='10px'
-            {...rest}>
-            <Icon as={MdBarChart} color={iconColor} w='24px' h='24px' />
-          </Button>
+          <Text color={textColor} fontSize='xl' fontWeight='600' mt='4px'>
+            Consumo Mensual
+          </Text>
         </Flex>
       </Flex>
       <Flex w='100%' flexDirection={{ base: "column", lg: "row" }}>
