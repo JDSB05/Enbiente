@@ -5,10 +5,10 @@ const middleware = require('../config/middleware');
 const router = express.Router();
 
 // Get all casas
-router.get('/', utilizadorController.getAllUtilizadores);
+router.get('/', middleware.jwtAuthMiddleware, utilizadorController.getAllUtilizadores);
 
 // Get a casa by id
-router.get('/:id', utilizadorController.getUtilizadorById);
+router.get('/:id', middleware.jwtAuthMiddleware, utilizadorController.getUtilizadorById);
 
 // Create a new casa
 router.post('/', utilizadorController.createUtilizador);

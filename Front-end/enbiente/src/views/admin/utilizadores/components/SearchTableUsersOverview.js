@@ -36,6 +36,7 @@ import {
   import React, { useMemo, useState, useEffect } from "react";
   import { MdChevronRight, MdChevronLeft, MdOutlineModeEdit } from "react-icons/md";
   import { useToast } from '../../../../components/toasts/toast';
+  import { useUser } from '../../../../UserProvider.js';
   import {
     useGlobalFilter,
     usePagination,
@@ -57,6 +58,7 @@ import {
     const [utilizador_id, setUtilizador_id] = useState("");
     const [cargoValor, setCargoValor] = useState("");
     const [tipoClienteValor, setTipoClienteValor] = useState("");
+    const { updateUserComponent } = useUser();
     useEffect(() => {
       const fetchData = async () => {
         try {
@@ -118,7 +120,7 @@ import {
         showSuccessToast('Utilizador editado com sucesso');
         setIsLoading(false);
         handleCloseModal();
-        window.location.reload();
+        updateUserComponent();
       })
       .catch(error => {
         console.log(error);
@@ -274,7 +276,7 @@ import {
                               onChange={async () => {
                                 novoEstado = cell.value === 0 ? 1 : 0; // Update novoEstado value
                                 await api.put(`auth/disableuser/${cell.row.original.utilizador_id}`, { estado: novoEstado }).then(() => {
-                                window.location.reload();
+                                updateUserComponent();
                                 });
                               }}
                             />

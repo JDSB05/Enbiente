@@ -1,7 +1,7 @@
 // Chakra imports
 import { Avatar, Box, Flex, Text, useColorModeValue } from "@chakra-ui/react";
 import Card from "../../../../components/card/Card.js";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 export default function Banner(props) {
   const { banner, nome, email, casas, volumetotalconsumido, eurosgastos, fotolink } = props;
@@ -13,6 +13,15 @@ export default function Banner(props) {
     "white !important",
     "#111C44 !important"
   );
+
+  // Use state para controlar a imagem do avatar
+  const [avatarSrc, setAvatarSrc] = useState(fotolink);
+
+  // Atualiza o avatar quando o fotolink mudar
+  useEffect(() => {
+    setAvatarSrc(fotolink);
+  }, [fotolink]);
+
   return (
     <Card mb={{ base: "0px", lg: "20px" }} maxH={{base:"auto", lg:"100%"}} align='center'>
       <Box
@@ -25,7 +34,7 @@ export default function Banner(props) {
       <Avatar
         mx='auto'
         name={nome}
-        src={fotolink}
+        src={avatarSrc} // Usa avatarSrc em vez de fotolink diretamente
         h='87px'
         w='87px'
         mt='-43px'

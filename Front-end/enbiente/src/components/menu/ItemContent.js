@@ -1,10 +1,12 @@
 // chakra imports
 import { Icon, Flex, Text, useColorModeValue } from "@chakra-ui/react";
 import { MdOutlineWaterDrop } from "react-icons/md";
+import { IoMailUnread, IoMailOpen } from "react-icons/io5";
 import React from "react";
 
 export function ItemContent(props) {
   const textColor = useColorModeValue("navy.700", "white");
+  const alerta_id = props.alerta_id;
   return (
     <>
       <Flex
@@ -35,6 +37,22 @@ export function ItemContent(props) {
             {props.descricao}
           </Text>
         </Flex>
+      </Flex>
+      <Flex>
+        <Text
+          fontSize={{ base: "sm", md: "sm" }}
+          color={textColor}
+          ms='10px'
+          onClick={() => {
+            // Verifica se o alerta já foi lido antes de chamar a função marcarlida
+            if (props.estado) {
+              props.marcarlida(alerta_id);
+            }
+          }}
+          title="Marcar como lida" // Adiciona a dica de ferramenta
+        >
+          {props.estado ? <Icon as={IoMailUnread} w={8} h={8} /> : <Icon as={IoMailOpen} w={8} h={14} />}
+        </Text>
       </Flex>
     </>
   );

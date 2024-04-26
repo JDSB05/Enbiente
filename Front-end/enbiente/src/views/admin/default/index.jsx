@@ -66,11 +66,11 @@ export default function UserReports() {
   const brandColor = useColorModeValue("brand.500", "white");
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
   const [dadosMensuais, setDadosMensuais] = useState([]); 
-  const [consumidoNesteMes, setConsumidoNesteMes] = useState("");
-  const [poupadoeuros, setPoupadoeuros] = useState("");
-  const [valorMesAtual, setValorMesAtual] = useState("");
-  const [valorMesAnterior, setValorMesAnterior] = useState("");
-  const [poupadoPercentagem, setPoupadoPercentagem] = useState("");
+  const [consumidoNesteMes, setConsumidoNesteMes] = useState(0.0);
+  const [poupadoeuros, setPoupadoeuros] = useState(0.0);
+  const [valorMesAtual, setValorMesAtual] = useState(0.0);
+  const [valorMesAnterior, setValorMesAnterior] = useState(0.0);
+  const [poupadoPercentagem, setPoupadoPercentagem] = useState(0.0);
   const [newTasks, setNewTasks] = useState("");
   let utilizador_id = localStorage.getItem('utilizador_id');
   const [isLoadingData, setIsLoadingData] = React.useState(true);
@@ -79,16 +79,24 @@ export default function UserReports() {
     const fetchData = async () => {
       try {
        const response = await api.get("/consumos?tipo=ultimosconsumos&utilizador_id=" + utilizador_id);
-       const response2 = await api.get("/consumos?tipo=consumosmensais&utilizador_id=" + utilizador_id);
+       //const response2 = await api.get("/consumos?tipo=consumosmensais&utilizador_id=" + utilizador_id);
        const data = response.data;
-       setConsumidoNesteMes(data.totalConsumoMesAtual)
-       setValorMesAtual(data.totalEurosPagarMesAtual);
-       setValorMesAnterior(parseFloat(data.totalEurosPoupadosMesAnterior));
-       setPoupadoPercentagem(parseFloat(((valorMesAtual - valorMesAnterior) / valorMesAnterior) * 100).toFixed(2));
-       setPoupadoeuros((valorMesAnterior-valorMesAtual).toFixed(2));
-       setNewTasks(null);
-       setDadosMensuais(response2.data);
-       setIsLoadingData(false);
+      setConsumidoNesteMes(parseFloat(data.totalConsumoMesAtual).toFixed(3));
+      console.log("consumidoNesteMes: ", isNaN(consumidoNesteMes));
+      setValorMesAtual(parseFloat(data.totalEurosPagarMesAtual).toFixed(2));
+      console.log("valorMesAtual: ", isNaN(valorMesAtual));
+      setValorMesAnterior(parseFloat(data.totalEurosPoupadosMesAnterior).toFixed(2));
+      console.log("valorMesAnterior: ", isNaN(valorMesAnterior));
+      const percentagem = parseFloat(((valorMesAtual - valorMesAnterior) / valorMesAnterior) * 100).toFixed(2);
+      console.log("percentagem: ", isNaN(percentagem));
+      setPoupadoPercentagem(isNaN(percentagem) || percentagem < 0 ? 0.0 : parseFloat(percentagem).toFixed(2));
+      console.log("poupadoPercentagem: ", isNaN(poupadoPercentagem));
+      setPoupadoeuros((valorMesAnterior-valorMesAtual).toFixed(2));
+      console.log("poupadoeuros: ", isNaN(poupadoeuros));
+      console.log("poupadoeuros: ", poupadoeuros);
+      setNewTasks(null);
+      setDadosMensuais(response.data);
+      setIsLoadingData(false);
        
      } catch (error) {
        console.log(error);
@@ -96,7 +104,6 @@ export default function UserReports() {
    };
     fetchData();
   }, []);
-
   
   if (isLoadingData)
   return (<Box pl={{ base: "45%", md: "45%", xl: "45%" }} pt={{ base: "45%", md: "45%", xl: "25%" }}><div className="loader"></div></Box>)
@@ -145,7 +152,7 @@ export default function UserReports() {
           name="Valor do mês atual"
           value={valorMesAtual + "€"}
         />
-        <MiniStatistics growth={poupadoPercentagem} name="Poupado" value={poupadoeuros + "€"} />
+        <MiniStatistics growth={poupadoPercentagem} name="Poupado" poupadoeuros={poupadoeuros + "€"} />
         <MiniStatistics
           startContent={
             <IconBox

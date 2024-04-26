@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import {
   Box,
   Button,
@@ -5,15 +6,14 @@ import {
   Icon,
   Text,
   useColorModeValue,
-  Input, 
   Image
 } from "@chakra-ui/react";
 import Card from "../../../../components/card/Card.js";
-import React, { useState } from "react";
 import { MdUpload } from "react-icons/md";
 import Dropzone from "../../../../views/admin/profile/components/Dropzone";
 import api from "../../../../services/api";
 import { useToast } from "../../../../components/toasts/toast.js";
+import { useUser } from "../../../../UserProvider.js";
 
 export default function Upload(props) {
   const { tema, ...rest } = props;
@@ -21,13 +21,10 @@ export default function Upload(props) {
   // Chakra Color Mode
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const brandColor = useColorModeValue("brand.500", "white");
-  const { showErrorToast } = useToast();
-  const { showSuccessToast } = useToast();
-  const bg = useColorModeValue("gray.100", "navy.700");
-  const borderColor = useColorModeValue("secondaryGray.100", "whiteAlpha.100");
+  const { showErrorToast, showSuccessToast } = useToast();
   const [uploadedFile, setUploadedFile] = useState(null);
-  const [imagem, setImagem] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { fotoUsuario, setFotoUsuario } = useUser();
 
   const handleSelectedFile = (event) => {
     const file = event.target.files[0];
@@ -38,8 +35,6 @@ export default function Upload(props) {
         event.target.value = "";
       } else {
         setUploadedFile(file);
-        const temporaryUrl = URL.createObjectURL(file);
-        console.log("Imagem selecionada:", file);
       }
     } else {
       showErrorToast("Utilize o formato de ficheiro correto!");
@@ -63,15 +58,16 @@ export default function Upload(props) {
       if (responseFoto && responseFoto.status === 200) {
         if (responseFoto.data.message) {
           const urlImagem = responseFoto.data.message;
-          setImagem(urlImagem);
           await api.put("/utilizador/" + localStorage.getItem("utilizador_id"), { foto: urlImagem }).then((response) => {
-          localStorage.setItem("foto", urlImagem);
+            localStorage.setItem("foto", urlImagem);
+            setFotoUsuario(urlImagem); // Atualiza a imagem globalmente
+            setUploadedFile(null);
+            showSuccessToast("Foto atualizada com sucesso!");
           }).catch((error) => {
             console.error("Erro ao atualizar foto do utilizador:", error)
             showErrorToast("Erro ao atualizar foto do utilizador! Recarregue a página e tente novamente.");
           });
           setIsLoading(false);
-          window.location.reload();
         }
         // Lógica adicional aqui, se necessário
       } else {
@@ -139,7 +135,6 @@ export default function Upload(props) {
               onClick={(event) => handleSubirFicheiro(event)}>
               Salvar
             </Button>
-
           </Flex>
         </Flex>
       </Flex>

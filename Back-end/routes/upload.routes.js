@@ -60,22 +60,11 @@ module.exports = app => {
           dimensions.height = parseInt(req.body.height);
         }
   
-        // check for resize parameter and update dimensions fit accordingly
-        if (req.body.resize === 'true') {
-          dimensions.fit = 'inside';
-        } else {
-          dimensions.fit = 'cover';
-        }
-  
-        // resize and compress the image using sharp
-        const buffer = await sharp(req.file.buffer)
-          .resize(dimensions)
-          .jpeg({ quality: 90 })
-          .toBuffer();
+        // Não é mais necessário redimensionar a imagem aqui com Sharp
   
         // upload the image using existing upload function
-        const uploadResult = await imagem.uploadImage(buffer, originalFilename);
-  
+        const uploadResult = await imagem.uploadImage(req.file.buffer, originalFilename, dimensions.width, dimensions.height);
+        
         res.status(200).send({ success: true, message: uploadResult.url });
       } catch (error) {
         console.log(error);

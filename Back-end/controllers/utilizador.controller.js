@@ -70,19 +70,24 @@ const getUtilizadorById = async (req, res) => {
   try {
     // Extract Utilizador ID from request parameters
     const { id } = req.params;
+    const user = req.user;
 
-    // Find the Utilizador by ID
-    const utilizador = await Utilizador.findByPk(id, {
-      attributes: { exclude: ['password', 'TokenEmail'] }
-    });
+    // Find the Utilizador by ID´
+    if (user.cargo_id == 1 || user.utilizador_id == id) {
+      const utilizador = await Utilizador.findByPk(id, {
+        attributes: { exclude: ['password', 'TokenEmail'] }
+      })
 
-    // Check if Utilizador exists
-    if (!utilizador) {
-      return res.status(404).json({ error: "Utilizador not found" });
+      // Check if Utilizador exists
+      if (!utilizador) {
+        return res.status(404).json({ error: "Utilizador not found" });
+      }
+
+      // Send the Utilizador as response
+      res.json(utilizador);
+    } else {
+      return res.status(401).json({ error: "Não está autorizado para obter informação de contas alheias" });
     }
-
-    // Send the Utilizador as response
-    res.json(utilizador);
   } catch (error) {
     // Handle error
     console.error(error);

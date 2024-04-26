@@ -33,7 +33,7 @@ function Alerts() {
   const brandColor = useColorModeValue("brand.500", "brand.400");
   const history = useHistory();
   function sendToHome() {
-    history.push("/");
+    window.location.href = "/";
   }
   return (
     <Flex direction='column' align='center' pt={{ sm: "125px", lg: "75px" }}>

@@ -32,6 +32,7 @@ import React, { useMemo, useEffect } from "react";
 import  { useToast } from '../../../../components/toasts/toast';
 import api from "../../../../services/api";
 import MiniCalendar from "components/calendar/MiniCalendar";
+import { useUser } from "../../../../UserProvider";
 import { Redirect } from "react-router-dom/cjs/react-router-dom.min";
 import {
   useGlobalFilter,
@@ -50,6 +51,7 @@ export default function DevelopmentTable(props) {
   const [editedFields, setEditedFields] = React.useState({});
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => tableData, [tableData]);
+  const { updateComponent, updateUserComponent } = useUser();
   useEffect(() => {
     async function getCasas() {
       try {
@@ -60,7 +62,7 @@ export default function DevelopmentTable(props) {
       }
     }
     getCasas();
-  }, []);
+  }, [updateComponent]);
 
   function handleFieldChange(field, value) {
     setEditedFields({ ...editedFields, [field]: value });
@@ -129,7 +131,7 @@ export default function DevelopmentTable(props) {
         showSuccessToast("Consumo criado com sucesso");
         setIsLoading(false);
         handleCloseModal();
-        window.location.reload();
+        updateUserComponent();
       }).catch(() => {
         showErrorToast("Erro ao criar consumo");
         setIsLoading(false);
