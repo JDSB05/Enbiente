@@ -171,7 +171,7 @@ exports.register = async (req, res) => {
   email_sender.verificarEmail(req.body.email, token);
 
   // Define o cargo padrão como 1 "Admin" (Mudar depois para 2 "Utilizador normal")
-  req.body.cargo_id = 1;
+  req.body.cargo_id = 2;
 
   //Define o tipo de cliente padrão como 1 "Particular"
   req.body.tipo_cliente_id = 1;

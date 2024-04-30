@@ -82,18 +82,10 @@ export default function UserReports() {
        //const response2 = await api.get("/consumos?tipo=consumosmensais&utilizador_id=" + utilizador_id);
        const data = response.data;
       setConsumidoNesteMes(parseFloat(data.totalConsumoMesAtual).toFixed(3));
-      console.log("consumidoNesteMes: ", isNaN(consumidoNesteMes));
       setValorMesAtual(parseFloat(data.totalEurosPagarMesAtual).toFixed(2));
-      console.log("valorMesAtual: ", isNaN(valorMesAtual));
       setValorMesAnterior(parseFloat(data.totalEurosPoupadosMesAnterior).toFixed(2));
-      console.log("valorMesAnterior: ", isNaN(valorMesAnterior));
-      const percentagem = parseFloat(((valorMesAtual - valorMesAnterior) / valorMesAnterior) * 100).toFixed(2);
-      console.log("percentagem: ", isNaN(percentagem));
-      setPoupadoPercentagem(isNaN(percentagem) || percentagem < 0 ? 0.0 : parseFloat(percentagem).toFixed(2));
-      console.log("poupadoPercentagem: ", isNaN(poupadoPercentagem));
-      setPoupadoeuros((valorMesAnterior-valorMesAtual).toFixed(2));
-      console.log("poupadoeuros: ", isNaN(poupadoeuros));
-      console.log("poupadoeuros: ", poupadoeuros);
+      setPoupadoPercentagem(data.poupadoPercentagem);
+      setPoupadoeuros(data.poupadoEuros);
       setNewTasks(null);
       setDadosMensuais(response.data);
       setIsLoadingData(false);
@@ -104,7 +96,6 @@ export default function UserReports() {
    };
     fetchData();
   }, []);
-  
   if (isLoadingData)
   return (<Box pl={{ base: "45%", md: "45%", xl: "45%" }} pt={{ base: "45%", md: "45%", xl: "25%" }}><div className="loader"></div></Box>)
   return (
@@ -152,7 +143,7 @@ export default function UserReports() {
           name="Valor do mês atual"
           value={valorMesAtual + "€"}
         />
-        <MiniStatistics growth={poupadoPercentagem} name="Poupado" poupadoeuros={poupadoeuros + "€"} />
+        <MiniStatistics growth={poupadoPercentagem} name="Poupado desde o mês anterior" poupadoeuros={poupadoeuros + "€"} />
         <MiniStatistics
           startContent={
             <IconBox

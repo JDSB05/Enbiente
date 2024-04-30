@@ -44,14 +44,14 @@ export default function Default(props) {
             {value}
             {poupadoeuros}
           </StatNumber>
-          {growth ? (
+          {growth || growth == 0.0 ? (
             <Flex align='center'>
               <Text
                 color={growth > 0 ? 'red.500' : 'green.500'}
                 fontSize='s'
                 fontWeight='700'
                 me='5px'>
-                {isNaN(growth) ? "Sem dados% " : growth + " %"}
+                {growth + " %"}
               </Text>
               <Text
                 color='secondaryGray.600'

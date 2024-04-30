@@ -5,8 +5,10 @@ import {
   InputGroup,
   InputLeftElement,
   useColorModeValue,
+  Icon,
 } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
+import { FiSearch } from "react-icons/fi";
 export function SearchBar(props) {
   // Pass the computed styles into the `__css` prop
   const { variant, background, children, placeholder, borderRadius, ...rest } =
@@ -18,24 +20,23 @@ export function SearchBar(props) {
   return (
     <InputGroup w={{ base: "100%", md: "200px" }} {...rest}>
       <InputLeftElement
-        children={
-          <IconButton
-            bg='inherit'
-            borderRadius='inherit'
-            _hover='none'
-            _active={{
-              bg: "inherit",
-              transform: "none",
-              borderColor: "transparent",
-            }}
-            _focus={{
-              boxShadow: "none",
-            }}
-            icon={
-              <SearchIcon color={searchIconColor} w='15px' h='15px' />
-            }></IconButton>
-        }
-      />
+				children={
+					<IconButton
+						bg='inherit'
+						borderRadius='inherit'
+						_hover='none'
+						_active={{
+							bg: 'inherit',
+							transform: 'none',
+							borderColor: 'transparent'
+						}}
+						_focus={{
+							boxShadow: 'none'
+						}}
+						icon={<Icon as={FiSearch} color={searchIconColor} w='15px' h='15px' />}
+					/>
+				}
+			/>
       <Input
         variant='search'
         fontSize='sm'

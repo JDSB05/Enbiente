@@ -2,11 +2,13 @@ const Alerta = require('../models/alerta.model');
 const Casa = require('../models/casa.model');
 // GET all alertas
 const getAllAlertas = async (req, res) => {
+  const { utilizador_id } = req.query;
   try {
     const alertas = await Alerta.findAll({
+      where: { '$Casa.utilizador_id$': utilizador_id },
       include: {
         model: Casa,
-        attributes: ['nome', 'endereco'],
+        attributes: ['nome', 'endereco', 'utilizador_id'],
       }
     });
     res.json(alertas);

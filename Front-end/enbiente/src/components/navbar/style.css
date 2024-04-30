@@ -46,15 +46,28 @@
   }
   @keyframes pulso {
     0%, 100% {
-      box-shadow: 0 0 0 0 rgba(255, 255, 0, 0.5);
+      box-shadow: 0 0 0 0 rgba(230, 230, 1, 0.95);
     }
     50% {
-      box-shadow: 0 0 5px 5px rgba(255, 255, 0, 0.5);
+      box-shadow: 0 0 10px 10px rgba(230, 230, 1, 0.95);
     }
     }
+    @keyframes pulsoDark {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 0, 0.5);
+      }
+      50% {
+        box-shadow: 0 0 10px 10px rgba(255, 255 , 0, 0.5);
+      }
+      }
   .ItemCampainha {
     position: relative;
     animation: campainha 1.75s infinite, pulso 2s infinite;
+    transform-origin: top center; /* Faz a rotação em torno da parte superior do elemento */
+  }
+  body.chakra-ui-dark .ItemCampainha {
+    position: relative;
+    animation: campainha 1.75s infinite, pulsoDark 2s infinite;
     transform-origin: top center; /* Faz a rotação em torno da parte superior do elemento */
   }
 

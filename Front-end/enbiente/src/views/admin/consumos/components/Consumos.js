@@ -33,6 +33,7 @@ import  { useToast } from '../../../../components/toasts/toast';
 import api from "../../../../services/api";
 import MiniCalendar from "components/calendar/MiniCalendar";
 import { useUser } from "../../../../UserProvider";
+import { SearchBar } from "../../../../components/navbar/searchBar/SearchBar";
 import { Redirect } from "react-router-dom/cjs/react-router-dom.min";
 import {
   useGlobalFilter,
@@ -85,6 +86,7 @@ export default function DevelopmentTable(props) {
     page,
     prepareRow,
     initialState,
+    setGlobalFilter,
   } = tableInstance;
 
   initialState.pageSize = 11;
@@ -109,7 +111,7 @@ export default function DevelopmentTable(props) {
   };
   function formatarMes(data) {
     const opcoes = { month: 'long' }; // ou use 'short' para a abreviação do mês
-    return new Date(data).toLocaleDateString('pt-BR', opcoes);
+    return new Date(data).toLocaleDateString('pt-PT', opcoes);
   }
   function submit() {
       setIsLoading(true);
@@ -123,19 +125,25 @@ export default function DevelopmentTable(props) {
         setIsLoading(false);
         return;
       }
+    try {
       api.post("/consumos", {
         casa_id: casaValor,
         data_consumo: dataVolumeConsumido,
         volume_consumido: volumeConsumido
-      }).then(() => {
-        showSuccessToast("Consumo criado com sucesso");
-        setIsLoading(false);
-        handleCloseModal();
-        updateUserComponent();
-      }).catch(() => {
-        showErrorToast("Erro ao criar consumo");
-        setIsLoading(false);
+      }).then((response) => {
+      showSuccessToast("Consumo criado com sucesso");
+      setIsLoading(false);
+      handleCloseModal();
+      updateUserComponent();
       });
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        showErrorToast("O valor do consumo tem que ser maior do que o valor de consumo anterior da mesma casa! Verifique os valores inseridos.");
+      } else {
+        showErrorToast("Erro ao criar consumo");
+      }
+      setIsLoading(false);
+    }
   }
   return (
     <div>
@@ -145,13 +153,12 @@ export default function DevelopmentTable(props) {
         px='0px'
         overflowX={{ sm: "scroll", lg: "hidden" }}>
         <Flex px='25px' justify='space-between' mb='20px' align='center'>
-          <Text
-            color={textColor}
-            fontSize='22px'
-            fontWeight='700'
-            lineHeight='100%'>
-            Consumos
-          </Text>
+            <SearchBar
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              h='44px'
+              w={{ lg: "390px" }}
+              borderRadius='16px'
+            />
           <Flex w='50%' justifyContent="right" alignItems='center' >
               <Button
                 w='auto'
@@ -202,14 +209,14 @@ export default function DevelopmentTable(props) {
                       } else if (cell.column.Header === "Casa") {
                         data = (
                           <Text color={textColor} fontSize='sm' fontWeight='700'>
-                            {cell.row.original['Casa.nome']}
+                            {cell.value}
                           </Text>
                         );
                       } else if (cell.column.Header === "Data") {
-                        let date = new Date(cell.row.original.data_consumo).toLocaleDateString()
+
                         data = (
                           <Text color={textColor} fontSize='sm' fontWeight='700'>
-                            {date}
+                            {new Date(cell.value).toLocaleDateString()}
                           </Text>
                         );
                       } else if (cell.column.Header === "Consumo") {
@@ -219,22 +226,26 @@ export default function DevelopmentTable(props) {
                           </Text>
                         );
                       } else if (cell.column.Header === "Eficiência") {
-                        data = (
+                        data = cell.value === 0.0 ? (
+                          <Text color={textColor} fontSize='sm' fontWeight='700'>
+                          Sem dados suficientes
+                          </Text>
+                        ) : (
                           <Flex align='center'>
-                            <Text
-                              me='10px'
-                              color={textColor}
-                              fontSize='sm'
-                              fontWeight='700'>
-                              {cell.value}%
-                            </Text>
-                            <Progress
-                              variant='table'
-                              colorScheme='brandScheme'
-                              h='8px'
-                              w='63px'
-                              value={cell.value}
-                            />
+                          <Text
+                            me='10px'
+                            color={textColor}
+                            fontSize='sm'
+                            fontWeight='700'>
+                            {cell.value}%
+                          </Text>
+                          <Progress
+                            variant='table'
+                            colorScheme='brandScheme'
+                            h='8px'
+                            w='63px'
+                            value={cell.value}
+                          />
                           </Flex>
                         );
                       }
