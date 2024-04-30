@@ -12,18 +12,19 @@ const getAllCasas = async (req, res) => {
                 where: { utilizador_id: utilizador },
                 include: {
                     model: TipoCasa,
-                    attributes: ['tipo_casa']
+                    attributes: ['tipo_casa', 'fator']
                 }
             });
         } else {
             casas = await Casa.findAll({
                 include: {
                     model: TipoCasa,
-                    attributes: ['tipo_casa']
+                    attributes: ['tipo_casa', 'fator']
                 }
             });
         }
         res.json(casas);
+        console.log(casas);
     } catch (error) {
         res.status(500).json({ error: 'Failed to retrieve casas' });
     }

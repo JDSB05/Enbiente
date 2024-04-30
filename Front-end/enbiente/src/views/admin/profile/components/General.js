@@ -3,6 +3,7 @@ import { SimpleGrid, Text, useColorModeValue, Input, FormLabel, FormControl, Sel
 import Card from "../../../../components/card/Card.js";
 import api from "../../../../services/api.js";
 import { useToast } from '../../../../components/toasts/toast';
+import { useUser } from '../../../../UserProvider.js';
 
 export default function GeneralInformation(props) {
   const { nome, telemovel, tipoCliente, setNome, setTelemovel, setTipoCliente, ...rest } = props;
@@ -11,7 +12,7 @@ export default function GeneralInformation(props) {
   const [isLoading, setIsLoading] = React.useState(false);
   const [tipoClienteValor, setTipoClienteValor] = React.useState("");
   const { showErrorToast, showSuccessToast, showMessageToast } = useToast();
-  
+  const { updateComponent, updateUserComponent } = useUser();
   React.useEffect(() => {
     const fetchData = async () => {
       try {
@@ -25,7 +26,7 @@ export default function GeneralInformation(props) {
       }
     };
     fetchData();
-  }, []);
+  }, [updateComponent]);
 
   function submit() {
     setIsLoading(true);
@@ -78,7 +79,7 @@ export default function GeneralInformation(props) {
           showSuccessToast("Dados do usuário atualizados com sucesso.");
           setIsLoading(false);
           localStorage.setItem('utilizador_nome', nome);
-          window.location.reload();
+          updateUserComponent();
         })
         .catch(error => {
           console.error("Erro ao atualizar dados do usuário:", error);

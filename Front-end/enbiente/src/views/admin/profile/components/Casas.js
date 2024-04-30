@@ -16,6 +16,7 @@ import Project from "./Casa";
 import { MdAdd } from "react-icons/md";
 import api from "../../../../services/api";
 import { useToast } from '../../../../components/toasts/toast';
+import { useUser } from '../../../../UserProvider.js';
 
 export default function Projects(props) {
   const textColor = useColorModeValue("secondaryGray.900", "white");
@@ -37,6 +38,7 @@ export default function Projects(props) {
   const [pessoas, setPessoas] = useState('');
   const [tipoCasa, setTipoCasa] = useState([]);
   const [editedFields, setEditedFields] = useState({});
+  const { updateComponent, updateUserComponent } = useUser();
   useEffect(() => {
     const fetchCasas = async () => {
       try {
@@ -60,7 +62,7 @@ export default function Projects(props) {
 
     fetchTiposCasa();
     fetchCasas();
-  }, []);
+  }, [updateComponent]);
 
   function handleOpenModal() {
     setIsOpen(true);
@@ -101,8 +103,6 @@ export default function Projects(props) {
         [field]: value
       };
       setEditedFields(updatedFields);
-      console.log("UPDATED FIELDS1")  
-      console.log(updatedFields);
   }
 
   function submit() {
@@ -130,7 +130,7 @@ export default function Projects(props) {
         showSuccessToast('Casa criada com sucesso');
         setIsLoading(false);
         handleCloseModal();
-        window.location.reload();
+        updateUserComponent();
       })
       .catch(error => {
         console.log(error);
@@ -155,7 +155,7 @@ export default function Projects(props) {
         showSuccessToast('Casa editada com sucesso');
         setIsLoading(false);
         handleCloseModalEditar();
-        window.location.reload();
+        updateUserComponent();
       })
       .catch(error => {
         console.log(error);
@@ -189,7 +189,7 @@ export default function Projects(props) {
       </Button>
     </Flex>
   </Flex>
-  <div style={{ width: '100%', maxHeight: '40vh', overflowY: 'auto', scrollbarWidth: 'none', scrollbarColor: '#888 transparent'  }}>
+  <div style={{ width: '100%', maxHeight: '40vh', height:'40vh', overflowY: 'auto', scrollbarWidth: 'none', scrollbarColor: '#888 transparent'  }}>
     {casas.length === 0 ? (
       <Flex justifyContent='center' alignItems='center' h='100%'>
         <Text color={textColorPrimary} fontWeight='bold' fontSize='2xl' mt='10px' mb='4px'>

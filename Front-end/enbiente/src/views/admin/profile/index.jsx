@@ -9,7 +9,6 @@ import Notifications from "../../../views/admin/profile/components/Notifications
 import Projects from "./components/Casas";
 import Storage from "../../../views/admin/profile/components/Storage";
 import Upload from "../../../views/admin/profile/components/Upload";
-
 // Assets
 import banner from "../../../assets/img/auth/banner.png";
 import avatar from "../../../assets/img/avatars/avatar4.png";
@@ -30,7 +29,7 @@ export default function Overview() {
   const [volumeTotalConsumido, setVolumeTotalConsumido] = useState(0);
   const [eurosGastos, setEurosGastos] = useState(0);
   const [isLoadingData, setIsLoadingData] = useState(true);
-
+  const { updateComponent } = useUser(); // Usando o updateComponent do contexto
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -53,7 +52,7 @@ export default function Overview() {
     };
 
     fetchData();
-  }, [utilizador]);
+  }, [utilizador, updateComponent]);
 
   if (isLoadingData) {
     return (
@@ -82,7 +81,7 @@ export default function Overview() {
           gridArea={{ base: "1 / 1 / 1 / 1", lg: '1 / 1 / 2 / 2' }}
           banner={banner}
           avatar={avatar}
-          nome={nome1}
+          nome={nome1 || nome} // Aqui, usamos o nome1 do estado local
           email={email}
           fotolink={fotoUsuario || fotolink} // Aqui, usamos o fotoUsuario do contexto
           volumetotalconsumido={volumeTotalConsumido + " m³"}

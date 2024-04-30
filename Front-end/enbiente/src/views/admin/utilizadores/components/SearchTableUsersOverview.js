@@ -137,8 +137,8 @@ import {
       useGlobalFilter,
       useSortBy,
       usePagination
-    );
-  
+    );  
+
     const {
       getTableProps,
       getTableBodyProps,
@@ -154,7 +154,7 @@ import {
       setGlobalFilter,
       state,
     } = tableInstance;
-  
+    console.log(tableInstance)
     const createPages = (count) => {
       let arrPageCount = [];
   
@@ -166,6 +166,7 @@ import {
     };
   
     const { pageIndex, pageSize } = state;
+    console.log(state)
     const textColorPrimary = useColorModeValue("navy.700", "white");
     const textColor = useColorModeValue("secondaryGray.900", "white");
     const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
@@ -326,11 +327,11 @@ import {
               color='gray.500'
               fontWeight='normal'
               mb={{ sm: "24px", md: "0px" }}>
-              Showing {pageSize * pageIndex + 1} to{" "}
+              A mostrar do {pageSize * pageIndex + 1} até {" "}
               {pageSize * (pageIndex + 1) <= tableData.length
                 ? pageSize * (pageIndex + 1)
-                : tableData.length}{" "}
-              of {tableData.length} entries
+                : tableData.length},{" "}
+              de {tableData.length} utilizadores
             </Text>
             <Stack direction='row' alignSelf='flex-end' spacing='4px' ms='auto'>
               <Button

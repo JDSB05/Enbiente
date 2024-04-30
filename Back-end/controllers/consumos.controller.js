@@ -29,9 +29,8 @@ const getAllConsumos = async (req, res) => {
                         }
                     },
                     attributes: ['casa_id', 'data_consumo', 'volume_consumido'],
-                    raw: true,
                 });
-        
+                
                 // Separar os consumos por casa
                 const consumosPorCasa = consumos.reduce((acc, consumo) => {
                     const { casa_id } = consumo;
@@ -41,61 +40,101 @@ const getAllConsumos = async (req, res) => {
                     acc[casa_id].push(consumo);
                     return acc;
                 }, {});
-        
-                // Calcular a diferença entre os volumes consumidos do penúltimo e último consumo de cada casa
-                const diferencaVolumeConsumido = {};
-                for (const casa_id in consumosPorCasa) {
-                    const consumosCasa = consumosPorCasa[casa_id];
-                    if (consumosCasa.length >= 2) {
-                        const ultimoConsumoMesAtual = consumosCasa.find(consumo => moment(consumo.data_consumo).month() === moment().month());
-                        console.log("Mes do ultimo consumo" + moment(ultimoConsumoMesAtual.data_consumo).month())
-                        console.log('Ultimo consumo do mês atual:', ultimoConsumoMesAtual);
-                        const penultimoConsumoMesAnterior = consumosCasa.find(consumo => moment(consumo.data_consumo).month() === (moment().month() - 1 + 12) % 12);
-                        if (ultimoConsumoMesAtual) {
-                            if (penultimoConsumoMesAnterior) {
-                                diferencaVolumeConsumido[casa_id] = ultimoConsumoMesAtual.volume_consumido - penultimoConsumoMesAnterior.volume_consumido;
-                            } else {
-                                console.log("Penúltimo consumo do mês anterior não encontrado para casa_id:", casa_id);
-                                diferencaVolumeConsumido[casa_id] = ultimoConsumoMesAtual.volume_consumido;
+                
+                // Função para calcular o total de consumo para um conjunto de consumos de uma casa
+                const calcularTotalConsumo = (consumosCasa) => {
+                    if (consumosCasa.length === 1) {
+                        return consumosCasa[0].volume_consumido; // Se houver apenas um consumo, retorna o volume consumido completo
+                    } else {
+                        const consumosPorMes = {};
+
+                        // Agrupar os consumos por mês
+                        consumosCasa.forEach(consumo => {
+                            const mes = moment(consumo.data_consumo).month();
+                            if (!consumosPorMes[mes]) {
+                                consumosPorMes[mes] = [];
+                            }
+                            consumosPorMes[mes].push(consumo);
+                        });
+
+                        // Obter os últimos consumos de cada mês
+                        const ultimosConsumosPorMes = Object.values(consumosPorMes).map(consumosDoMes => {
+                            return consumosDoMes.reduce((ultimoConsumo, consumo) => {
+                                return !ultimoConsumo || moment(consumo.data_consumo).isAfter(moment(ultimoConsumo.data_consumo)) ? consumo : ultimoConsumo;
+                            }, null);
+                        });
+
+                        // Calcular a diferença entre o último consumo de um mês e o último consumo do mês anterior
+                        let diferencaVolumeConsumido = 0;
+                        for (let i = 0; i < ultimosConsumosPorMes.length - 1; i++) {
+                            const ultimoConsumoMesAtual = ultimosConsumosPorMes[i];
+                            const ultimoConsumoMesAnterior = ultimosConsumosPorMes[i + 1];
+                            if (ultimoConsumoMesAtual && ultimoConsumoMesAnterior) {
+                                diferencaVolumeConsumido += ultimoConsumoMesAtual.volume_consumido - ultimoConsumoMesAnterior.volume_consumido;
                             }
                         }
+
+                        return diferencaVolumeConsumido;
                     }
-                }
-        
-                // Calcular a soma de todas as diferenças de volume consumido
-                const totalConsumoMesAtual = Object.values(diferencaVolumeConsumido).reduce((acc, diferenca) => acc + diferenca, 0);
-                const totalEurosPagarMesAtual = Object.entries(diferencaVolumeConsumido).reduce((acc, [casa_id, diferencaVolume]) => {
-                    const precoPorMetro = consumosPorCasa[casa_id][0]['Casa.precopormetro']; // Acessando o precopormetro da casa correspondente
-                    const precoTotal = diferencaVolume * precoPorMetro;
-                    return acc + precoTotal;
+                };
+                
+                
+                
+                // Calcular o total de consumo do mês atual
+                let totalConsumoMesAtual = Object.values(consumosPorCasa).reduce((acc, consumosCasa) => {
+                    return acc + calcularTotalConsumo(consumosCasa);
                 }, 0);
-        
-                // Calcular a diferença entre os volumes consumidos do antepenúltimo e penúltimo consumo de cada casa
-                const diferencaVolumeConsumidoAnterior = {};
-                for (const casa_id in consumosPorCasa) {
-                    const consumosCasa = consumosPorCasa[casa_id];
-                    if (consumosCasa.length >= 3) { // Considerar apenas se houver pelo menos três consumos
-                        const penultimoConsumo = consumosCasa.find(consumo => moment(consumo.data_consumo).month() === moment().subtract(1, 'month').month());
-                        const antepenultimoConsumo = consumosCasa.find(consumo => moment(consumo.data_consumo).month() === moment().subtract(2, 'month').month());
-                        if (penultimoConsumo && antepenultimoConsumo) {
-                            diferencaVolumeConsumidoAnterior[casa_id] = penultimoConsumo.volume_consumido - antepenultimoConsumo.volume_consumido;
+                
+                // Calcular o total de euros a pagar do mês atual e o total de euros poupados do mês anterior
+                let totalEurosPagarMesAtual = Object.values(consumosPorCasa).reduce((acc, consumosCasa) => {
+                    const precoPorMetro = consumosCasa[0].Casa.precopormetro; // Acessando o precopormetro da casa correspondente
+                    return acc + (calcularTotalConsumo(consumosCasa) * precoPorMetro);
+                }, 0);
+                
+                // Calcular o total de euros poupados do mês anterior
+                let totalEurosPoupadosMesAnterior = Object.values(consumosPorCasa).reduce((acc, consumosCasa) => {
+                    const precoPorMetro = consumosCasa[0].Casa.precopormetro; // Acessando o precopormetro da casa correspondente
+
+                    // Verificar se há pelo menos dois consumos para calcular o total de euros poupados
+                    if (consumosCasa.length >= 2) {
+                        // Encontrar os consumos dos dois últimos meses
+                        const ultimoConsumoMesAtual = consumosCasa.find(consumo => moment(consumo.data_consumo).month() === moment().month());
+                        const penultimoConsumoMesAnterior = consumosCasa.find(consumo => moment(consumo.data_consumo).month() === (moment().month() - 1 + 12) % 12);
+
+                        // Verificar se encontramos os consumos dos dois últimos meses
+                        if (ultimoConsumoMesAtual && penultimoConsumoMesAnterior) {
+                            // Calcular a diferença nos volumes de consumo entre os dois últimos meses
+                            const diferencaVolumeConsumido = ultimoConsumoMesAtual.volume_consumido - penultimoConsumoMesAnterior.volume_consumido;
+
+                            // Calcular o total de euros poupados multiplicando a diferença no volume de consumo pelo preço por metro
+                            return acc + (diferencaVolumeConsumido * precoPorMetro);
                         }
                     }
-                }
-        
-                // Calcular o total de euros poupados do mês anterior
-                const totalEurosPoupadosMesAnterior = Object.entries(diferencaVolumeConsumidoAnterior).reduce((acc, [casa_id, diferencaVolume]) => {
-                    const precoPorMetro = consumosPorCasa[casa_id][0]['Casa.precopormetro']; // Acessando o precopormetro da casa correspondente
-                    const precoTotal = diferencaVolume * precoPorMetro;
-                    return acc + precoTotal;
+                    // Se não houver mês anterior ou se os consumos dos dois últimos meses não forem encontrados,
+                    // retorne o total de euros a pagar do mês atual
+                    return acc + (calcularTotalConsumo(consumosCasa) * precoPorMetro);
                 }, 0);
-        
+                // Converter tudo a posiitivo
+                totalConsumoMesAtual = Math.abs(totalConsumoMesAtual);
+                totalEurosPagarMesAtual = Math.abs(totalEurosPagarMesAtual);
+                totalEurosPoupadosMesAnterior = Math.abs(totalEurosPoupadosMesAnterior);
+
+                
                 console.log('Total de consumo do mês atual:', totalConsumoMesAtual);
                 console.log('Total de euros a pagar do mês atual:', totalEurosPagarMesAtual);
                 console.log('Total de euros poupados do mês anterior:', totalEurosPoupadosMesAnterior);
-        
-                // Agora você pode usar a variável totalConsumoMesAtual conforme necessário
-                res.status(200).json({ totalConsumoMesAtual: totalConsumoMesAtual.toFixed(3), totalEurosPagarMesAtual: totalEurosPagarMesAtual.toFixed(2), totalEurosPoupadosMesAnterior: totalEurosPoupadosMesAnterior.toFixed(2) });
+
+                let valorMesAtual = parseFloat(totalEurosPagarMesAtual.toFixed(2));
+                let valorMesAnterior = parseFloat(totalEurosPoupadosMesAnterior.toFixed(2));
+                const percentagem = parseFloat((( (valorMesAtual - valorMesAnterior) / valorMesAnterior) * 100).toFixed(2));
+                const poupadoPercentagem = percentagem;
+                const poupadoEuros = parseFloat((valorMesAnterior-valorMesAtual).toFixed(2));
+
+                console.log('Percentagem poupada:', poupadoPercentagem);
+                console.log('Euros poupados:', poupadoEuros);
+                // Agora você pode usar as variáveis conforme necessário
+                res.status(200).json({ totalConsumoMesAtual: totalConsumoMesAtual.toFixed(3), totalEurosPagarMesAtual: totalEurosPagarMesAtual.toFixed(2), totalEurosPoupadosMesAnterior: totalEurosPoupadosMesAnterior.toFixed(2), poupadoPercentagem, poupadoEuros});
+                
             } catch (error) {
                 console.error('Erro ao buscar consumos:', error);
                 res.status(500).send('Erro ao buscar consumos');
@@ -116,7 +155,6 @@ const getAllConsumos = async (req, res) => {
                     casa_id: casa
                 },
                 attributes: ['casa_id', 'data_consumo', 'volume_consumido'],
-                raw: true,
             });
             res.json(consumos);
         } else if (tipo === 'consumototal') {
@@ -127,7 +165,6 @@ const getAllConsumos = async (req, res) => {
                     where: {
                         utilizador_id: utilizador
                     },
-                    raw: true
                 });
 
                 // Verificar se existem casas associadas ao utilizador
@@ -149,7 +186,6 @@ const getAllConsumos = async (req, res) => {
                             casa_id: casa.casa_id
                         },
                         order: [['data_consumo', 'DESC']], // Ordenamos por data descendentemente para obter o último consumo
-                        raw: true
                     });
 
                     if (ultimoConsumo) {
@@ -158,7 +194,7 @@ const getAllConsumos = async (req, res) => {
                     }
                 }
 
-                res.json({ totalConsumido, eurosGastos, quantidadeCasas });
+                res.json({ totalConsumido, eurosGastos: eurosGastos.toFixed(2), quantidadeCasas });
             } catch (error) {
                 console.error('Erro ao calcular consumo total:', error);
                 res.status(500).json({ error: 'Internal server error' });
@@ -176,8 +212,7 @@ const getAllConsumos = async (req, res) => {
                             utilizador_id: utilizador
                         }
                     },
-                    attributes: ['casa_id', 'data_consumo', 'volume_consumido'],
-                    raw: true,
+                    attributes: ['casa_id', 'data_consumo', 'volume_consumido']
                 });
         
                 // Separar os consumos por casa
@@ -241,20 +276,19 @@ const getAllConsumos = async (req, res) => {
         else {
             console.log('Todos os consumos');
             // Caso contrário, buscar todos os consumos
-            const consumos = await Consumo.findAll({
+            consumos = await Consumo.findAll({
                 include: {
                     model: Casa,
-                    attributes: ['nome', 'precopormetro', 'pessoas'], // Incluir nome e precopormetro da Casa
+                    attributes: ['nome', 'precopormetro', 'pessoas'],
                     where: {
-                        utilizador_id: utilizador // Filtrar casas pelo utilizador_id
+                        utilizador_id: utilizador
                     },
                     include: {
                         model: TipoCasa,
-                        attributes: ['tipo_casa', 'fator'] // Incluir tipo_casa e fator do TipoCasa
+                        attributes: ['tipo_casa', 'fator']
                     }
                 },
                 attributes: ['casa_id', 'data_consumo', 'volume_consumido'],
-                raw: true,
             });
         
             // Calcular a eficiência de cada consumo
@@ -265,21 +299,48 @@ const getAllConsumos = async (req, res) => {
                         casa_id: consumo.casa_id,
                         data_consumo: { [Op.lt]: consumo.data_consumo } // Consumo anterior cronologicamente
                     },
+                    include: { 
+                        model: Casa,
+                        attributes: ['pessoas', 'tipo_casa_id'], // Incluir pessoas e tipo_casa_id da Casa
+                        include: {
+                            model: TipoCasa,
+                            attributes: ['fator'] // Incluir fator do TipoCasa
+                        }
+                    },
                     order: [['data_consumo', 'DESC']] // Ordenado do mais recente para o mais antigo
                 });
         
                 if (consumoAnterior) {
-                    const diffDays = moment(consumo.data_consumo).diff(moment(consumoAnterior.data_consumo), 'days') || 1; // Evitar divisão por zero
-                    const eficiencia = Math.min((consumo.volume_consumido / (consumo['Casa.pessoas'] * consumo['Casa.TipoCasa.fator'] * diffDays)) * 100, 100);
-                    consumosComEficiencia.push({ ...consumo, eficiencia: eficiencia.toFixed(2) });
+                    const diffDays = moment(consumo.data_consumo).diff(moment(consumoAnterior.data_consumo), 'days') || 1; // Se a diferença for 0, definir como 1
+                    const consumoDiferenca = parseFloat((consumo.volume_consumido - consumoAnterior.volume_consumido).toFixed(3));
+                    const consumoIdealDiario = process.env.LITROS_POR_PESSOA_IDEAL / 1000; // Consumo ideal diário por pessoa em m³
+                    const consumoIdeal = consumoIdealDiario * consumoAnterior.Casa.pessoas * diffDays * consumoAnterior.Casa.TipoCasa.fator;
+                    // Calcula a eficiência hídrica em porcentagem
+                    let eficiencia = parseFloat(((consumoIdeal / consumoDiferenca) * 100).toFixed(2))
+                    consumosComEficiencia.push({ ...consumo.toJSON(), eficiencia, dataconsumo: consumo.data_consumo });
                 } else {
                     // Se não houver consumo anterior, definir a eficiência como 0
-                    consumosComEficiencia.push({ ...consumo, eficiencia: 0.00 });
+                    consumosComEficiencia.push({ ...consumo.toJSON(), eficiencia: 0.00, dataconsumo: consumo.data_consumo });
                 }
             }
         
-            res.json(consumosComEficiencia);
-            console.log(consumosComEficiencia);
+            // Função para converter os objetos Sequelize para objetos simples
+            function convertToPlainObject(obj) {
+                if (obj instanceof sequelize.Model) {
+                    return obj.get({ plain: true });
+                } else {
+                    return obj;
+                }
+            }
+        
+            // Convertendo os consumos para objetos simples
+            const consumosPlain = consumosComEficiencia.map(consumo => ({
+                ...consumo,
+                Casa: convertToPlainObject(consumo.Casa), // Convertendo o objeto Casa
+            }));
+        
+            // Enviar a resposta JSON
+            res.json(consumosPlain);
         }
     } catch (error) {
         console.error('Erro ao processar requisição:', error);
@@ -317,12 +378,15 @@ const getConsumoById = async (req, res) => {
 const createConsumo = async (req, res) => {
     const { casa_id, data_consumo, volume_consumido } = req.body;
     try {
-        // Cria o novo consumo
-        const consumo = await Consumo.create({ casa_id, data_consumo, volume_consumido });
-
-        // Busca o último consumo da mesma casa, ordenado cronologicamente
+        let consumo = {
+            casa_id,
+            data_consumo,
+            volume_consumido
+        };
+        // CALCULAR EFICIENCIA HIDRICA
+        // Busca o último consumo da mesma casa, ordenado cronologicamente, anterior ao consumo atual
         const ultimoConsumo = await Consumo.findOne({
-            where: { casa_id },
+            where: { casa_id, data_consumo: { [Op.lt]: data_consumo } },
             include: {
                 model: Casa,
                 attributes: ['pessoas', 'tipo_casa_id'], // Incluir pessoas e tipo_casa_id da Casa
@@ -333,66 +397,105 @@ const createConsumo = async (req, res) => {
             },
             order: [['data_consumo', 'DESC']]
         });
+        // Se o valor_consumido for menor do que o valor_consumido do último consumo, retorne um erro
+        if (ultimoConsumo && volume_consumido < ultimoConsumo.volume_consumido) {
+            return res.status(400).json({ error: 'O volume consumido não pode ser menor do que o volume consumido do último consumo' });
+        } else {
+            // Se não houver consumo anterior, cria o novo consumo
+            //Cria o novo consumo
+            consumo = await Consumo.create({ casa_id, data_consumo, volume_consumido });
+        }
 
         if (ultimoConsumo) {
+            console.log('Último consumo:', JSON.stringify(ultimoConsumo));
             // Calcula a diferença em dias entre os dois consumos
-            const diffDays = moment(data_consumo).diff(moment(ultimoConsumo.data_consumo), 'days');
-
-            // Calcula a eficiência hídrica em porcentagem
+            const diffDays = moment(data_consumo).diff(moment(ultimoConsumo.data_consumo), 'days') || 1; // Se a diferença for 0, definir como 1
+            const consumoDiferenca = parseFloat((volume_consumido - ultimoConsumo.volume_consumido).toFixed(3));
             const consumoIdealDiario = process.env.LITROS_POR_PESSOA_IDEAL / 1000; // Consumo ideal diário por pessoa em m³
-            let eficiencia = Math.min((volume_consumido / (ultimoConsumo.Casa.pessoas * consumoIdealDiario * diffDays)) * 100, 100);
+            const consumoIdeal = consumoIdealDiario * ultimoConsumo.Casa.pessoas * diffDays * ultimoConsumo.Casa.TipoCasa.fator;
+            // Calcula a eficiência hídrica em porcentagem
+            let eficiencia = parseFloat(((consumoIdeal / consumoDiferenca) * 100).toFixed(2));
 
-            // Cria os alertas com base na eficiência, tipo de casa e consumo ideal diário
-            const alertas = [];
             try {
-                if (eficiencia < 100) {
-                    // Calcula o consumo médio ideal de água por pessoa em m³
-                    const consumoMedioIdeal = (110 * ultimoConsumo.Casa.pessoas) / 1000;
-
                     // Verifica o range de eficiência e cria os alertas correspondentes
-                    if (eficiencia < 80) {
+                    if (eficiencia < 20) {
                         await Alerta.create({
                             casa_id: casa_id,
-                            tipo_alerta: 'Consumo abaixo do ideal',
-                            mensagem_alerta: `O consumo médio atual da casa está abaixo do ideal de ${consumoMedioIdeal.toFixed(3)} m³ por pessoa por mês.`,
+                            tipo_alerta: 'Consumo muito acima do ideal',
+                            mensagem_alerta: `O consumo com data ${moment(data_consumo).format('DD/MM/YYYY')} da casa está muito acima do ideal de ${consumoIdeal.toFixed(3)} m³. É crucial tomar medidas imediatas para reduzir o consumo.`,
                             data_alerta: new Date(),
                             estado: true // Defina o estado inicial do alerta como ativo
                         });
-                    } else if (eficiencia >= 80 && eficiencia < 100) {
+                    } else if (eficiencia >= 20 && eficiencia < 40) {
                         await Alerta.create({
                             casa_id: casa_id,
-                            tipo_alerta: 'Consumo próximo do ideal',
-                            mensagem_alerta: `O consumo médio atual da casa está próximo do ideal de ${consumoMedioIdeal.toFixed(3)} m³ por pessoa por mês.`,
+                            tipo_alerta: 'Consumo muito acima do ideal',
+                            mensagem_alerta: `O consumo com data ${moment(data_consumo).format('DD/MM/YYYY')} da casa está consideravelmente acima do ideal de ${consumoIdeal.toFixed(3)} m³. Recomenda-se tomar medidas para reduzir o consumo.`,
+                            data_alerta: new Date(),
+                            estado: true // Defina o estado inicial do alerta como ativo
+                        });
+                    } else if (eficiencia >= 40 && eficiencia < 60) {
+                        await Alerta.create({
+                            casa_id: casa_id,
+                            tipo_alerta: 'Consumo acima do ideal',
+                            mensagem_alerta: `O consumo com data ${moment(data_consumo).format('DD/MM/YYYY')} da casa está acima do ideal de ${consumoIdeal.toFixed(3)} m³. Sugere-se buscar maneiras de reduzir o consumo de água.`,
+                            data_alerta: new Date(),
+                            estado: true // Defina o estado inicial do alerta como ativo
+                        });
+                    } else if (eficiencia >= 60 && eficiencia < 80) {
+                        await Alerta.create({
+                            casa_id: casa_id,
+                            tipo_alerta: 'Consumo abaixo do ideal',
+                            mensagem_alerta: `O consumo com data ${moment(data_consumo).format('DD/MM/YYYY')} da casa está ligeiramente acima do ideal de ${consumoIdeal.toFixed(3)} m³. Pode-se considerar maneiras de otimizar o consumo de água.`,
                             data_alerta: new Date(),
                             estado: true // Defina o estado inicial do alerta como ativo
                         });
                     }
-                } else {
-                    eficiencia = 100; // Limita a eficiência a 100%
-                    await Alerta.create({
-                        casa_id: casa_id,
-                        tipo_alerta: 'Consumo superior ao limite',
-                        mensagem_alerta: 'O consumo atual excedeu o limite máximo permitido.',
-                        data_alerta: new Date(),
-                        estado: true // Defina o estado inicial do alerta como ativo
-                    });
-                }
             } catch (error) {
                 console.error('Erro ao criar alertas:', error);
                 res.status(500).send('Erro ao criar alertas');
+            } finally {
+                try {
+                    // Verificar se há picos de consumo anormal
+                    const historicoConsumo = await Consumo.findAll({
+                        where: {
+                            casa_id,
+                            data_consumo: {
+                                [Op.between]: [moment(data_consumo).subtract(6, 'months').toDate(), moment(data_consumo).toDate()]
+                            }
+                        },
+                        order: [['data_consumo', 'DESC']]
+                    });
+                    // Se não houver histórico de consumo suficiente, não é possível verificar picos de consumo anormal
+                    if (!historicoConsumo) {
+                        console.log('Não há histórico de consumo suficiente para verificar picos de consumo anormal');
+                        return res.status(201).json({ consumo, eficiencia: eficiencia.toFixed(2) });
+                    }
+                    // Calcular a média de consumo dos últimos 6 meses
+                    const mediaConsumo = historicoConsumo.reduce((acc, consumo) => acc + consumo.volume_consumido, 0) / historicoConsumo.length;
+                    // Calcular o desvio padrão do consumo dos últimos 6 meses
+                    const desvioPadrao = Math.sqrt(historicoConsumo.reduce((acc, consumo) => acc + Math.pow(consumo.volume_consumido - mediaConsumo, 2), 0) / historicoConsumo.length);
+                    // Verificar se o consumo atual é um pico anormal
+                    const consumoAtual = volume_consumido;
+                    // Calcular o Z-Score do consumo atual
+                    const zScore = (consumoAtual - mediaConsumo) / desvioPadrao;
+                    // Se o Z-Score for maior que 2, considera-se um pico de consumo anormal
+                    if (zScore > 2) {
+                        await Alerta.create({
+                            casa_id: casa_id,
+                            tipo_alerta: 'Pico de consumo anormal',
+                            mensagem_alerta: `O consumo com data ${moment(data_consumo).format('DD/MM/YYYY')} da casa é um pico anormal em comparação com os últimos 6 meses. Verifique se há fugas ou uso excessivo de água.`,
+                            data_alerta: new Date(),
+                            estado: true // Defina o estado inicial do alerta como ativo
+                        });
+                }           
+                res.status(201).json({ consumo, eficiencia: eficiencia });
+                } catch (error) {
+                    console.error('Erro ao buscar picos de consumo:', error);
+                    res.status(500).send('Erro ao buscar picos de consumo');
+                }
             }
-
-            // Verifica se existem alertas para criar
-            if (alertas.length > 0) {
-                // Cria os alertas no banco de dados
-                const alertasCriados = await Alerta.bulkCreate(alertas);
-
-                // Retorna o consumo criado juntamente com a eficiência hídrica e os alertas
-                res.status(201).json({ consumo, eficiencia: eficiencia.toFixed(2), alertas: alertasCriados });
-            } else {
-                // Se não houver alertas para criar, retorna apenas o consumo
-                res.status(201).json({ consumo, eficiencia: eficiencia.toFixed(2) });
-            }
+            
         } else {
             // Se não houver consumo anterior, retorna apenas o consumo criado
             res.status(201).json(consumo);

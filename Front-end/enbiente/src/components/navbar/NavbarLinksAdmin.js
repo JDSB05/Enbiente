@@ -61,7 +61,7 @@ export default function HeaderLinks(props) {
 		function fetchAlertas(){
 			//fetch alertas
 			try {
-				api.get('/alertas').then((response) => {
+				api.get('/alertas?utilizador_id=' + localStorage.getItem('utilizador_id')).then((response) => {
 					setAlertas(response.data);
 				});
 			} catch (error) {
@@ -154,8 +154,8 @@ export default function HeaderLinks(props) {
 							.sort((a, b) => new Date(b.data_alerta) - new Date(a.data_alerta)) // Ordena todas as alertas por data_alerta em ordem decrescente
 							.filter((alerta, index) => alerta.estado || index < 5) // Filtra para mostrar todas as alertas com estado=true e as últimas 5 alertas com estado=false
 							.map((alerta, index) => (
-								<MenuItem key={index} className={alerta.estado ? "ItemRespiracao" : ""} _hover={{ bg: 'none' }} _focus={{ bg: 'none' }} borderRadius="8px" mb="10px" px="8px">
-									<ItemContent tipoalerta={alerta.tipo_alerta} info={alerta.Casa.nome} descricao={alerta.mensagem_alerta} estado={alerta.estado} marcarlida={marcarAlertaComoLida} alerta_id={alerta.alerta_id} />
+								<MenuItem key={index} className={alerta.estado ? "ItemRespiracao" : ""} _hover={{ bg: 'none' }} _focus={{ bg: 'none' }} borderRadius="8px" mb="10px" px="8px" maxW='500px'>
+									<ItemContent casa={alerta.Casa.nome} tipoalerta={alerta.tipo_alerta} descricao={alerta.mensagem_alerta} estado={alerta.estado} marcarlida={marcarAlertaComoLida} alerta_id={alerta.alerta_id} />
 								</MenuItem>
 							))}
 					</Flex>
