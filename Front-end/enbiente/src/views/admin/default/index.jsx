@@ -69,11 +69,11 @@ export default function UserReports() {
   const brandColor = useColorModeValue("brand.500", "white");
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
   const [dadosMensais, setDadosMensais] = useState([]); 
-  const [consumidoNesteMes, setConsumidoNesteMes] = useState(0.0);
-  const [poupadoeuros, setPoupadoeuros] = useState(0.0);
-  const [valorMesAtual, setValorMesAtual] = useState(0.0);
-  const [valorMesAnterior, setValorMesAnterior] = useState(0.0);
-  const [poupadoPercentagem, setPoupadoPercentagem] = useState(0.0);
+  const [consumidoNesteMes, setConsumidoNesteMes] = useState("");
+  const [poupadoeuros, setPoupadoeuros] = useState("");
+  const [valorMesAtual, setValorMesAtual] = useState("");
+  const [valorMesAnterior, setValorMesAnterior] = useState("");
+  const [poupadoPercentagem, setPoupadoPercentagem] = useState("");
   let utilizador_id = localStorage.getItem('utilizador_id');
   const [isLoadingData, setIsLoadingData] = React.useState(true);
   const { showMessageToast, showErrorToast } = useToast();
@@ -97,7 +97,7 @@ export default function UserReports() {
         setDadosMensais(data2);
         setConsumosPorCasa(data3);
         setIsLoadingData(false);
-        if (consumidoNesteMes === 0.0 || consumidoNesteMes === null || valorMesAtual === 0.0 || valorMesAtual === null || poupadoeuros === 0.0 || poupadoeuros === null || poupadoPercentagem === 0.0 || poupadoPercentagem === null) {
+        if ((consumidoNesteMes === 0.0) && (valorMesAtual === 0.0) && (poupadoeuros === 0.0) && (poupadoPercentagem === 0.0)) {
           showMessageToast("Não existem dados suficientes para mostrar os dados, adicione consumos para mostrar as estatisticas.");
         }
       } catch (error) {
