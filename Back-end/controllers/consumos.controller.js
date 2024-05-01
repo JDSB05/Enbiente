@@ -86,13 +86,13 @@ const getAllConsumos = async (req, res) => {
                             console.log('Consumos do mês anterior:', JSON.stringify(consumosMesAnterior, null, 2));
                             // Verificar se existem consumos para o mês anterior
                             if (consumosMesAnterior && consumosMesAnterior.length > 0) {
-                                totalConsumoMesAtual += consumosMesAtual[0].volume_consumido - consumosMesAnterior[0].volume_consumido;
+                                totalConsumoMesAtual += consumosMesAtual[0].volume_consumido - consumosMesAnterior[0].volume_consumido; // Se for preciso, adicionar outros calculos aqui
                                 // Calcula o preço total da diferença de volume consumido, adiciona o preco por cada casa
                                 const precoDiferencaCasa = (consumosMesAtual[0].volume_consumido - consumosMesAnterior[0].volume_consumido) * consumosMesAtual[0].Casa.precopormetro;
                                 totalEurosPagarMesAtual += precoDiferencaCasa;
                             } else {
                                 // Se não houver consumos para o mês anterior, adicione o volume consumido do mês atual ao total
-                                totalConsumoMesAtual += consumosMesAtual[0].volume_consumido;
+                                totalConsumoMesAtual += consumosMesAtual[0].volume_consumido; // Se for preciso, adicionar outros calculos aqui
                                 // Calcula o preço total da diferença de volume consumido
                                 const precoTotalCasa = consumosMesAtual[0].volume_consumido * consumosMesAtual[0].Casa.precopormetro;
                                 totalEurosPagarMesAtual += precoTotalCasa;
@@ -123,13 +123,13 @@ const getAllConsumos = async (req, res) => {
                             console.log('Consumos do mês anterior:', JSON.stringify(consumosMesAnterior, null, 2));
                             // Verificar se existem consumos para o mês anterior
                             if (consumosMesAnterior && consumosMesAnterior.length > 0) {
-                                totalConsumoMesAnterior += consumosMesAtual[0].volume_consumido - consumosMesAnterior[0].volume_consumido;
+                                totalConsumoMesAnterior += consumosMesAtual[0].volume_consumido - consumosMesAnterior[0].volume_consumido; // Se for preciso, adicionar outros calculos aqui
                                 // Calcula o preço total da diferença de volume consumido, adiciona o preco por cada casa
                                 const precoDiferencaCasa = (consumosMesAtual[0].volume_consumido - consumosMesAnterior[0].volume_consumido) * consumosMesAtual[0].Casa.precopormetro;
                                 totalEurosPoupadosMesAnterior += precoDiferencaCasa;
                             } else {
                                 // Se não houver consumos para o mês anterior, adicione o volume consumido do mês atual ao total
-                                totalConsumoMesAnterior += consumosMesAtual[0].volume_consumido;
+                                totalConsumoMesAnterior += consumosMesAtual[0].volume_consumido; // Se for preciso, adicionar outros calculos aqui
                                 // Calcula o preço total da diferença de volume consumido
                                 const precoTotalCasa = consumosMesAtual[0].volume_consumido * consumosMesAtual[0].Casa.precopormetro;
                                 totalEurosPoupadosMesAnterior += precoTotalCasa;
@@ -171,22 +171,94 @@ const getAllConsumos = async (req, res) => {
             }
         }
         
-        else if (tipo === 'consumosporcasa' && casa) {
+        else if (tipo === 'consumosporcasa') {
             console.log('Consumos por casa');
-            consumos = await Consumo.findAll({
+            // Buscar todos os consumos com ordenação e limite
+            const consumos = await Consumo.findAll({
+                order: [['casa_id', 'ASC'], ['data_consumo', 'DESC']],
                 include: {
                     model: Casa,
-                    attributes: ['nome', 'precopormetro'], // Incluir nome e precopormetro da Casa
+                    attributes: ['nome','precopormetro'], 
                     where: {
                         utilizador_id: utilizador
                     }
                 },
-                where: {
-                    casa_id: casa
-                },
                 attributes: ['casa_id', 'data_consumo', 'volume_consumido'],
             });
-            res.json(consumos);
+
+            const Casas = await Casa.findAll({
+                where: {
+                    utilizador_id: utilizador
+                },
+                attributes: ['casa_id', 'nome']
+            });
+            // Separar os consumos por casa e por mês
+            const consumosPorCasa = {};
+
+            // Iterar sobre cada consumo para organizar por casa, ano e mês
+            consumos.forEach(consumo => {
+                const { casa_id, data_consumo } = consumo;
+                const ano = moment(data_consumo).year(); // Obter o ano do consumo
+                const mes = moment(data_consumo).month(); // Obter o mês do consumo
+
+                // Verificar se a casa já está no objeto consumosPorCasa
+                if (!consumosPorCasa[casa_id]) {
+                    consumosPorCasa[casa_id] = {};
+                }
+
+                // Verificar se o ano já existe para essa casa
+                if (!consumosPorCasa[casa_id][ano]) {
+                    // Se o ano não existir, criar um novo objeto para o ano atual
+                    consumosPorCasa[casa_id][ano] = {};
+                }
+
+                // Verificar se o mês já existe para esse ano
+                if (!consumosPorCasa[casa_id][ano][mes]) {
+                    // Se o mês não existir, criar um novo array para o mês atual
+                    consumosPorCasa[casa_id][ano][mes] = [];
+                }
+
+                // Adicionar o consumo ao mês correspondente da casa e ano
+                consumosPorCasa[casa_id][ano][mes].push(consumo);
+            });
+
+            console.log('Consumos por casa, ano e mês:', JSON.stringify(consumosPorCasa, null, 2));
+
+            // Função para calcular a diferença no volume consumido entre o mês atual e o mês anterior para todas as casas
+            const calcularDiferencaVolumeConsumido = (consumosPorCasa) => {
+                let totalConsumoMesAtual = {};
+
+                const anoAtual = moment().year().toString();
+                const mesAtual = (moment().month()).toString();
+                // Iterar sobre todas as casas
+                for (const casaId in consumosPorCasa) {
+                    const consumosPorAno = consumosPorCasa[casaId];
+                    let nomeCasa = Casas.find(casa => casa.casa_id === parseInt(casaId))?.nome || null;
+                    // Inicializar a 0
+                    totalConsumoMesAtual[nomeCasa] = 0;
+                        // Verificar se existem consumos para o mês atual
+                        if (consumosPorAno[anoAtual] && consumosPorAno[anoAtual][mesAtual]) {
+                            // Obter os consumos do mês atual e do mês anterior
+                            const consumosMesAtual = consumosPorAno[anoAtual][mesAtual];
+                            const consumosMesAnterior = mesAtual === '0' ? (consumosPorAno[(moment().year() - 1).toString()]?.['11'] || []) : consumosPorAno[anoAtual][mesAtual - 1] || [];
+                            // Verificar se existem consumos para o mês anterior
+                            if (consumosMesAnterior && consumosMesAnterior.length > 0) {
+                                totalConsumoMesAtual[nomeCasa] += parseFloat((consumosMesAtual[0].volume_consumido - consumosMesAnterior[0].volume_consumido).toFixed(3)); // Se for preciso, adicionar outros calculos aqui
+                            } else {
+                                // Se não houver consumos para o mês anterior, adicione o volume consumido do mês atual ao total
+                                totalConsumoMesAtual[nomeCasa] += parseFloat((consumosMesAtual[0].volume_consumido).toFixed(3)); // Se for preciso, adicionar outros calculos aqui
+                            }
+
+                        } else {
+                            // Se não houver consumos para o mês atual, não adicione nada ao total
+                            console.log('Não existem consumos para o mês de', moment().month(parseInt(mesAtual)).locale('pt').format('MMMM'), 'da casa com id:', casaId);
+                        }
+                }
+                return totalConsumoMesAtual;
+            };
+            const totalConsumoMesAtual = calcularDiferencaVolumeConsumido(consumosPorCasa);
+            console.log('Total de consumo do mês atual:', totalConsumoMesAtual);
+            res.status(200).json({ totalConsumoMesAtual });
         } else if (tipo === 'consumototal') {
             try {
                 // Encontrar todas as casas pertencentes ao utilizador
@@ -287,8 +359,6 @@ const getAllConsumos = async (req, res) => {
                         if (mesAtual === 0) {
                             ano--;
                             mesAtual = 11; // Dezembro
-                        } else {
-                            mesAtual--; // Subtrai um mês
                         }
                 
                         const mesAtualStr = mesAtual.toString();
@@ -304,22 +374,25 @@ const getAllConsumos = async (req, res) => {
                             if (consumosMesAtual.length > 0 && consumosMesAnterior.length > 0) {
                                 // Se houver consumos para o mês anterior, calcule a diferença de volume consumido
                                 dataconsumo = moment(consumosMesAtual[0].data_consumo).format('MM/YYYY');
-                                const diferencaVolumeConsumido = consumosMesAtual[0].volume_consumido - consumosMesAnterior[0].volume_consumido;
-                                totalConsumoMes[dataconsumo] = (totalConsumoMes[dataconsumo] || 0) + diferencaVolumeConsumido;
-                                totalEurosPagarMes[dataconsumo] = (totalEurosPagarMes[dataconsumo] || 0) + (diferencaVolumeConsumido * consumosMesAtual[0].Casa.precopormetro);
+                                const diferencaVolumeConsumido = parseFloat((consumosMesAtual[0].volume_consumido - consumosMesAnterior[0].volume_consumido).toFixed(3));
+                                totalConsumoMes[dataconsumo] = parseFloat((totalConsumoMes[dataconsumo] || 0) + diferencaVolumeConsumido.toFixed(3)); // Se for preciso, adicionar outros calculos aqui
+                                totalEurosPagarMes[dataconsumo] = parseFloat((totalEurosPagarMes[dataconsumo] || 0) + (diferencaVolumeConsumido * consumosMesAtual[0].Casa.precopormetro).toFixed(2));
                             } else if (consumosMesAtual.length > 0) {
                                 // Se não houver consumos para o mês anterior, adicione o volume consumido do mês atual ao total
                                 dataconsumo = moment(consumosMesAtual[0].data_consumo).format('MM/YYYY');
-                                totalConsumoMes[dataconsumo] = (totalConsumoMes[dataconsumo] || 0) + consumosMesAtual[0].volume_consumido;
-                                totalEurosPagarMes[dataconsumo] = 0;
+                                //totalConsumoMes[dataconsumo] = parseFloat((totalConsumoMes[dataconsumo] || 0) + consumosMesAtual[0].volume_consumido.toFixed(3)); // Se for preciso, adicionar outros calculos aqui
+                                //totalEurosPagarMes[dataconsumo] = 0; 
+                            
                             } else {
                                 // Se não houver consumos para o mês atual, não adicione nada ao total, mas deixe o valor como 0
                                 const ultimaData = Object.keys(totalConsumoMes).pop();
                                 dataconsumo = moment(ultimaData, 'MM/YYYY').subtract(1, 'months').format('MM/YYYY');
-                                totalConsumoMes[dataconsumo] = (totalConsumoMes[dataconsumo] || 0);
-                                totalEurosPagarMes[dataconsumo] = 0;
+                                if (dataconsumo === 'Invalid date') dataconsumo = moment().format('MM/YYYY');
+                                //totalConsumoMes[dataconsumo] = (totalConsumoMes[dataconsumo] || 0);
+                                //totalEurosPagarMes[dataconsumo] = 0;
                             }
                         }
+                        mesAtual--;
                     }
                 
                     return { totalConsumoMes, totalEurosPagarMes }; // Retorna ambos os valores

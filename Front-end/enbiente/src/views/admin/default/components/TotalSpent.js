@@ -11,14 +11,15 @@ import {
 import Card from "../../../../components/card/Card.js";
 import LineChart from "../../../../components/charts/LineChart";
 import React from "react";
+import moment from "moment";
 import { IoCheckmarkCircle } from "react-icons/io5";
 
 export default function TotalSpent(props) {
   const { data, ...rest } = props;
 
   // Chakra Color Mode
-  const precoMedio = "51.23€"
-  const precoAnual = "614.76€"
+  let precoMedio = 0
+  let precoAnual = 0
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = useColorModeValue("secondaryGray.600", "white");
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
@@ -33,19 +34,28 @@ export default function TotalSpent(props) {
     { bg: "whiteAlpha.100" }
   );
   const getMonthArray = () => {
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth();
-    const currentYear = currentDate.getFullYear();
-    const monthArray = [];
-
-    for (let i = 0; i < 12; i++) {
-      const month = (currentMonth - i + 12) % 12;
-      const year = currentYear - Math.floor((currentMonth - i) / 12);
-      const monthString = new Date(year, month).toLocaleString('default', { month: 'short' });
-      monthArray.push(`${monthString}`);
-    }
-
-    return monthArray.reverse();
+    const mesesEmPortugues = {
+      '01': 'Jan',
+      '02': 'Fev',
+      '03': 'Mar',
+      '04': 'Abr',
+      '05': 'Maio',
+      '06': 'Jun',
+      '07': 'Jul',
+      '08': 'Ago',
+      '09': 'Set',
+      '10': 'Out',
+      '11': 'Nov',
+      '12': 'Dez'
+    };
+    
+    const dadosFormatados = Object.entries(data.totalConsumoMes).reduce((acc, [data, valor]) => {
+      const [mes, ano] = data.split('/');
+      const mesPorExtenso = mesesEmPortugues[mes];
+      acc[`${mesPorExtenso} - ${ano}`] = valor;
+      return acc;
+    }, {});
+    return Object.keys(dadosFormatados).reverse();
   };
 
   // Example usage
@@ -122,14 +132,21 @@ export default function TotalSpent(props) {
     },
     color: ["#7551FF", "#39B8FF"],
   };
+  // Converter o data.totalConsumoMes para um array de objetos do tipo [30, 40, 24, 46, 20, 46]
+  const volumeArray = Object.values(data.totalConsumoMes).reverse();
+  const custoArray = Object.values(data.totalEurosPagarMes).reverse();
+  // Média de todos os valores do array
+  precoMedio = (custoArray.reduce((a, b) => a + b, 0) / custoArray.length).toFixed(2);
+  //Soma de todos os valores do array
+  precoAnual = (custoArray.reduce((a, b) => a + b, 0)).toFixed(2);
   const lineChartDataTotalSpent = [
     {
-      name: "Revenue",
-      data: [50, 64, 48, 66, 49, 68, 50, 64, 48, 66, 49, 68],
+      name: "Volume",
+      data: volumeArray,
     },
     {
-      name: "Profit",
-      data: [30, 40, 24, 46, 20, 46],
+      name: "Preço",
+      data: custoArray,
     },
   ];
   
@@ -144,19 +161,19 @@ export default function TotalSpent(props) {
       <Flex justify='space-between' ps='0px' pe='20px' pt='5px'>
         <Flex align='center' w='100%'>
           <Text color={textColor} fontSize='xl' fontWeight='600' mt='4px'>
-            Consumo Mensual
+            Consumo Mensal
           </Text>
         </Flex>
       </Flex>
       <Flex w='100%' flexDirection={{ base: "column", lg: "row" }}>
-        <Flex flexDirection='column' me='20px' mt='28px'>
+        <Flex flexDirection='column' mr='15px' mt='28px'>
           <Text
             color={textColor}
             fontSize='34px'
             textAlign='start'
             fontWeight='700'
             lineHeight='100%'>
-            {precoMedio}
+            Media mensal: {precoMedio + " €"}
           </Text>
           <Flex align='center' mb='20px'>
             <Text
@@ -165,14 +182,7 @@ export default function TotalSpent(props) {
               fontWeight='500'
               mt='4px'
               me='12px'>
-              Anual: {precoAnual}
-            </Text>
-          </Flex>
-
-          <Flex align='center'>
-            <Icon as={IoCheckmarkCircle} color='green.500' me='4px' />
-            <Text color='green.500' fontSize='md' fontWeight='700'>
-              On track
+              Soma anual: {precoAnual + " €"}
             </Text>
           </Flex>
         </Flex>

@@ -27,7 +27,8 @@ import {
 import Card from "../../../../components/card/Card";
 import { AndroidLogo, AppleLogo, WindowsLogo } from "../../../../components/icons/Icons";
 import { MdAdd } from "react-icons/md";
-import Menu from "../../../../components/menu/MainMenu";
+import { CiCalendarDate } from "react-icons/ci";
+import MainMenu from "../../../../components/menu/MainMenu";
 import React, { useMemo, useEffect } from "react";
 import  { useToast } from '../../../../components/toasts/toast';
 import api from "../../../../services/api";
@@ -41,6 +42,7 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
+import { CardMenu } from "../../../../components/card/Card";
 
 export default function DevelopmentTable(props) {
   const { showSuccessToast, showErrorToast, showMessageToast } = useToast();
@@ -148,18 +150,21 @@ export default function DevelopmentTable(props) {
   return (
     <div>
       <Card
-        direction='column'
+
         w='100%'
         px='0px'
         overflowX={{ sm: "scroll", lg: "hidden" }}>
-        <Flex px='25px' justify='space-between' mb='20px' align='center'>
+        <Flex id="PAI" px='25px' justify='space-between' mb='20px' align='center'>
+          <Flex id="FILHO1" alignItems='center' w='50%' justifyContent='left'> 
             <SearchBar
               onChange={(e) => setGlobalFilter(e.target.value)}
               h='44px'
               w={{ lg: "390px" }}
               borderRadius='16px'
-            />
-          <Flex w='50%' justifyContent="right" alignItems='center' >
+            /> 
+            <MainMenu ml='10px' icon={CiCalendarDate} setGlobal={setGlobalFilter}/>
+          </Flex>
+          <Flex id="FILHO2" w='50%' justifyContent="right" alignItems='center' >
               <Button
                 w='auto'
                 variant='solid'
