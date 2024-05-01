@@ -1,5 +1,5 @@
-import React from "react";
-
+import React, {useState, useEffect, useRef} from "react";
+import MiniCalendar from "../../components/calendar/MiniCalendar";
 // Chakra imports
 import {
   Icon,
@@ -22,8 +22,9 @@ import {
 } from "react-icons/md";
 
 export default function Banner(props) {
-  const { ...rest } = props;
+  const { icon, setGlobal, ...rest } = props;
 
+  let data = new Date();
   const textColor = useColorModeValue("secondaryGray.500", "white");
   const textHover = useColorModeValue(
     { color: "secondaryGray.900", bg: "unset" },
@@ -44,16 +45,42 @@ export default function Banner(props) {
     { bg: "secondaryGray.300" },
     { bg: "whiteAlpha.100" }
   );
+    // Ref para o MenuList
+    const menuListRef = useRef();
 
-  // Ellipsis modals
-  const {
-    isOpen: isOpen1,
-    onOpen: onOpen1,
-    onClose: onClose1,
-  } = useDisclosure();
+    // Estado para controlar a abertura do menu
+    const [isMenuOpen, setMenuOpen] = useState(false);
+
+    // Função para abrir o menu
+    const openMenu = () => {
+      setMenuOpen(true);
+    };
+  
+    // Função para fechar o menu
+    const closeMenu = () => {
+      setMenuOpen(false);
+    };
+
+    // Adiciona um event listener quando o componente é montado
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Verifica se o clique foi fora do MenuList
+      if (menuListRef.current && !menuListRef.current.contains(event.target)) {
+        closeMenu();
+      }
+    };
+
+    // Adiciona o listener ao documento
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // Limpa o listener quando o componente é desmontado
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
-    <Menu isOpen={isOpen1} onClose={onClose1}>
+    <Menu isOpen={isMenuOpen} onClose={closeMenu}>
       <MenuButton
         align='center'
         justifyContent='center'
@@ -64,100 +91,41 @@ export default function Banner(props) {
         w='37px'
         h='37px'
         lineHeight='100%'
-        onClick={onOpen1}
+        onClick={openMenu}
         borderRadius='10px'
         {...rest}>
-        <Icon as={MdOutlineMoreHoriz} color={iconColor} w='24px' h='24px' />
+        <Icon as={icon} color={iconColor} w='24px' h='24px' />
       </MenuButton>
       <MenuList
-        w='150px'
+        w='100%'
         minW='unset'
-        maxW='150px !important'
+        maxW='100%'
         border='transparent'
         backdropFilter='blur(63px)'
         bg={bgList}
         boxShadow={bgShadow}
         borderRadius='20px'
+        onClick={(event) => {
+          // Pare a propagação para evitar que o evento de clique feche o menu
+          event.stopPropagation();
+        }}
         p='15px'>
-        <MenuItem
-          transition='0.2s linear'
-          color={textColor}
-          _hover={textHover}
-          p='0px'
-          borderRadius='8px'
-          _active={{
-            bg: "transparent",
-          }}
-          _focus={{
-            bg: "transparent",
-          }}
-          mb='10px'>
-          <Flex align='center'>
-            <Icon as={MdOutlinePerson} h='16px' w='16px' me='8px' />
-            <Text fontSize='sm' fontWeight='400'>
-              Panel 1
-            </Text>
+          <Flex align='center' w="auto" h='auto'>
+          <MiniCalendar
+            selectRange={false}
+            onChange={(value, event) => {
+              // Chame 'setGlobal' e feche o menu
+              setGlobal(value);
+              closeMenu();
+            }}
+            value={data}
+            justifyContent="center"
+            
+            isRequired={true}
+            maxDate={new Date()}
+            mb='5px'
+          />
           </Flex>
-        </MenuItem>
-        <MenuItem
-          transition='0.2s linear'
-          p='0px'
-          borderRadius='8px'
-          color={textColor}
-          _hover={textHover}
-          _active={{
-            bg: "transparent",
-          }}
-          _focus={{
-            bg: "transparent",
-          }}
-          mb='10px'>
-          <Flex align='center'>
-            <Icon as={MdOutlineCardTravel} h='16px' w='16px' me='8px' />
-            <Text fontSize='sm' fontWeight='400'>
-              Panel 2
-            </Text>
-          </Flex>
-        </MenuItem>
-        <MenuItem
-          transition='0.2s linear'
-          p='0px'
-          borderRadius='8px'
-          color={textColor}
-          _hover={textHover}
-          _active={{
-            bg: "transparent",
-          }}
-          _focus={{
-            bg: "transparent",
-          }}
-          mb='10px'>
-          <Flex align='center'>
-            <Icon as={MdOutlineLightbulb} h='16px' w='16px' me='8px' />
-            <Text fontSize='sm' fontWeight='400'>
-              Panel 3
-            </Text>
-          </Flex>
-        </MenuItem>
-        <MenuItem
-          transition='0.2s linear'
-          color={textColor}
-          _hover={textHover}
-          p='0px'
-          borderRadius='8px'
-          _active={{
-            bg: "transparent",
-          }}
-          _focus={{
-            bg: "transparent",
-          }}>
-          <Flex align='center'>
-            <Icon as={MdOutlineSettings} h='16px' w='16px' me='8px' />
-            <Text fontSize='sm' fontWeight='400'>
-              Panel 4
-            </Text>
-          </Flex>
-        </MenuItem>
       </MenuList>
     </Menu>
   );

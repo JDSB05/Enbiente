@@ -42,6 +42,7 @@ import {
   MdAttachMoney,
   MdBarChart,
   MdFileCopy,
+  MdNotifications,
 } from "react-icons/md";
 
 import CheckTable from "../../../views/admin/default/components/CheckTable";
@@ -59,41 +60,52 @@ import tableDataCheck from "../../../views/admin/default/variables/tableDataChec
 import tableDataComplex from "../../../views/admin/default/variables/tableDataComplex.json";
 
 import { useEffect, useState } from "react";
+import { useToast } from "../../../components/toasts/toast";
+import { useUser } from "../../../UserProvider";
 import api from '../../../services/api';
 
 export default function UserReports() {
   // Chakra Color Mode
   const brandColor = useColorModeValue("brand.500", "white");
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
-  const [dadosMensuais, setDadosMensuais] = useState([]); 
+  const [dadosMensais, setDadosMensais] = useState([]); 
   const [consumidoNesteMes, setConsumidoNesteMes] = useState(0.0);
   const [poupadoeuros, setPoupadoeuros] = useState(0.0);
   const [valorMesAtual, setValorMesAtual] = useState(0.0);
   const [valorMesAnterior, setValorMesAnterior] = useState(0.0);
   const [poupadoPercentagem, setPoupadoPercentagem] = useState(0.0);
-  const [newTasks, setNewTasks] = useState("");
   let utilizador_id = localStorage.getItem('utilizador_id');
   const [isLoadingData, setIsLoadingData] = React.useState(true);
-
+  const { showMessageToast, showErrorToast } = useToast();
+  const [consumosPorCasa, setConsumosPorCasa] = useState([]);
+  const { updateComponent, updateUserComponent, numeroAlertas } = useUser();
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
-       const response = await api.get("/consumos?tipo=ultimosconsumos&utilizador_id=" + utilizador_id);
-       //const response2 = await api.get("/consumos?tipo=consumosmensais&utilizador_id=" + utilizador_id);
-       const data = response.data;
-      setConsumidoNesteMes(parseFloat(data.totalConsumoMesAtual).toFixed(3));
-      setValorMesAtual(parseFloat(data.totalEurosPagarMesAtual).toFixed(2));
-      setValorMesAnterior(parseFloat(data.totalEurosPoupadosMesAnterior).toFixed(2));
-      setPoupadoPercentagem(data.poupadoPercentagem);
-      setPoupadoeuros(data.poupadoEuros);
-      setNewTasks(null);
-      setDadosMensuais(response.data);
-      setIsLoadingData(false);
-       
-     } catch (error) {
-       console.log(error);
-     }
-   };
+        const response = await api.get("/consumos?tipo=ultimosconsumos&utilizador_id=" + utilizador_id);
+        const response2 = await api.get("/consumos?tipo=consumosmensais&utilizador_id=" + utilizador_id);
+        const response3 = await api.get("/consumos?tipo=consumosporcasa&utilizador_id=" + utilizador_id);
+        const data = response.data;
+        const data2 = response2.data;
+        const data3 = response3.data;
+        setConsumidoNesteMes(parseFloat(data.totalConsumoMesAtual).toFixed(3));
+        setValorMesAtual(parseFloat(data.totalEurosPagarMesAtual).toFixed(2));
+        setValorMesAnterior(parseFloat(data.totalEurosPoupadosMesAnterior).toFixed(2));
+        setPoupadoPercentagem(data.poupadoPercentagem);
+        setPoupadoeuros(data.poupadoEuros);
+        setDadosMensais(data2);
+        setConsumosPorCasa(data3);
+        setIsLoadingData(false);
+        if (consumidoNesteMes === 0.0 || consumidoNesteMes === null || valorMesAtual === 0.0 || valorMesAtual === null || poupadoeuros === 0.0 || poupadoeuros === null || poupadoPercentagem === 0.0 || poupadoPercentagem === null) {
+          showMessageToast("Não existem dados suficientes para mostrar os dados, adicione consumos para mostrar as estatisticas.");
+        }
+      } catch (error) {
+        console.log(error);
+        showErrorToast("Erro ao buscar dados do utilizador");
+        setIsLoadingData(false);
+      }
+    };
     fetchData();
   }, []);
   if (isLoadingData)
@@ -101,7 +113,7 @@ export default function UserReports() {
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       <SimpleGrid
-        columns={{ base: 1, md: 2, lg: 3, "2xl": 4   }}
+        columns={{ base: 1, md: 2, lg: 2, "2xl": 4   }}
         gap="20px"
         mb="20px"
       >
@@ -150,19 +162,19 @@ export default function UserReports() {
               w="56px"
               h="56px"
               bg="linear-gradient(90deg, #4481EB 0%, #04BEFE 100%)"
-              icon={<Icon w="28px" h="28px" as={MdAddTask} color="white" />}
+              icon={<Icon w="28px" h="28px" as={MdNotifications} color="white" />}
             />
           }
-          name="New Tasks"
-          value={newTasks}
+          name="Alertas: "
+          value={numeroAlertas}
         />
       </SimpleGrid>
 
       <SimpleGrid columns={{ base: 1, md: 1, xl: 1 }} gap="20px" mb="20px">
-        <TotalSpent data={dadosMensuais} />
+        <TotalSpent data={dadosMensais} />
       </SimpleGrid>
       <SimpleGrid columns={{ base: 1, md: 1, xl: 2 }} gap="20px" mb="20px">
-          <WeeklyRevenue />
+          <WeeklyRevenue data={consumosPorCasa}/>
           <PieCard  volumeconsumido={consumidoNesteMes}/>
       </SimpleGrid>
     </Box>

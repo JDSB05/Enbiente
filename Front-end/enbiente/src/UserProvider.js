@@ -4,6 +4,7 @@ const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const [fotoUsuario, setFotoUsuario] = useState('');
+  const [numeroAlertas, setNumeroAlertas] = useState(0);
   const [updateComponent, setUpdateComponent] = useState(false); // Variável para atualizar o componente
 
   const updateUserComponent = () => {
@@ -11,7 +12,7 @@ export const UserProvider = ({ children }) => {
   };
 
   return (
-    <UserContext.Provider value={{ fotoUsuario, setFotoUsuario, updateComponent, updateUserComponent }}>
+    <UserContext.Provider value={{ fotoUsuario, setFotoUsuario, updateComponent, updateUserComponent, numeroAlertas, setNumeroAlertas }}>
       {children}
     </UserContext.Provider>
   );

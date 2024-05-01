@@ -9,7 +9,7 @@ import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import Card from "components/card/Card.js";
 
 export default function MiniCalendar(props) {
-  const { selectRange, maxDate, value, onChange, ...rest } = props;
+  const { selectRange, maxDate, value, onChange, view, ...rest } = props;
   return (
     <Card
       align='center'
@@ -24,7 +24,7 @@ export default function MiniCalendar(props) {
         value={value}
         maxDate={maxDate}
         selectRange={selectRange}
-        view={"month"}
+        view={view || "month"}
         showNeighboringMonth={false}
         tileContent={<Text color='brand.500'></Text>}
         prevLabel={<Icon as={MdChevronLeft} w='24px' h='24px' mt='4px' />}

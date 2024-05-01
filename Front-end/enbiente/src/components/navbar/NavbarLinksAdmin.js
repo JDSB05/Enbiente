@@ -56,13 +56,14 @@ export default function HeaderLinks(props) {
 	const btnRef = React.useRef();
 	const [alertas, setAlertas] = useState([]);
 	const [fotolink, setFotolink] = useState('');
-	const { fotoUsuario, updateComponent, updateUserComponent } = useUser(); // Usando o fotoUsuario do contexto
+	const { fotoUsuario, updateComponent, updateUserComponent, setNumeroAlertas } = useUser(); // Usando o fotoUsuario do contexto
 	useEffect(() => {
 		function fetchAlertas(){
 			//fetch alertas
 			try {
 				api.get('/alertas?utilizador_id=' + localStorage.getItem('utilizador_id')).then((response) => {
 					setAlertas(response.data);
+					setNumeroAlertas(response.data.filter(alerta => alerta.estado).length);
 				});
 			} catch (error) {
 				console.log('Erro ao buscar alertas', error);
