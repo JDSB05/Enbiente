@@ -38,7 +38,9 @@ const createUtilizador = async (req, res) => {
 
 // Controller for getting all Utilizadors
 const getAllUtilizadores = async (req, res) => {
-  if (req.user.cargo_id !== 1) return res.status(401).json({ error: "Não autorizado" })
+  if (req.user.cargo_id !== 1) {
+    console.log("Não autorizado")
+    return res.status(401).json({ error: "Não autorizado" })}
   try {
     // Retrieve the orderby parameter from the query string
     const orderby = req.query.orderby;
@@ -87,6 +89,7 @@ const getUtilizadorById = async (req, res) => {
       // Send the Utilizador as response
       res.json(utilizador);
     } else {
+      console.log("Não autorizado para obter informação de contas alheias")
       return res.status(401).json({ error: "Não está autorizado para obter informação de contas alheias" });
     }
   } catch (error) {

@@ -110,12 +110,13 @@ export default function DevelopmentTable(props) {
     setCasaValor("");
     setDataVolumeConsumido(new Date());
     setVolumeConsumido("");
+    setIsLoading(false);
   };
   function formatarMes(data) {
     const opcoes = { month: 'long' }; // ou use 'short' para a abreviação do mês
     return new Date(data).toLocaleDateString('pt-PT', opcoes);
   }
-  function submit() {
+  async function submit() {
       setIsLoading(true);
       if (!casaValor || !dataVolumeConsumido || !volumeConsumido) {
         showErrorToast("Preencha todos os campos");
@@ -128,19 +129,19 @@ export default function DevelopmentTable(props) {
         return;
       }
     try {
-      api.post("/consumos", {
+      await api.post("/consumos", {
         casa_id: casaValor,
         data_consumo: dataVolumeConsumido,
         volume_consumido: volumeConsumido
-      }).then((response) => {
+      })
       showSuccessToast("Consumo criado com sucesso");
       setIsLoading(false);
       handleCloseModal();
       updateUserComponent();
-      });
     } catch (error) {
+      console.error(error);
       if (error.response && error.response.status === 400) {
-        showErrorToast("O valor do consumo tem que ser maior do que o valor de consumo anterior da mesma casa! Verifique os valores inseridos.");
+        showErrorToast("O valor do consumo que introduziu tem que ser maior do que o último valor de consumo da mesma casa! Verifique os valores inseridos e tente novamente.");
       } else {
         showErrorToast("Erro ao criar consumo");
       }

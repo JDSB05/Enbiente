@@ -13,7 +13,9 @@ const getAllTipoClientes = async (req, res) => {
 };
 
 const createTipoCliente = async (req, res) => {
-    if (req.user.cargo_id !== 1) return res.status(401).json({ error: 'Não autorizado' });
+    if (req.user.cargo_id !== 1) {
+        console.log("Não autorizado")
+        return res.status(401).json({ error: 'Não autorizado' });}
     try {
         const { tipo_cliente } = req.body;
         const newTipoCliente = await TipoCliente.create({ tipo_cliente });
@@ -39,7 +41,9 @@ const getTipoClienteById = async (req, res) => {
 };
 
 const updateTipoCliente = async (req, res) => {
-    if (req.user.cargo_id !== 1) return res.status(401).json({ error: 'Não autorizado' });
+    if (req.user.cargo_id !== 1) {
+        console.log("Não autorizado")
+        return res.status(401).json({ error: 'Não autorizado' });}
     try {
         const { id } = req.params;
         const { tipo_cliente } = req.body;

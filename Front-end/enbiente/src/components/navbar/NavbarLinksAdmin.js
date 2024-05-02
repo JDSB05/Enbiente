@@ -103,6 +103,7 @@ export default function HeaderLinks(props) {
 		localStorage.removeItem('utilizador_nome');
 		localStorage.removeItem('token');
 		localStorage.removeItem('foto');
+		sessionStorage.removeItem('lastPath');
 		window.location.href = '#/login';
 	}
 	function gotoPerfil() {

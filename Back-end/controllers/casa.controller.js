@@ -6,8 +6,10 @@ const TipoCasa = require('../models/tipocasa.model');
 const getAllCasas = async (req, res) => {
     const { utilizador } = req.query;
     if (!utilizador) {
+        console.log("Falta utilizador_id")
         return res.status(400).json({ message: 'Falta utilizador_id' });
       } else if (utilizador != req.user.utilizador_id && req.user.cargo_id != 1) {
+        console.log("Não está autorizado para aceder a informações de outros utilizadores")
         return res.status(409).json({ message: 'Não está autorizado para aceder a informações de outros utilizadores' });
       }
     try {
@@ -48,6 +50,7 @@ const getCasaById = async (req, res) => {
         if (casa.utilizador_id == req.user.utilizador_id || req.user.cargo == 1) {
             res.json(casa);
         } else if (casa.utilizador_id != req.user.utilizador && req.user.cargo != 1) {
+            console.log("Não está autorizado para aceder a informações de outros utilizadores")
             res.status(409).json({ message: 'Não está autorizado para aceder a informações de outros utilizadores' });
         } else {
             res.status(404).json({ error: 'Casa not found' });
@@ -60,8 +63,10 @@ const getCasaById = async (req, res) => {
 const createCasa = async (req, res) => {
     const { utilizador_id, nome, endereco, tipo_casa_id, precopormetro, pessoas, data_criacao, data_ultalteracao } = req.body;
     if (!utilizador_id) {
+        console.log("Falta utilizador_id")
         return res.status(400).json({ message: 'Falta utilizador_id' });
       } else if (utilizador_id != req.user.utilizador_id && req.user.cargo_id != 1) {
+        console.log("Não está autorizado para criar casa a outros utilizadores")
         return res.status(401).json({ message: 'Não está autorizado para criar casa a outros utilizadores' });
       }
     try {
@@ -86,8 +91,10 @@ const updateCasa = async (req, res) => {
     const { id } = req.params;
     const { utilizador_id, nome, endereco, tipo_casa_id, precopormetro, pessoas, data_criacao, data_ultalteracao } = req.body;
     if (!utilizador_id) {
+        console.log("Falta utilizador_id")
         return res.status(400).json({ message: 'Falta utilizador_id' });
       } else if (utilizador_id != req.user.utilizador_id && req.user.cargo_id != 1) {
+        console.log("Não está autorizado para editar informações de outros utilizadores")
         return res.status(409).json({ message: 'Não está autorizado para editar informações de outros utilizadores' });
       }
     try {

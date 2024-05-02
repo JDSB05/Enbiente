@@ -32,6 +32,7 @@ function App() {
         localStorage.setItem('foto', foto);
         setIsAuthenticated(true);
         setCargo(cargo_id);
+        return cargo_id;
       } catch (error) {
         console.error('Erro ao verificar autenticação', error);
         localStorage.removeItem('token');
@@ -46,7 +47,7 @@ function App() {
 
   useEffect(() => {
     verificarAutenticacao();
-  }, [verificarAutenticacao, isAuthenticated]);
+  }, [verificarAutenticacao]);
 
   return (
     <HashRouter>
