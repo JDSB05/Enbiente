@@ -17,7 +17,10 @@ app.use(passport.initialize());
 // Middleware de log de solicitações
 app.use((req, res, next) => {
   console.log(`[${new Date()}] ${req.method} ${req.url}`);
+  //Se a url for diferente de /api/auth/login e /api/auth/register
+  if (req.url != '/api/auth/login' && req.url != '/api/auth/register') {
   console.log('Body:', req.body);
+  }
   next();
 });
 // suporte as sessões

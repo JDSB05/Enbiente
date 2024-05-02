@@ -61,14 +61,13 @@ function SignIn({ verificarAutenticacao }) {
   const [show, setShow] = React.useState(false);
   const handleClick = () => setShow(!show);
   const [isLoading, setIsLoading] = React.useState(false);
-  
+  const lastPath = sessionStorage.getItem('lastPath');
   React.useEffect(() => {
     async function checkAuthentication() {
       const token = localStorage.getItem("token");
-      const lastPath = sessionStorage.getItem('lastPath');
       if (token) {
         try {
-          await verificarAutenticacao();
+          const cargo_id = await verificarAutenticacao();
           const currentHour = new Date().getHours();
           let greeting = "Boa noite"; // Default greeting
           if (currentHour >= 5 && currentHour < 12) {
@@ -78,20 +77,11 @@ function SignIn({ verificarAutenticacao }) {
           }
           const nome = localStorage.getItem("utilizador_nome");
           showSuccessToast(`${greeting}, ${nome}. Seja bem-vind@!`);
-          const cargo = localStorage.getItem("cargo");
-          if (cargo === "1") {
-            if (lastPath !== "/" && lastPath !== null) {
-              history.push(lastPath);
-            } else {
-              history.push("/admin/dashboard");
-            }
-          } else if (cargo === "2") {
-            if (lastPath !== "/" && lastPath !== null) {
-              history.push(lastPath);
-            } else {
-              history.push("/user/dashboard");
-            }
-          }
+          if (cargo_id == 1) {
+            lastPath ? history.push(lastPath) : history.push("/admin/dashboard");
+          } else if (cargo_id == 2) {
+            lastPath ? history.push(lastPath) : history.push("/user/dashboard");
+          } 
         } catch (error) {
           console.error(error);
           localStorage.removeItem("token");
@@ -116,7 +106,7 @@ function SignIn({ verificarAutenticacao }) {
       const user = await api.post("/auth/login", { email, password });
       localStorage.setItem("token", user.data.message); // guardar o token no localStorage
 
-      await verificarAutenticacao();
+      const cargo_id = await verificarAutenticacao();
       const currentHour = new Date().getHours();
       let greeting;
       let nome = localStorage.getItem("utilizador_nome");
@@ -128,28 +118,23 @@ function SignIn({ verificarAutenticacao }) {
         greeting = "Boa noite";
       }
       showSuccessToast(`${greeting}, ${nome}. Seja bem-vind@!`);
-
-      if (cargo === "1") {
-        if (lastPath !== "/" && lastPath !== null) {
-          history.push(lastPath);
-        } else {
-          history.push("/admin/dashboard");
-        }
-      } else if (cargo === "2") {
-        if (lastPath !== "/" && lastPath !== null) {
-          history.push(lastPath);
-        } else {
-          history.push("/user/dashboard");
-        }
-      }
+      console.log("lastPath", lastPath);
+      
+      if (cargo_id == 1) {
+        lastPath ? history.push(lastPath) : history.push("/admin/dashboard");
+      } else if (cargo_id == 2) {
+        lastPath ? history.push(lastPath) : history.push("/user/dashboard");
+      } 
+      setIsLoading(false);
     } catch (err) {
+      console.log("Erro ao iniciar sessão")
       console.log(err);
-
+      console.log("ACABOU O ERRO")
       if (err.code === "ERR_NETWORK") {
         showErrorToast("Erro de Conexão");
         setIsLoading(false);
       } else {
-        showErrorToast(err.response.data.message);
+        showErrorToast("Erro ao iniciar sessão");
         setIsLoading(false);
       }
     }

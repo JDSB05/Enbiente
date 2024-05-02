@@ -4,8 +4,10 @@ const Casa = require('../models/casa.model');
 const getAllAlertas = async ( req, res) => {
   const { utilizador_id } = req.query;
   if (!utilizador_id) {
+    console.log("Falta utilizador_id")
     return res.status(400).json({ message: 'Falta utilizador_id' });
   } else if (utilizador_id != req.user.utilizador_id && req.user.cargo_id != 1) {
+    console.log("Não está autorizado para aceder a informações de outros utilizadores")
     return res.status(409).json({ message: 'Não está autorizado para aceder a informações de outros utilizadores' });
   }
   try {
