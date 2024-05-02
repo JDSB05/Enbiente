@@ -1,22 +1,27 @@
 const express = require('express');
 const consumosController = require('../controllers/consumos.controller');
-
+const middleware = require('../config/middleware');
 const router = express.Router();
 
-// Get all casas
-router.get('/', consumosController.getAllConsumos);
+// Get all consumos
+router.route('/')
+    .get(middleware.jwtAuthMiddleware, consumosController.getAllConsumos);
 
-// Get a casa by id
-router.get('/:id', consumosController.getConsumoById);
+// Get a consumo by id
+router.route('/:id')
+    .get(middleware.jwtAuthMiddleware, consumosController.getConsumoById);
 
-// Create a new casa
-router.post('/', consumosController.createConsumo);
+// Create a new consumo
+router.route('/')
+    .post(middleware.jwtAuthMiddleware, consumosController.createConsumo);
 
-// Update a casa by id
-router.put('/:id', consumosController.updateConsumo);
+// Update a consumo by id
+router.route('/:id')
+    .put(middleware.jwtAuthMiddleware, consumosController.updateConsumo);
 
-// Delete a casa by id
-router.delete('/:id', consumosController.deleteConsumo);
+// Delete a consumo by id
+//router.route('/:id')
+//    .delete(consumosController.deleteConsumo);
 
 
 module.exports = app => {

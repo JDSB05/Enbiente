@@ -2,6 +2,7 @@ const Cargo = require("../models/cargo.model");
 
 // Create a new cargo
 const createCargo = async (req, res) => {
+  if (req.user.cargo_id !== 1) return res.status(401).json({ error: "Não autorizado" })
   try {
     const cargo = await Cargo.create(req.body);
     res.status(201).json(cargo);
@@ -23,6 +24,7 @@ const getAllCargos = async (req, res) => {
 // Get a single cargo by ID
 const getCargoById = async (req, res) => {
   const { id } = req.params;
+  if (req.user.cargo_id !== 1) return res.status(401).json({ error: "Não autorizado" })
   try {
     const cargo = await Cargo.findByPk(id);
     if (!cargo) {
@@ -36,6 +38,7 @@ const getCargoById = async (req, res) => {
 
 // Update a cargo by ID
 const updateCargo = async (req, res) => {
+  if (req.user.cargo_id !== 1) return res.status(401).json({ error: "Não autorizado" })
   const { id } = req.params;
   try {
     const [updated] = await Cargo.update(req.body, {
@@ -53,6 +56,7 @@ const updateCargo = async (req, res) => {
 
 // Delete a cargo by ID
 const deleteCargo = async (req, res) => {
+  if (req.user.cargo_id !== 1) return res.status(401).json({ error: "Não autorizado" })
   const { id } = req.params;
   try {
     const deleted = await Cargo.destroy({

@@ -84,7 +84,7 @@ export default function Upload(props) {
   }
 
   return (
-    <Card {...rest} mb='20px' align='center' p='20px'>
+    <Card {...rest} mb='20px' align='center' p='20px' h='100%'>
       <Flex h='100%' direction={{ base: "column", "2xl": "row" }}>
         <Dropzone
           w={{ base: "100%", "2xl": "100%" }}

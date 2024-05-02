@@ -26,6 +26,9 @@ export default function Settings() {
   const { updateComponent } = useUser();
   useEffect(() => {
     async function getConsumos() {
+      let currentPath = window.location.href;
+      currentPath = currentPath.split('#')[1];
+      sessionStorage.setItem('lastPath', currentPath);
       try {
         const response = await api.get("/consumos?utilizador_id=" + localStorage.getItem("utilizador_id"));
         setConsumos(response.data);

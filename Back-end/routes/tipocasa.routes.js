@@ -1,22 +1,27 @@
 const express = require('express');
 const tipoCasaController = require('../controllers/tipocasa.controller');
-
+const middleware = require('../config/middleware');
 const router = express.Router();
 
 // Get all tipocasas
-router.get('/', tipoCasaController.getAllTipoCasas);
+router.route('/')
+    .get(tipoCasaController.getAllTipoCasas);
 
 // Get a tipocasa by id
-router.get('/:id', tipoCasaController.getTipoCasaById);
+router.route('/:id')
+    .get(middleware.jwtAuthMiddleware, tipoCasaController.getTipoCasaById);
 
 // Create a new tipocasa
-router.post('/', tipoCasaController.createTipoCasa);
+router.route('/')
+    .post( tipoCasaController.createTipoCasa);
 
 // Update a tipocasa by id
-router.put('/:id', tipoCasaController.updateTipoCasa);
+router.route('/:id')
+    .put(middleware.jwtAuthMiddleware, tipoCasaController.updateTipoCasa);
 
 // Delete a tipocasa by id
-router.delete('/:id', tipoCasaController.deleteTipoCasa);
+//router.route('/:id')
+//    .delete(tipoCasaController.deleteTipoCasa);
 
 module.exports = app => {
     app.use("/api/tipocasa", router);

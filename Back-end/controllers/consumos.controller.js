@@ -9,8 +9,12 @@ const { Op } = require('sequelize');
 // Controller actions
 const getAllConsumos = async (req, res) => {
     const tipo = req.query.tipo;
-    const casa = req.query.casa;
     const utilizador = req.query.utilizador_id;
+    if (!utilizador) {
+        return res.status(400).json({ message: 'Falta utilizador_id' });
+      } else if (utilizador != req.user.utilizador_id && req.user.cargo_id != 1) {
+        return res.status(409).json({ message: 'Não está autorizado para aceder a informações de outros utilizadores' });
+      }
     try {
         let consumos;
 
@@ -71,7 +75,12 @@ const getAllConsumos = async (req, res) => {
                 const calcularDiferencaVolumeConsumido = (consumosPorCasa) => {
                     let totalConsumoMesAtual = 0;
                     let totalEurosPagarMesAtual = 0; // Inicializa como número
-                
+                    
+                    // Se consumosPorCasa for um objeto vazio, retorne um objeto vazio
+                    if (Object.keys(consumosPorCasa).length === 0) {
+                        console.log('Não existem consumos para calcular a diferença de volume consumido');
+                        return { totalConsumoMesAtual, totalEurosPagarMesAtual };
+                    }
                     const anoAtual = moment().year().toString();
                     const mesAtual = (moment().month()).toString();
                     // Iterar sobre todas as casas
@@ -108,7 +117,12 @@ const getAllConsumos = async (req, res) => {
                 const calcularDiferencaVolumeConsumidoAnterior = (consumosPorCasa) => {
                     let totalConsumoMesAnterior = 0;
                     let totalEurosPoupadosMesAnterior = 0; // Inicializa como número
-                
+                    
+                    // Se consumosPorCasa for um objeto vazio, retorne um objeto vazio
+                    if (Object.keys(consumosPorCasa).length === 0) {
+                        console.log('Não existem consumos para calcular a diferença de volume consumido');
+                        return { totalConsumoMesAnterior, totalEurosPoupadosMesAnterior };
+                    }
                     const anoAtual = moment().year().toString();
                     const mesAtual = (moment().month()-1).toString();
                     // Iterar sobre todas as casas
@@ -227,7 +241,11 @@ const getAllConsumos = async (req, res) => {
             // Função para calcular a diferença no volume consumido entre o mês atual e o mês anterior para todas as casas
             const calcularDiferencaVolumeConsumido = (consumosPorCasa) => {
                 let totalConsumoMesAtual = {};
-
+                // Se consumosPorCasa for um objeto vazio, retorne um objeto vazio
+                if (Object.keys(consumosPorCasa).length === 0) {
+                    console.log('Não existem consumos para calcular a diferença de volume consumido');
+                    return totalConsumoMesAtual;
+                }
                 const anoAtual = moment().year().toString();
                 const mesAtual = (moment().month()).toString();
                 // Iterar sobre todas as casas
@@ -353,7 +371,11 @@ const getAllConsumos = async (req, res) => {
                 
                     let mesAtual = moment().month();
                     let ano = moment().year();
-                    
+                    // Se consumosPorCasa for um objeto vazio, retorne um objeto vazio
+                    if (Object.keys(consumosPorCasa).length === 0) {
+                        console.log('Não existem consumos para calcular a diferença de volume consumido');
+                        return { totalConsumoMes, totalEurosPagarMes };
+                    }
                     for (let i = 0; i < mesesAnteriores; i++) {
                         // Se o mês atual for janeiro, subtraia um ano e defina o mês como dezembro
                         if (mesAtual === 0) {
@@ -368,8 +390,10 @@ const getAllConsumos = async (req, res) => {
                         for (const casaId in consumosPorCasa) {
                             const consumosPorAno = consumosPorCasa[casaId];
                             const consumosMesAtual = consumosPorAno[ano.toString()]?.[mesAtualStr] || [];
-                            const consumosMesAnterior = mesAtual === 0 ? (consumosPorAno[(ano - 1).toString()]?.['11'] || []) : consumosPorAno[ano.toString()][(mesAtual - 1).toString()] || [];
-                
+                            const consumosMesAnterior = mesAtual === 0
+                                ? (consumosPorAno[(ano - 1).toString()]?.['11'] || [])
+                                : (consumosPorAno[ano.toString()]?.[(mesAtual - 1).toString()] || []);
+
                             // Verificar se existem consumos para o mês anterior
                             if (consumosMesAtual.length > 0 && consumosMesAnterior.length > 0) {
                                 // Se houver consumos para o mês anterior, calcule a diferença de volume consumido
@@ -394,7 +418,7 @@ const getAllConsumos = async (req, res) => {
                         }
                         mesAtual--;
                     }
-                
+
                     return { totalConsumoMes, totalEurosPagarMes }; // Retorna ambos os valores
                 };
                 
@@ -494,16 +518,18 @@ const getConsumoById = async (req, res) => {
             {
                 include: {
                     model: Casa,
-                    attributes: ['nome', 'endereco', 'pessoas', 'tipo_casa_id', 'precopormetro'], // Incluir nome, endereco, pessoas, tipo_casa_id e precopormetro da Casa
+                    attributes: ['nome', 'endereco', 'pessoas', 'tipo_casa_id', 'precopormetro', 'utilizador_id'], // Incluir nome, endereco, pessoas, tipo_casa_id e precopormetro da Casa
                     include: {
                         model: TipoCasa,
                         attributes: ['tipo_casa'] // Incluir nome, email e telemovel do Utilizador
                     }
                 }
             });
-        if (consumo) {
+        // Se o consumo pertencer a um utilizador diferente, retorne um erro
+        if (consumo.Casa.utilizador_id == req.user.utilizador_id || req.user.cargo_id == 1) {
             res.json(consumo);
-            console.log(consumo);
+        } else if (consumo.Casa.utilizador_id != req.user.utilizador && req.user.cargo != 1) {
+            res.status(409).json({ message: 'Não está autorizado para aceder a informações de outros utilizadores' });
         } else {
             res.status(404).json({ error: 'Consumo not found' });
         }
@@ -527,7 +553,7 @@ const createConsumo = async (req, res) => {
             where: { casa_id, data_consumo: { [Op.lt]: data_consumo } },
             include: {
                 model: Casa,
-                attributes: ['pessoas', 'tipo_casa_id'], // Incluir pessoas e tipo_casa_id da Casa
+                attributes: ['pessoas', 'tipo_casa_id', 'utilizador_id'], // Incluir pessoas e tipo_casa_id da Casa
                 include: {
                     model: TipoCasa,
                     attributes: ['fator'] // Incluir fator do TipoCasa
@@ -535,8 +561,12 @@ const createConsumo = async (req, res) => {
             },
             order: [['data_consumo', 'DESC']]
         });
+        if (ultimoConsumo && (ultimoConsumo.Casa.utilizador_id != req.user.utilizador_id && req.user.cargo_id != 1)) {
+            // Se o consumo anterior pertencer a outro utilizador, retorne um erro
+            return res.status(401).json({ message: 'Não está autorizado para criar casa a outros utilizadores' });
+        }
         // Se o valor_consumido for menor do que o valor_consumido do último consumo, retorne um erro
-        if (ultimoConsumo && volume_consumido < ultimoConsumo.volume_consumido) {
+         else if (ultimoConsumo && volume_consumido < ultimoConsumo.volume_consumido) {
             return res.status(400).json({ error: 'O volume consumido não pode ser menor do que o volume consumido do último consumo' });
         } else {
             // Se não houver consumo anterior, cria o novo consumo
@@ -649,10 +679,18 @@ const updateConsumo = async (req, res) => {
     const { id } = req.params;
     const { casa_id, data_consumo, volume_consumido } = req.body;
     try {
-        const consumo = await Consumo.findByPk(id);
-        if (consumo) {
+        const consumo = await Consumo.findByPk(id, {
+            include: {
+                model: Casa,
+                attributes: ['utilizador_id'], // Incluir utilizador_id da Casa
+            }
+        });
+        // Verificar se o consumo pertence ao utilizador
+        if (consumo && (consumo.Casa.utilizador_id == req.user.utilizador_id || req.user.cargo_id == 1)) {
             await consumo.update({ casa_id, data_consumo, volume_consumido });
             res.json(consumo);
+        } else if (consumo && consumo.Casa.utilizador_id != req.user.utilizador_id && req.user.cargo_id != 1) {
+            res.status(409).json({ message: 'Não está autorizado para editar consumos de outros utilizadores' });
         } else {
             res.status(404).json({ error: 'Consumo not found' });
         }

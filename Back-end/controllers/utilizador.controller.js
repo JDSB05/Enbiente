@@ -38,6 +38,7 @@ const createUtilizador = async (req, res) => {
 
 // Controller for getting all Utilizadors
 const getAllUtilizadores = async (req, res) => {
+  if (req.user.cargo_id !== 1) return res.status(401).json({ error: "Não autorizado" })
   try {
     // Retrieve the orderby parameter from the query string
     const orderby = req.query.orderby;

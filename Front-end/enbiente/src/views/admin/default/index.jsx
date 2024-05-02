@@ -83,6 +83,9 @@ export default function UserReports() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        let currentPath = window.location.href;
+        currentPath = currentPath.split('#')[1];
+        sessionStorage.setItem('lastPath', currentPath);
         const response = await api.get("/consumos?tipo=ultimosconsumos&utilizador_id=" + utilizador_id);
         const response2 = await api.get("/consumos?tipo=consumosmensais&utilizador_id=" + utilizador_id);
         const response3 = await api.get("/consumos?tipo=consumosporcasa&utilizador_id=" + utilizador_id);

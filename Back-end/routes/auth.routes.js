@@ -1,6 +1,6 @@
 module.exports = app => {
   const router = require("express").Router();
-
+  const middleware = require('../config/middleware');
   const authController = require('../controllers/auth.controller');
   const passport = require("passport");
 
@@ -25,7 +25,7 @@ module.exports = app => {
 
   router.route("/requestresetpassword").post(authController.requestResetPassword)
 
-  router.route("/disableuser/:utilizador_id").put(authController.disableUser);
+  router.route("/disableuser/:utilizador_id").put( middleware.jwtAuthMiddleware, authController.disableUser);
 
 // Rota de verificação de token
 router.get('/checktoken', passport.authenticate('jwt', { session: false }), (req, res) => {

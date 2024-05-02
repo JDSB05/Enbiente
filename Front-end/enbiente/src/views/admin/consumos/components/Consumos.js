@@ -43,13 +43,14 @@ import {
   useTable,
 } from "react-table";
 import { CardMenu } from "../../../../components/card/Card";
+import moment from "moment";
 
 export default function DevelopmentTable(props) {
   const { showSuccessToast, showErrorToast, showMessageToast } = useToast();
   const { columnsData, tableData } = props;
   const [casaList, setCasaList] = React.useState([]);
   const [casaValor, setCasaValor] = React.useState("");
-  const [dataVolumeConsumido, setDataVolumeConsumido] = React.useState(new Date());
+  const [dataVolumeConsumido, setDataVolumeConsumido] = React.useState(moment().toDate());
   const [volumeConsumido, setVolumeConsumido] = React.useState("");
   const [editedFields, setEditedFields] = React.useState({});
   const columns = useMemo(() => columnsData, [columnsData]);
@@ -97,10 +98,9 @@ export default function DevelopmentTable(props) {
   const iconColor = useColorModeValue("secondaryGray.500", "white");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
   const textColorPrimary = useColorModeValue("brand.500", "brand.300");
-
   const [isOpen, setIsOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
-
+  const [pesquisa, setPesquisa] = React.useState("");
   function handleOpenModal() {
     setIsOpen(true);
   };
@@ -150,21 +150,26 @@ export default function DevelopmentTable(props) {
   return (
     <div>
       <Card
-
+        position='default'
         w='100%'
         px='0px'
         overflowX={{ sm: "scroll", lg: "hidden" }}>
-        <Flex id="PAI" px='25px' justify='space-between' mb='20px' align='center'>
-          <Flex id="FILHO1" alignItems='center' w='50%' justifyContent='left'> 
+        <Flex px='25px' justify='space-between' mb='20px' align='center'>
+          <Flex alignItems='center' w='50%' justifyContent='left'> 
             <SearchBar
-              onChange={(e) => setGlobalFilter(e.target.value)}
+              onChange={(e) => {
+                setGlobalFilter(e.target.value);
+                setPesquisa(e.target.value);
+              }}
               h='44px'
+              setPesquisa={setPesquisa}
+              setGlobal={setGlobalFilter}
               w={{ lg: "390px" }}
               borderRadius='16px'
             /> 
-            <MainMenu ml='10px' icon={CiCalendarDate} setGlobal={setGlobalFilter}/>
+            <MainMenu ml='10px' icon={CiCalendarDate} setGlobal={setGlobalFilter} setPesquisa={setPesquisa}/>
           </Flex>
-          <Flex id="FILHO2" w='50%' justifyContent="right" alignItems='center' >
+          <Flex w='50%' justifyContent="right" alignItems='center' >
               <Button
                 w='auto'
                 variant='solid'
@@ -221,7 +226,7 @@ export default function DevelopmentTable(props) {
 
                         data = (
                           <Text color={textColor} fontSize='sm' fontWeight='700'>
-                            {new Date(cell.value).toLocaleDateString()}
+                            {moment(cell.value).format("DD/MM/YYYY")}
                           </Text>
                         );
                       } else if (cell.column.Header === "Consumo") {
@@ -333,7 +338,7 @@ export default function DevelopmentTable(props) {
             value={dataVolumeConsumido}
             justifyContent="center"
             isRequired={true}
-            maxDate={new Date()}
+            maxDate={moment().toDate()}
             mb='5px'
           />
         </div>

@@ -214,7 +214,8 @@ import {
               ))}
             </Thead>
             <Tbody {...getTableBodyProps()}>
-              {page.map((row, index) => {
+            {page.length ? ( // Verifica se há dados na página
+              page.map((row, index) => {
                 prepareRow(row);
                 return (
                   <Tr {...row.getRowProps()} key={index}>
@@ -313,7 +314,14 @@ import {
                     })}
                   </Tr>
                 );
-              })}
+              })
+            ) : (
+              <Tr>
+                <Td colSpan={headerGroups[0].headers.length} textAlign="center">
+                  Não existem utlizadores
+                </Td>
+              </Tr>
+            )}
             </Tbody>
           </Table>
           <Flex

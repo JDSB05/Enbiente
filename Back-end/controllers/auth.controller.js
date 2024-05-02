@@ -388,10 +388,9 @@ exports.resetPassword = async function (req, res) {
 exports.disableUser = async (req, res) => {
   const utilizador_id = req.params.utilizador_id;
   if (!utilizador_id) {
-    return res.status(400).send({
-      success: false,
-      message: "utilizador_id não fornecido"
-    });
+    return res.status(400).json({ message: 'Falta utilizador_id' });
+  } else if (req.user.cargo_id != 1) {
+    return res.status(409).json({ message: 'Não está autorizado para editar informações de outros utilizadores' });
   }
   try {
     const allowedFields = ['estado']; // definir os campos permitidos
