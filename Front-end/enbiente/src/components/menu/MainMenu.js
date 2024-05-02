@@ -1,5 +1,6 @@
 import React, {useState, useEffect, useRef} from "react";
 import MiniCalendar from "../../components/calendar/MiniCalendar";
+import moment from "moment";
 // Chakra imports
 import {
   Icon,
@@ -22,7 +23,7 @@ import {
 } from "react-icons/md";
 
 export default function Banner(props) {
-  const { icon, setGlobal, ...rest } = props;
+  const { icon, setGlobal, setPesquisa, ...rest } = props;
 
   let data = new Date();
   const textColor = useColorModeValue("secondaryGray.500", "white");
@@ -114,13 +115,14 @@ export default function Banner(props) {
           <MiniCalendar
             selectRange={false}
             onChange={(value, event) => {
-              // Chame 'setGlobal' e feche o menu
-              setGlobal(value);
+              data = value;
+              data = moment(data).utc().format("YYYY-MM-DD")
+              setGlobal(data);
+              setPesquisa(data);
               closeMenu();
             }}
             value={data}
             justifyContent="center"
-            
             isRequired={true}
             maxDate={new Date()}
             mb='5px'

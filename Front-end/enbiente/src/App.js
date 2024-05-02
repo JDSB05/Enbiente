@@ -1,6 +1,7 @@
 import './App.css';
 import api from './services/api';
 import React, { useEffect, useState, useCallback } from 'react';
+import { useHistory } from "react-router-dom";
 import { HashRouter, Route, Switch, Redirect } from 'react-router-dom';
 import AuthLayout from './layouts/auth';
 import Alerts from './views/notfound/index';
@@ -15,6 +16,7 @@ import ProtectedRoute from './ProtectedRoutes';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [cargo, setCargo] = useState(undefined);
+  const history = useHistory();
 
   const verificarAutenticacao = useCallback(async () => {
     const token = localStorage.getItem('token');
@@ -33,7 +35,7 @@ function App() {
       } catch (error) {
         console.error('Erro ao verificar autenticação', error);
         localStorage.removeItem('token');
-        window.location.pathname = '/login';
+        history.push('/login');
         setIsAuthenticated(false);
         throw new Error('Erro ao verificar autenticação');
       }
@@ -44,7 +46,7 @@ function App() {
 
   useEffect(() => {
     verificarAutenticacao();
-  }, [verificarAutenticacao]);
+  }, [verificarAutenticacao, isAuthenticated]);
 
   return (
     <HashRouter>

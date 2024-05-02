@@ -65,6 +65,7 @@ function SignIn({ verificarAutenticacao }) {
   React.useEffect(() => {
     async function checkAuthentication() {
       const token = localStorage.getItem("token");
+      const lastPath = sessionStorage.getItem('lastPath');
       if (token) {
         try {
           await verificarAutenticacao();
@@ -79,9 +80,17 @@ function SignIn({ verificarAutenticacao }) {
           showSuccessToast(`${greeting}, ${nome}. Seja bem-vind@!`);
           const cargo = localStorage.getItem("cargo");
           if (cargo === "1") {
-            history.push("/admin/dashboard");
+            if (lastPath !== "/" && lastPath !== null) {
+              history.push(lastPath);
+            } else {
+              history.push("/admin/dashboard");
+            }
           } else if (cargo === "2") {
-            history.push("/user/dashboard");
+            if (lastPath !== "/" && lastPath !== null) {
+              history.push(lastPath);
+            } else {
+              history.push("/user/dashboard");
+            }
           }
         } catch (error) {
           console.error(error);
@@ -120,8 +129,19 @@ function SignIn({ verificarAutenticacao }) {
       }
       showSuccessToast(`${greeting}, ${nome}. Seja bem-vind@!`);
 
-      history.push("/admin/dashboard");
- 
+      if (cargo === "1") {
+        if (lastPath !== "/" && lastPath !== null) {
+          history.push(lastPath);
+        } else {
+          history.push("/admin/dashboard");
+        }
+      } else if (cargo === "2") {
+        if (lastPath !== "/" && lastPath !== null) {
+          history.push(lastPath);
+        } else {
+          history.push("/user/dashboard");
+        }
+      }
     } catch (err) {
       console.log(err);
 

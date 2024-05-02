@@ -1,22 +1,27 @@
 const express = require('express');
 const tipoClienteController = require('../controllers/tipocliente.controller');
-
+const middleware = require('../config/middleware');
 const router = express.Router();
 
-// Get all casas
-router.get('/', tipoClienteController.getAllTipoClientes);
+// Get all tipoClientes
+router.route('/')
+    .get(tipoClienteController.getAllTipoClientes);
 
-// Get a casa by id
-router.get('/:id', tipoClienteController.getTipoClienteById);
+// Get a tipoCliente by id
+router.route('/:id')
+    .get( tipoClienteController.getTipoClienteById);
 
-// Create a new casa
-router.post('/', tipoClienteController.createTipoCliente);
+// Create a new tipoCliente
+router.route('/')
+    .post(middleware.jwtAuthMiddleware, tipoClienteController.createTipoCliente);
 
-// Update a casa by id
-router.put('/:id', tipoClienteController.updateTipoCliente);
+// Update a tipoCliente by id
+router.route('/:id')
+    .put(middleware.jwtAuthMiddleware, tipoClienteController.updateTipoCliente);
 
-// Delete a casa by id
-router.delete('/:id', tipoClienteController.deleteTipoCliente);
+// Delete a tipoCliente by id
+//router.route('/:id')
+ //   .delete(middleware.jwtAuthMiddleware, tipoClienteController.deleteTipoCliente);
 
 module.exports = app => {
     app.use("/api/tipoclientes", router);

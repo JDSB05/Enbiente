@@ -15,6 +15,9 @@ export default function UsersOverview() {
 
   useEffect(() => {
     async function getUsers() {
+      let currentPath = window.location.href;
+      currentPath = currentPath.split('#')[1];
+      sessionStorage.setItem('lastPath', currentPath);
       try {
         const response = await api.get("/utilizador");
         setUsers(response.data);

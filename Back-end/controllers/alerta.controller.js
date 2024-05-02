@@ -1,8 +1,13 @@
 const Alerta = require('../models/alerta.model');
 const Casa = require('../models/casa.model');
 // GET all alertas
-const getAllAlertas = async (req, res) => {
+const getAllAlertas = async ( req, res) => {
   const { utilizador_id } = req.query;
+  if (!utilizador_id) {
+    return res.status(400).json({ message: 'Falta utilizador_id' });
+  } else if (utilizador_id != req.user.utilizador_id && req.user.cargo_id != 1) {
+    return res.status(409).json({ message: 'Não está autorizado para aceder a informações de outros utilizadores' });
+  }
   try {
     const alertas = await Alerta.findAll({
       where: { '$Casa.utilizador_id$': utilizador_id },
