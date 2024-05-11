@@ -14,7 +14,7 @@ import React from "react";
 import { MdBarChart } from "react-icons/md";
 
 export default function WeeklyRevenue(props) {
-  const {data, ...rest } = props;
+  const {data, mostrar, ...rest } = props;
 
   // Chakra Color Mode
   const textColor = useColorModeValue("secondaryGray.900", "white");
@@ -138,10 +138,22 @@ export default function WeeklyRevenue(props) {
       </Flex>
 
       <Box h='240px' mt='auto'>
+      { mostrar ? (
         <BarChart
           chartData={barChartDataConsumption}
           chartOptions={barChartOptionsConsumption}
         />
+      ) : (
+        <Flex
+          w='100%'
+          h='100%'
+          alignContent='center'
+          justifyContent='center'>
+          <Text color={textColor} fontSize='xl' fontWeight='600' mt='4px'>
+            Sem dados suficientes
+          </Text>
+        </Flex>
+      )}
       </Box>
     </Card>
   );

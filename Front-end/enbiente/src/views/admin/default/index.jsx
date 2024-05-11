@@ -78,6 +78,9 @@ export default function UserReports() {
   const [isLoadingData, setIsLoadingData] = React.useState(true);
   const { showMessageToast, showErrorToast } = useToast();
   const [consumosPorCasa, setConsumosPorCasa] = useState([]);
+  const [mostrar1, setMostrar1] = useState(true);
+  const [mostrar2, setMostrar2] = useState(true);
+  const [mostrar3, setMostrar3] = useState(true);
   const { updateComponent, updateUserComponent, numeroAlertas } = useUser();
   
   useEffect(() => {
@@ -92,25 +95,32 @@ export default function UserReports() {
         const data = response.data;
         const data2 = response2.data;
         const data3 = response3.data;
-        setConsumidoNesteMes(parseFloat(data.totalConsumoMesAtual).toFixed(3));
-        setValorMesAtual(parseFloat(data.totalEurosPagarMesAtual).toFixed(2));
-        setValorMesAnterior(parseFloat(data.totalEurosPoupadosMesAnterior).toFixed(2));
+        setConsumidoNesteMes(parseFloat(data.totalConsumoMesAtual));
+        setValorMesAtual(parseFloat(data.totalEurosPagarMesAtual));
+        setValorMesAnterior(parseFloat(data.totalEurosPoupadosMesAnterior));
         setPoupadoPercentagem(data.poupadoPercentagem);
         setPoupadoeuros(data.poupadoEuros);
         setDadosMensais(data2);
         setConsumosPorCasa(data3);
         setIsLoadingData(false);
-        if ((consumidoNesteMes === 0.0) && (valorMesAtual === 0.0) && (poupadoeuros === 0.0) && (poupadoPercentagem === 0.0)) {
-          showMessageToast("Não existem dados suficientes para mostrar os dados, adicione consumos para mostrar as estatisticas.");
-        }
       } catch (error) {
         console.log(error);
-        showErrorToast("Erro ao buscar dados do utilizador");
+        showErrorToast("Erro ao buscar dados do mês atual");
         setIsLoadingData(false);
       }
     };
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if ((consumidoNesteMes === 0 || valorMesAtual === 0 || poupadoeuros === 0 || poupadoPercentagem === 0)) {
+      showMessageToast("Não existem dados suficientes para mostrar os dados, adicione consumos para mostrar as estatisticas.");
+      setMostrar1(dadosMensais && Object.keys(dadosMensais.totalConsumoMes).length !== 0);
+      setMostrar2(consumosPorCasa && consumosPorCasa.totalConsumoMesAtual && Object.keys(consumosPorCasa.totalConsumoMesAtual).length !== 0);
+      setMostrar3(consumidoNesteMes !== null && consumidoNesteMes !== undefined && consumidoNesteMes !== 0);
+  }
+}, [consumidoNesteMes, valorMesAtual, poupadoeuros, poupadoPercentagem, dadosMensais, consumosPorCasa]);
+
   if (isLoadingData)
   return (<Box pl={{ base: "45%", md: "45%", xl: "45%" }} pt={{ base: "45%", md: "45%", xl: "25%" }}><div className="loader"></div></Box>)
   return (
@@ -174,11 +184,11 @@ export default function UserReports() {
       </SimpleGrid>
 
       <SimpleGrid columns={{ base: 1, md: 1, xl: 1 }} gap="20px" mb="20px">
-        <TotalSpent data={dadosMensais} />
+        <TotalSpent data={dadosMensais} mostrar={mostrar1}/>
       </SimpleGrid>
       <SimpleGrid columns={{ base: 1, md: 1, xl: 2 }} gap="20px" mb="20px">
-          <WeeklyRevenue data={consumosPorCasa}/>
-          <PieCard  volumeconsumido={consumidoNesteMes}/>
+          <WeeklyRevenue data={consumosPorCasa} mostrar={mostrar2}/>
+          <PieCard  volumeconsumido={consumidoNesteMes} mostrar={mostrar3}/>
       </SimpleGrid>
     </Box>
   );

@@ -154,7 +154,6 @@ import {
       setGlobalFilter,
       state,
     } = tableInstance;
-    console.log(tableInstance)
     const createPages = (count) => {
       let arrPageCount = [];
   
@@ -166,7 +165,6 @@ import {
     };
   
     const { pageIndex, pageSize } = state;
-    console.log(state)
     const textColorPrimary = useColorModeValue("navy.700", "white");
     const textColor = useColorModeValue("secondaryGray.900", "white");
     const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
@@ -277,9 +275,14 @@ import {
                               isChecked={cell.value === 0 ? false : true}
                               onChange={async () => {
                                 novoEstado = cell.value === 0 ? 1 : 0; // Update novoEstado value
-                                await api.put(`auth/disableuser/${cell.row.original.utilizador_id}`, { estado: novoEstado }).then(() => {
-                                updateUserComponent();
-                                });
+                                try {
+                                  await api.put(`auth/disableuser/${cell.row.original.utilizador_id}`, { estado: novoEstado }).then(() => {
+                                  updateUserComponent();
+                                  });
+                                } catch (error) {
+                                  console.error("Error fetching data", error);
+                                  showErrorToast(error.response.status == 403 ? error.response.data.message : 'Erro ao desativar utilizador');
+                                }
                               }}
                             />
                             <Text color={textColor} fontSize='sm' fontWeight='500'>

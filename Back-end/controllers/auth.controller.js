@@ -390,7 +390,9 @@ exports.disableUser = async (req, res) => {
   if (!utilizador_id) {
     return res.status(400).json({ message: 'Falta utilizador_id' });
   } else if (req.user.cargo_id != 1) {
-    return res.status(409).json({ message: 'Não está autorizado para editar informações de outros utilizadores' });
+    return res.status(403).json({ message: 'Não está autorizado para editar informações de outros utilizadores' });
+  } else if (utilizador_id == req.user.utilizador_id) {
+    return res.status(403).json({ message: 'Não pode desativar a sua própria conta' });
   }
   try {
     const allowedFields = ['estado']; // definir os campos permitidos

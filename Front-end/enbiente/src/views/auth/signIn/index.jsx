@@ -118,7 +118,6 @@ function SignIn({ verificarAutenticacao }) {
         greeting = "Boa noite";
       }
       showSuccessToast(`${greeting}, ${nome}. Seja bem-vind@!`);
-      console.log("lastPath", lastPath);
       
       if (cargo_id == 1) {
         lastPath ? history.push(lastPath) : history.push("/admin/dashboard");
@@ -127,9 +126,7 @@ function SignIn({ verificarAutenticacao }) {
       } 
       setIsLoading(false);
     } catch (err) {
-      console.log("Erro ao iniciar sessão")
       console.log(err);
-      console.log("ACABOU O ERRO")
       if (err.code === "ERR_NETWORK") {
         showErrorToast("Erro de Conexão");
         setIsLoading(false);

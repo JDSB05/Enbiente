@@ -1,6 +1,7 @@
 const Casa = require('../models/casa.model');
 const Utilizador = require('../models/utilizador.model');
 const TipoCasa = require('../models/tipocasa.model');
+const moment = require('moment');
 
 // Controller actions
 const getAllCasas = async (req, res) => {
@@ -10,7 +11,7 @@ const getAllCasas = async (req, res) => {
         return res.status(400).json({ message: 'Falta utilizador_id' });
       } else if (utilizador != req.user.utilizador_id && req.user.cargo_id != 1) {
         console.log("Não está autorizado para aceder a informações de outros utilizadores")
-        return res.status(409).json({ message: 'Não está autorizado para aceder a informações de outros utilizadores' });
+        return res.status(403).json({ message: 'Não está autorizado para aceder a informações de outros utilizadores' });
       }
     try {
         let casas;
@@ -51,7 +52,7 @@ const getCasaById = async (req, res) => {
             res.json(casa);
         } else if (casa.utilizador_id != req.user.utilizador && req.user.cargo != 1) {
             console.log("Não está autorizado para aceder a informações de outros utilizadores")
-            res.status(409).json({ message: 'Não está autorizado para aceder a informações de outros utilizadores' });
+            res.status(403).json({ message: 'Não está autorizado para aceder a informações de outros utilizadores' });
         } else {
             res.status(404).json({ error: 'Casa not found' });
         }
@@ -61,13 +62,13 @@ const getCasaById = async (req, res) => {
 };
 
 const createCasa = async (req, res) => {
-    const { utilizador_id, nome, endereco, tipo_casa_id, precopormetro, pessoas, data_criacao, data_ultalteracao } = req.body;
+    const { utilizador_id, nome, endereco, tipo_casa_id, precopormetro, pessoas } = req.body;
     if (!utilizador_id) {
         console.log("Falta utilizador_id")
         return res.status(400).json({ message: 'Falta utilizador_id' });
       } else if (utilizador_id != req.user.utilizador_id && req.user.cargo_id != 1) {
         console.log("Não está autorizado para criar casa a outros utilizadores")
-        return res.status(401).json({ message: 'Não está autorizado para criar casa a outros utilizadores' });
+        return res.status(403).json({ message: 'Não está autorizado para criar casa a outros utilizadores' });
       }
     try {
         const casa = await Casa.create({
@@ -77,8 +78,8 @@ const createCasa = async (req, res) => {
             tipo_casa_id,
             pessoas,
             precopormetro,
-            data_criacao,
-            data_ultalteracao
+            data_criacao: moment(),
+            data_ultalteracao: moment()
         });
         res.status(201).json(casa);
     } catch (error) {
@@ -89,13 +90,13 @@ const createCasa = async (req, res) => {
 
 const updateCasa = async (req, res) => {
     const { id } = req.params;
-    const { utilizador_id, nome, endereco, tipo_casa_id, precopormetro, pessoas, data_criacao, data_ultalteracao } = req.body;
+    const { utilizador_id, nome, endereco, tipo_casa_id, precopormetro, pessoas } = req.body;
     if (!utilizador_id) {
         console.log("Falta utilizador_id")
         return res.status(400).json({ message: 'Falta utilizador_id' });
       } else if (utilizador_id != req.user.utilizador_id && req.user.cargo_id != 1) {
         console.log("Não está autorizado para editar informações de outros utilizadores")
-        return res.status(409).json({ message: 'Não está autorizado para editar informações de outros utilizadores' });
+        return res.status(403).json({ message: 'Não está autorizado para editar informações de outros utilizadores' });
       }
     try {
         const casa = await Casa.findByPk(id, {
@@ -112,8 +113,7 @@ const updateCasa = async (req, res) => {
                 tipo_casa_id,
                 pessoas,
                 precopormetro,
-                data_criacao,
-                data_ultalteracao
+                data_ultalteracao: moment()
             });
             res.json(casa);
         } else {

@@ -15,7 +15,7 @@ const getAllConsumos = async (req, res) => {
         return res.status(400).json({ message: 'Falta utilizador_id' });
       } else if (utilizador != req.user.utilizador_id && req.user.cargo_id != 1) {
         console.log("Não está autorizado para aceder a informações de outros utilizadores")
-        return res.status(409).json({ message: 'Não está autorizado para aceder a informações de outros utilizadores' });
+        return res.status(403).json({ message: 'Não está autorizado para aceder a informações de outros utilizadores' });
       }
     try {
         let consumos;
@@ -532,7 +532,7 @@ const getConsumoById = async (req, res) => {
             res.json(consumo);
         } else if (consumo.Casa.utilizador_id != req.user.utilizador && req.user.cargo != 1) {
             console.log('Não está autorizado para aceder a informações de outros utilizadores')
-            res.status(409).json({ message: 'Não está autorizado para aceder a informações de outros utilizadores' });
+            res.status(403).json({ message: 'Não está autorizado para aceder a informações de outros utilizadores' });
         } else {
             res.status(404).json({ error: 'Consumo not found' });
         }
@@ -567,7 +567,7 @@ const createConsumo = async (req, res) => {
         if (ultimoConsumo && (ultimoConsumo.Casa.utilizador_id != req.user.utilizador_id && req.user.cargo_id != 1)) {
             // Se o consumo anterior pertencer a outro utilizador, retorne um erro
             console.log('Não está autorizado para criar consumo a outros utilizadores');
-            return res.status(401).json({ message: 'Não está autorizado para criar casa a outros utilizadores' });
+            return res.status(403).json({ message: 'Não está autorizado para criar casa a outros utilizadores' });
         }
         // Se o valor_consumido for menor do que o valor_consumido do último consumo, retorne um erro
          else if (ultimoConsumo && volume_consumido < ultimoConsumo.volume_consumido) {
@@ -696,7 +696,7 @@ const updateConsumo = async (req, res) => {
             res.json(consumo);
         } else if (consumo && consumo.Casa.utilizador_id != req.user.utilizador_id && req.user.cargo_id != 1) {
             console.log('Não está autorizado para editar consumos de outros utilizadores');
-            res.status(409).json({ message: 'Não está autorizado para editar consumos de outros utilizadores' });
+            res.status(403).json({ message: 'Não está autorizado para editar consumos de outros utilizadores' });
         } else {
             res.status(404).json({ error: 'Consumo not found' });
         }
