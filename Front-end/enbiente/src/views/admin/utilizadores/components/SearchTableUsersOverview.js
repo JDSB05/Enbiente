@@ -133,6 +133,7 @@ import {
       {
         columns,
         data,
+        initialState: { pageSize: 10 },
       },
       useGlobalFilter,
       useSortBy,
