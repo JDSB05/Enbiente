@@ -71,8 +71,7 @@ export default function GeneralInformation(props) {
         showErrorToast("Por favor, selecione um tipo de cliente.");
         return;
     }
-    try {
-      console.log(nome, telemovel, tipoCliente); 
+    try { 
       
       api.put('/utilizador/' + localStorage.getItem('utilizador_id'), { nome: nome, telemovel: telemovel, tipo_cliente_id: parseInt(tipoClienteValor)})
         .then(() => {

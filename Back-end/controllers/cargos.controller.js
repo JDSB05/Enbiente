@@ -4,7 +4,7 @@ const Cargo = require("../models/cargo.model");
 const createCargo = async (req, res) => {
   if (req.user.cargo_id !== 1) {
     console.log("Não autorizado")
-    return res.status(401).json({ error: "Não autorizado" })}
+    return res.status(403).json({ error: "Não autorizado" })}
   try {
     const cargo = await Cargo.create(req.body);
     res.status(201).json(cargo);
@@ -28,7 +28,7 @@ const getCargoById = async (req, res) => {
   const { id } = req.params;
   if (req.user.cargo_id !== 1) {
     console.log("Não autorizado")
-    return res.status(401).json({ error: "Não autorizado" })}
+    return res.status(403).json({ error: "Não autorizado" })}
   try {
     const cargo = await Cargo.findByPk(id);
     if (!cargo) {
@@ -44,7 +44,7 @@ const getCargoById = async (req, res) => {
 const updateCargo = async (req, res) => {
   if (req.user.cargo_id !== 1) {
     console.log("Não autorizado")
-    return res.status(401).json({ error: "Não autorizado" })}
+    return res.status(403).json({ error: "Não autorizado" })}
   const { id } = req.params;
   try {
     const [updated] = await Cargo.update(req.body, {
@@ -64,7 +64,7 @@ const updateCargo = async (req, res) => {
 const deleteCargo = async (req, res) => {
   if (req.user.cargo_id !== 1) {
     console.log("Não autorizado")
-    return res.status(401).json({ error: "Não autorizado" })}
+    return res.status(403).json({ error: "Não autorizado" })}
   const { id } = req.params;
   try {
     const deleted = await Cargo.destroy({

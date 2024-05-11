@@ -15,7 +15,7 @@ import moment from "moment";
 import { IoCheckmarkCircle } from "react-icons/io5";
 
 export default function TotalSpent(props) {
-  const { data, ...rest } = props;
+  const { data, mostrar, ...rest } = props;
 
   // Chakra Color Mode
   let precoMedio = 0
@@ -149,7 +149,7 @@ export default function TotalSpent(props) {
       data: custoArray,
     },
   ];
-  
+
   return (
     <Card
       justifyContent='center'
@@ -172,8 +172,9 @@ export default function TotalSpent(props) {
             fontSize='34px'
             textAlign='start'
             fontWeight='700'
-            lineHeight='100%'>
-            Media mensal: {precoMedio + " €"}
+            lineHeight='100%'
+            mr='5px'>
+            Media mensal: {(isNaN(precoMedio) ? "0.00" : precoMedio) + " €"}
           </Text>
           <Flex align='center' mb='20px'>
             <Text
@@ -187,10 +188,22 @@ export default function TotalSpent(props) {
           </Flex>
         </Flex>
         <Box minH='260px' minW='75%' mt='auto'>
+          { mostrar ? (
           <LineChart
             chartData={lineChartDataTotalSpent}
             chartOptions={lineChartOptionsTotalSpent}
           />
+          ) : (
+            <Flex
+              w='100%'
+              h='100%'
+              alignContent='center'
+              justifyContent='center'>
+              <Text color={textColorSecondary} fontSize='xl' fontWeight='600' mt='4px'>
+                Sem dados suficientes
+              </Text>
+            </Flex>
+          )}
         </Box>
       </Flex>
     </Card>

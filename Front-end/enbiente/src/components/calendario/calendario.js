@@ -81,7 +81,6 @@ const Calendario = ({  candidatura, noportunidade, tipo, bloquearEventos }) => {
   };
 
   const handleDateClick = (info) => {
-    //console.log(`Inicio ${info.start}, fim ${info.end}` )
     setStartDate(info.start)
     setEndDate(info.end)
     setShowModal(true);

@@ -8,7 +8,7 @@ import React, {useState, useEffect} from "react";
 import { wait } from "@testing-library/user-event/dist/utils/index.js";
 
 export default function Conversion(props) {
-  const {volumeconsumido, ...rest } = props;
+  const {volumeconsumido, mostrar, ...rest } = props;
 
   // Chakra Color Mode 
   const [higienePessoal, setHigienePessoal] = useState("");
@@ -90,15 +90,24 @@ export default function Conversion(props) {
         </Text>
       </Flex>
 
-      {dadosProntos ? (
+      {mostrar && dadosProntos ? (
         <PieChart
           h='100%'
           w='100%'
           chartData={pieChartData}
           chartOptions={pieChartOptions}
         />
-      ) : "Sem dados disponíveis"}
-      {console.log(pieChartData)}
+      ) : (
+        <Flex
+          w='100%'
+          h='50%'
+          alignContent='center'
+          justifyContent='center'>
+          <Text color={textColor} fontSize='xl' fontWeight='600' mt='4px'>
+            Sem dados suficientes
+          </Text>
+        </Flex>
+      )}
       <Card
         bg={cardColor}
         flexDirection='row'

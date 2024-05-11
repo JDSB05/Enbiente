@@ -28,7 +28,6 @@ export default function Upload(props) {
 
   const handleSelectedFile = (event) => {
     const file = event.target.files[0];
-    console.log("Ficheiro selecionado:", event.target.files[0]);
     if (file && file.type.startsWith("image/")) {
       if (file.size > 10000000) {
         showErrorToast("O arquivo deve ter menos de 10MB, escolha outro ficheiro!");

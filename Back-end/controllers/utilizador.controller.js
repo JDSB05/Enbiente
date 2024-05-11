@@ -40,7 +40,7 @@ const createUtilizador = async (req, res) => {
 const getAllUtilizadores = async (req, res) => {
   if (req.user.cargo_id !== 1) {
     console.log("Não autorizado")
-    return res.status(401).json({ error: "Não autorizado" })}
+    return res.status(403).json({ error: "Não autorizado" })}
   try {
     // Retrieve the orderby parameter from the query string
     const orderby = req.query.orderby;
@@ -90,7 +90,7 @@ const getUtilizadorById = async (req, res) => {
       res.json(utilizador);
     } else {
       console.log("Não autorizado para obter informação de contas alheias")
-      return res.status(401).json({ error: "Não está autorizado para obter informação de contas alheias" });
+      return res.status(403).json({ error: "Não está autorizado para obter informação de contas alheias" });
     }
   } catch (error) {
     // Handle error
@@ -133,7 +133,7 @@ const updateUtilizador = async (req, res) => {
     }
 
     if (newCargo_id !== undefined && utilizadorCargoId !== 1 && newCargo_id !== utilizadorCargoId) {
-      return res.status(401).send({
+      return res.status(403).send({
         success: false,
         message: "Apenas os administradores podem alterar o campo cargo_id."
       });
@@ -141,7 +141,7 @@ const updateUtilizador = async (req, res) => {
 
     if(utilizadorCargoId !== 1 && utilizador_id != utilizadorAuthId)
     {
-      return res.status(401).send({
+      return res.status(403).send({
         success: false,
         message: "Não tem permissão para alterar uma conta alheia."
       });

@@ -31,12 +31,14 @@ import { ThemeEditor } from './ThemeEditor';
 import  FixedPlugin  from '../fixedPlugin/FixedPlugin';
 import { Redirect, Switch } from 'react-router-dom/cjs/react-router-dom.min';
 import { useUser } from '../../UserProvider'; // Importando o hook useUser
+import { useToast } from '../toasts/toast';
 import './style.css';
 
 export default function HeaderLinks(props) {
 	const { secondary } = props;
 	const { colorMode, toggleColorMode } = useColorMode();
 	const nome = localStorage.getItem('utilizador_nome');
+	const { showErrorToast } = useToast();
 	//const [email, setEmail] = React.useState('');
 	// Chakra Color Mode
 	const navbarIcon = useColorModeValue('gray.400', 'white');
@@ -82,11 +84,15 @@ export default function HeaderLinks(props) {
 	function marcarAlertasComoLidas() {
 		//marcar alertas como lidas
 		for (let i = 0; i < alertas.length; i++) {
-			if (alertas[i].estado) 
+			if (alertas[i].estado) {
 				api.put(`/alertas/${alertas[i].alerta_id}`, { estado: false }).then((response) => {
-				console.log('Alertas marcadas como lidas', response.data);
-				updateUserComponent();
-			});
+					console.log('Alertas marcadas como lidas', response.data);
+					updateUserComponent();
+				}).catch((error) => {
+					console.log('Erro ao marcar alertas como lidas', error);
+					showErrorToast("Erro ao marcar alerta como lida")
+				});
+			}
 		}
 	}
 	function marcarAlertaComoLida(id) {
@@ -94,7 +100,10 @@ export default function HeaderLinks(props) {
 		api.put(`/alertas/${id}`, { estado: false }).then((response) => {
 			console.log('Alerta marcado como lido', response.data);
 			updateUserComponent();
-		});
+		}).catch((error) => {
+			console.log('Erro ao marcar alerta como lida', error);
+			showErrorToast("Erro ao marcar alerta como lida")
+		});;
 	}
 	function logout() {
 		localStorage.removeItem('email');
@@ -152,14 +161,17 @@ export default function HeaderLinks(props) {
 						</Text>
 					</Flex>
 					<Flex flexDirection="column">
-						{alertas
-							.sort((a, b) => new Date(b.data_alerta) - new Date(a.data_alerta)) // Ordena todas as alertas por data_alerta em ordem decrescente
-							.filter((alerta, index) => alerta.estado || index < 5) // Filtra para mostrar todas as alertas com estado=true e as últimas 5 alertas com estado=false
-							.map((alerta, index) => (
-								<MenuItem key={index} className={alerta.estado ? "ItemRespiracao" : ""} _hover={{ bg: 'none' }} _focus={{ bg: 'none' }} borderRadius="8px" mb="10px" px="8px" maxW='500px'>
-									<ItemContent casa={alerta.Casa.nome} tipoalerta={alerta.tipo_alerta} descricao={alerta.mensagem_alerta} estado={alerta.estado} marcarlida={marcarAlertaComoLida} alerta_id={alerta.alerta_id} />
-								</MenuItem>
-							))}
+						{alertas.length > 0 ? 
+							alertas
+								.sort((a, b) => new Date(b.data_alerta) - new Date(a.data_alerta)) // Ordena todas as alertas por data_alerta em ordem decrescente
+								.filter((alerta, index) => alerta.estado || index < 5) // Filtra para mostrar todas as alertas com estado=true e as últimas 5 alertas com estado=false
+								.map((alerta, index) => (
+									<MenuItem key={index} className={alerta.estado ? "ItemRespiracao" : ""} _hover={{ bg: 'none' }} _focus={{ bg: 'none' }} borderRadius="8px" mb="10px" px="8px" maxW='500px'>
+										<ItemContent casa={alerta.Casa.nome} tipoalerta={alerta.tipo_alerta} descricao={alerta.mensagem_alerta} estado={alerta.estado} marcarlida={marcarAlertaComoLida} alerta_id={alerta.alerta_id} />
+									</MenuItem>
+								))
+							: (<Flex justifyContent='center'><Text fontSize="sm" color={textColor}>Não existem alertas</Text></Flex>)
+						}
 					</Flex>
 				</MenuList>
 			</Menu>
@@ -187,7 +199,7 @@ export default function HeaderLinks(props) {
 					<Avatar
 						_hover={{ cursor: 'pointer' }}
 						color="white"
-						name={nome === 'Francisca' ? 'Princesa' : nome}
+						name={nome}
 						src={fotoUsuario || fotolink}
 						bg="#11047A"
 						size="sm"
@@ -207,7 +219,7 @@ export default function HeaderLinks(props) {
 							fontSize="sm"
 							fontWeight="700"
 							color={textColor}>
-							👋&nbsp; Olá, {nome === 'Francisca' ? 'Princesa❤️' : nome}!
+							👋&nbsp; Olá, {nome}!
 						</Text>
 					</Flex>
 					<Flex flexDirection="column" p="10px">

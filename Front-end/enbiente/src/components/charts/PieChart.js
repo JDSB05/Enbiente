@@ -19,15 +19,18 @@ class PieChart extends React.Component {
   }
 
   render() {
-    return (
+    const { chartData, chartOptions } = this.state;
+    const noDataMessage = <div>Sem dados</div>;
+  
+    return chartData.length ? (
       <ReactApexChart
-        options={this.state.chartOptions}
-        series={this.state.chartData}
+        options={chartOptions}
+        series={chartData}
         type='pie'
         width='100%'
         height='55%'
       />
-    );
+    ) : noDataMessage;
   }
 }
 

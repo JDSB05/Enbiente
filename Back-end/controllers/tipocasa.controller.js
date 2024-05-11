@@ -15,7 +15,7 @@ const getAllTipoCasas = async (req, res) => {
 const createTipoCasa = async (req, res) => {
     if (req.user.cargo_id !== 1) {
         console.log("Não autorizado")
-        return res.status(401).json({ error: 'Não autorizado' });}
+        return res.status(403).json({ error: 'Não autorizado' });}
     try {
         const { tipo_casa } = req.body;
         const newTipoCasa = await TipoCasa.create({ tipo_casa });
@@ -43,7 +43,7 @@ const getTipoCasaById = async (req, res) => {
 const updateTipoCasa = async (req, res) => {
     if (req.user.cargo_id !== 1) {
         console.log("Não autorizado")
-        return res.status(401).json({ error: 'Não autorizado' });}
+        return res.status(403).json({ error: 'Não autorizado' });}
     try {
         const { id } = req.params;
         const { tipo_casa } = req.body;

@@ -43,7 +43,7 @@ export default function Projects(props) {
     const fetchCasas = async () => {
       try {
         const response = await api.get('/casas?utilizador=' + localStorage.getItem('utilizador_id'));
-        setCasas(response.data);
+        setCasas(response.data.sort((a, b) => a.nome.localeCompare(b.nome)));
       } catch (error) {
         console.log(error);
         showErrorToast('Erro ao buscar casas');
