@@ -21,11 +21,16 @@ import {
   ModalBody,
   ModalCloseButton,
   Input,
-  Select
+  Select, 
+  Stack,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
 } from "@chakra-ui/react";
 // Custom components
 import Card from "../../../../components/card/Card";
-import { AndroidLogo, AppleLogo, WindowsLogo } from "../../../../components/icons/Icons";
 import { MdAdd } from "react-icons/md";
 import { CiCalendarDate } from "react-icons/ci";
 import MainMenu from "../../../../components/menu/MainMenu";
@@ -33,6 +38,7 @@ import React, { useMemo, useEffect } from "react";
 import  { useToast } from '../../../../components/toasts/toast';
 import api from "../../../../services/api";
 import MiniCalendar from "components/calendar/MiniCalendar";
+import { MdChevronRight, MdChevronLeft } from "react-icons/md";
 import { useUser } from "../../../../UserProvider";
 import { SearchBar } from "../../../../components/navbar/searchBar/SearchBar";
 import { Redirect } from "react-router-dom/cjs/react-router-dom.min";
@@ -76,6 +82,7 @@ export default function DevelopmentTable(props) {
     {
       columns,
       data,
+      initialState: { pageSize: 10 },
     },
     useGlobalFilter,
     useSortBy,
@@ -87,20 +94,35 @@ export default function DevelopmentTable(props) {
     getTableBodyProps,
     headerGroups,
     page,
+    gotoPage,
+    pageCount,
     prepareRow,
-    initialState,
+    nextPage,
+    previousPage,
+    canNextPage,
+    canPreviousPage,
     setGlobalFilter,
+    state,
   } = tableInstance;
+  const createPages = (count) => {
+    let arrPageCount = [];
 
-  initialState.pageSize = 11;
+    for (let i = 1; i <= count; i++) {
+      arrPageCount.push(i);
+    }
+
+    return arrPageCount;
+  };
 
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const iconColor = useColorModeValue("secondaryGray.500", "white");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
   const textColorPrimary = useColorModeValue("brand.500", "brand.300");
+  const brandColor = useColorModeValue("brand.500", "brand.400");
   const [isOpen, setIsOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [pesquisa, setPesquisa] = React.useState("");
+  const { pageIndex, pageSize } = state;
   function handleOpenModal() {
     setIsOpen(true);
   };
@@ -283,6 +305,113 @@ export default function DevelopmentTable(props) {
             )}
           </Tbody>
         </Table>
+        <Flex
+            direction={{ sm: "column", md: "row" }}
+            justify='space-between'
+            align='center'
+            w='100%'
+            px={{ md: "22px" }}>
+            <Text
+              fontSize='sm'
+              color='gray.500'
+              fontWeight='normal'
+              mb={{ sm: "24px", md: "0px" }}>
+              A mostrar do {pageSize * pageIndex + 1} até {" "}
+              {pageSize * (pageIndex + 1) <= tableData.length
+                ? pageSize * (pageIndex + 1)
+                : tableData.length},{" "}
+              de {tableData.length} consumos
+            </Text>
+            <Stack direction='row' alignSelf='flex-end' spacing='4px' ms='auto'>
+              <Button
+                variant='no-effects'
+                onClick={() => previousPage()}
+                transition='all .5s ease'
+                w='40px'
+                h='40px'
+                borderRadius='50%'
+                bg='transparent'
+                border='1px solid'
+                borderColor={useColorModeValue("gray.200", "white")}
+                display={
+                  pageSize === 5 ? "none" : canPreviousPage ? "flex" : "none"
+                }
+                _hover={{
+                  bg: "whiteAlpha.100",
+                  opacity: "0.7",
+                }}>
+                <Icon as={MdChevronLeft} w='16px' h='16px' color={textColor} />
+              </Button>
+              {pageSize === 5 ? (
+                <NumberInput
+                  max={pageCount - 1}
+                  min={1}
+                  w='75px'
+                  mx='6px'
+                  defaultValue='1'
+                  onChange={(e) => gotoPage(e)}>
+                  <NumberInputField />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper onClick={() => nextPage()} />
+                    <NumberDecrementStepper onClick={() => previousPage()} />
+                  </NumberInputStepper>
+                </NumberInput>
+              ) : (
+                createPages(pageCount).map((pageNumber, index) => {
+                  return (
+                    <Button
+                      variant='no-effects'
+                      transition='all .5s ease'
+                      onClick={() => gotoPage(pageNumber - 1)}
+                      w='40px'
+                      h='40px'
+                      borderRadius='50%'
+                      bg={
+                        pageNumber === pageIndex + 1 ? brandColor : "transparent"
+                      }
+                      border={
+                        pageNumber === pageIndex + 1
+                          ? "none"
+                          : "1px solid lightgray"
+                      }
+                      _hover={
+                        pageNumber === pageIndex + 1
+                          ? {
+                              opacity: "0.7",
+                            }
+                          : {
+                              bg: "whiteAlpha.100",
+                            }
+                      }
+                      key={index}>
+                      <Text
+                        fontSize='sm'
+                        color={pageNumber === pageIndex + 1 ? "#fff" : textColor}>
+                        {pageNumber}
+                      </Text>
+                    </Button>
+                  );
+                })
+              )}
+              <Button
+                variant='no-effects'
+                onClick={() => nextPage()}
+                transition='all .5s ease'
+                w='40px'
+                h='40px'
+                borderRadius='50%'
+                bg='transparent'
+                border='1px solid'
+                borderColor={useColorModeValue("gray.200", "white")}
+                display={pageSize === 5 ? "none" : canNextPage ? "flex" : "none"}
+                _hover={{
+                  bg: "whiteAlpha.100",
+                  opacity: "0.7",
+                }}>
+                <Icon as={MdChevronRight} w='16px' h='16px' color={textColor} />
+              </Button>
+            </Stack>
+          </Flex>
       </Card>
       <Modal isOpen={isOpen} size="xl" onClose={handleCloseModal} >
     <ModalOverlay />
