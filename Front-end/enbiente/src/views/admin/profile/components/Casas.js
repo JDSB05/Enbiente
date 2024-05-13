@@ -373,7 +373,7 @@ export default function Projects(props) {
                 fontWeight='500'
                 color={textColor}
               >
-                Nome
+                Nome da casa (para identificação)
               </FormLabel>
               <Input
                 value={nome}
