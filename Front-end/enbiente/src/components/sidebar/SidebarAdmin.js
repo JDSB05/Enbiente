@@ -62,7 +62,7 @@ function Sidebar(props) {
 }
 
 // FUNCTIONS
-export function SidebarResponsive(props) {
+export function SidebarResponsiveAdmin(props) {
   let sidebarBackgroundColor = useColorModeValue("white", "navy.800");
   let menuColor = useColorModeValue("gray.400", "white");
   // // SIDEBAR

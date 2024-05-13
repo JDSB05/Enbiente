@@ -17,7 +17,8 @@ import {
 // Custom Components
 import { ItemContent } from '../../components/menu/ItemContent';
 import { SearchBar } from '../../components/navbar/searchBar/SearchBar';
-import { SidebarResponsive } from '../sidebar/SidebarAdmin';
+import { SidebarResponsiveAdmin } from '../sidebar/SidebarAdmin';
+import { SidebarResponsiveUser } from '../sidebar/SidebarUser';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 // Assets
@@ -130,9 +131,11 @@ export default function HeaderLinks(props) {
 			p="10px"
 			borderRadius="30px"
 			boxShadow={shadow}>
-
-			<SidebarResponsive align='center' justify='center' routes={routes} />
-			
+			{cargo === '1' ? (
+			<SidebarResponsiveAdmin align='center' justify='center' routes={routes} />
+			) : (
+			<SidebarResponsiveUser align='center' justify='center' routes={routes} />
+			)}
 			<Menu>
 				<MenuButton mt='-1px' mx='5px' ml='10px' align='center' justify='center'>
 					{alertas.some(alerta => alerta.estado) ? (
