@@ -12,7 +12,7 @@ router.route("/").get(middleware.jwtAuthMiddleware, Alerta.getAllAlertas);
 //router.route("/").post(Alerta.createAlerta);
 
 // PUT update an existing alerta
-//router.route("/:id").put(Alerta.updateAlerta);
+router.route("/:id").put(Alerta.updateAlerta);
 
 
 module.exports = app => {
