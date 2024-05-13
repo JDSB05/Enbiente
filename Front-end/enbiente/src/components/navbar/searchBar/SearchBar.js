@@ -55,7 +55,6 @@ export function SearchBar(props) {
         onClick={() => {
           setPesquisa("")
           setGlobal("")
-          console.log("pesquisa limpa")
         }}
       children={
         <IconButton

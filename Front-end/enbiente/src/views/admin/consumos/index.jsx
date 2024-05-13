@@ -2,19 +2,7 @@
 // Chakra imports
 import { Box, SimpleGrid } from "@chakra-ui/react";
 import DevelopmentTable from "./components/Consumos";
-import CheckTable from "../../../views/admin/consumos/components/CheckTable";
-import ColumnsTable from "../../../views/admin/consumos/components/ColumnsTable";
-import ComplexTable from "../../../views/admin/consumos/components/ComplexTable";
-import {
-  columnsDataDevelopment,
-  columnsDataCheck,
-  columnsDataColumns,
-  columnsDataComplex,
-} from "../../../views/admin/consumos/variables/columnsData";
-import tableDataDevelopment from "../../../views/admin/consumos/variables/tableDataDevelopment.json";
-import tableDataCheck from "../../../views/admin/consumos/variables/tableDataCheck.json";
-import tableDataColumns from "../../../views/admin/consumos/variables/tableDataColumns.json";
-import tableDataComplex from "../../../views/admin/consumos/variables/tableDataComplex.json";
+
 import React, {useEffect} from "react";
 import api from "../../../services/api"
 import { useToast } from '../../../components/toasts/toast';
@@ -24,6 +12,28 @@ export default function Settings() {
   const { showSuccessToast, showErrorToast, showMessageToast } = useToast();
   const [isLoadingData, setIsLoadingData] = React.useState(true);
   const { updateComponent } = useUser();
+  const columnsDataDevelopment = [
+    {
+      Header: "Mês",
+      accessor: "data_consumo",
+    },
+    {
+      Header: "Casa",
+      accessor: "Casa.nome",
+    },
+    {
+      Header: "Data",
+      accessor: "dataconsumo",
+    },
+    {
+      Header: "Consumo",
+      accessor: "volume_consumido",
+    },
+    {
+      Header: "Eficiência",
+      accessor: "eficiencia",
+    },
+  ];
   useEffect(() => {
     async function getConsumos() {
       let currentPath = window.location.href;

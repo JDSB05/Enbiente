@@ -2,7 +2,6 @@ import { Flex, Box } from "@chakra-ui/react";
 import Card from "components/card/Card";
 import React, { useEffect, useState } from "react";
 import SearchTableUsers from "./components/SearchTableUsersOverview";
-import { columnsDataUsersOverview } from "./variables/ColumnsDataUserOverview";
 import api from "../../../services/api";
 import { useToast } from '../../../components/toasts/toast';
 import { useUser } from '../../../UserProvider'; // Importe o hook useUser
@@ -12,7 +11,36 @@ export default function UsersOverview() {
   const [isLoadingData, setIsLoadingData] = useState(true);
   const { showSuccessToast, showErrorToast, showMessageToast } = useToast();
   const { updateComponent } = useUser(); // Use o hook useUser para acessar a variável updateComponent
-
+  const columnsDataUsersOverview = [
+    {
+      Header: "Foto",
+      accessor: "foto",
+    },
+    {
+      Header: "Nome",
+      accessor: "nome",
+    },
+    {
+      Header: "Email",
+      accessor: "email",
+    },
+    {
+      Header: "Telemovel",
+      accessor: "telemovel",
+    },
+    {
+      Header: "Ultimo Login",
+      accessor: "ultimoLogin",
+    },
+    {
+      Header: "Estado",
+      accessor: "estado",
+    },
+    {
+      Header: "",
+      accessor: "a",
+    },
+  ];
   useEffect(() => {
     async function getUsers() {
       let currentPath = window.location.href;

@@ -11,7 +11,6 @@ import {
 import { FaUserGroup } from "react-icons/fa6";
 // Admin Imports
 import MainDashboard from "./views/admin/default";
-import NFTMarketplace from "./views/admin/marketplace";
 import Profile from "./views/admin/profile";
 import Consumos from "./views/admin/consumos";
 import UsersOverview from "./views/admin/utilizadores";

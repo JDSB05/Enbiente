@@ -440,54 +440,73 @@ const getAllConsumos = async (req, res) => {
         else {
             console.log('Todos os consumos');
             // Caso contrário, buscar todos os consumos
-            consumos = await Consumo.findAll({
+            // Buscar todos os consumos com ordenação e limite
+            const consumos = await Consumo.findAll({
+                order: [['casa_id', 'ASC'], ['data_consumo', 'DESC']],
                 include: {
                     model: Casa,
-                    attributes: ['nome', 'precopormetro', 'pessoas'],
+                    attributes: ['nome','precopormetro', 'pessoas'], 
                     where: {
                         utilizador_id: utilizador
                     },
                     include: {
                         model: TipoCasa,
-                        attributes: ['tipo_casa', 'fator']
+                        attributes: ['fator'] // Incluir fator do TipoCasa
                     }
                 },
                 attributes: ['casa_id', 'data_consumo', 'volume_consumido'],
             });
-        
-            // Calcular a eficiência de cada consumo
-            const consumosComEficiencia = [];
-            for (const consumo of consumos) {
-                const consumoAnterior = await Consumo.findOne({
-                    where: {
-                        casa_id: consumo.casa_id,
-                        data_consumo: { [Op.lt]: consumo.data_consumo } // Consumo anterior cronologicamente
-                    },
-                    include: { 
-                        model: Casa,
-                        attributes: ['pessoas', 'tipo_casa_id'], // Incluir pessoas e tipo_casa_id da Casa
-                        include: {
-                            model: TipoCasa,
-                            attributes: ['fator'] // Incluir fator do TipoCasa
-                        }
-                    },
-                    order: [['data_consumo', 'DESC']] // Ordenado do mais recente para o mais antigo
-                });
-        
-                if (consumoAnterior) {
-                    const diffDays = moment(consumo.data_consumo).diff(moment(consumoAnterior.data_consumo), 'days') || 1; // Se a diferença for 0, definir como 1
-                    const consumoDiferenca = parseFloat((consumo.volume_consumido - consumoAnterior.volume_consumido).toFixed(3));
-                    const consumoIdealDiario = process.env.LITROS_POR_PESSOA_IDEAL / 1000; // Consumo ideal diário por pessoa em m³
-                    const consumoIdeal = consumoIdealDiario * consumoAnterior.Casa.pessoas * diffDays * consumoAnterior.Casa.TipoCasa.fator;
-                    // Calcula a eficiência hídrica em porcentagem
-                    let eficiencia = parseFloat(((consumoIdeal / consumoDiferenca) * 100).toFixed(2))
-                    consumosComEficiencia.push({ ...consumo.toJSON(), eficiencia, dataconsumo: consumo.data_consumo });
-                } else {
-                    // Se não houver consumo anterior, definir a eficiência como 0
-                    consumosComEficiencia.push({ ...consumo.toJSON(), eficiencia: 0.00, dataconsumo: consumo.data_consumo });
+            // Separar os consumos por casa
+            const consumosPorCasa = {};
+            //console.log('Consumos:', JSON.stringify(consumos, null, 2));
+            // Iterar sobre cada consumo para organizar por casa
+            consumos.forEach(consumo => {
+                const { casa_id } = consumo;
+            
+                // Verificar se a casa já está no objeto consumosPorCasa
+                if (!consumosPorCasa[casa_id]) {
+                    consumosPorCasa[casa_id] = [];
                 }
-            }
+            
+                // Adicionar o consumo à lista de consumos da casa
+                consumosPorCasa[casa_id].push(consumo);
+            });
+            //console.log('Consumos por casa:', JSON.stringify(consumosPorCasa, null, 2));
         
+            // Função para calcular a eficiência de cada consumo agrupado por casa
+            async function calcularEficiencia(consumosPorCasa) {
+                const consumosComEficiencia = [];
+
+                // Iterar sobre cada casa
+                for (const casaId in consumosPorCasa) {
+                    const consumos = consumosPorCasa[casaId];
+                    // Iterar sobre os consumos da casa
+                    for (const consumo of consumos) {
+                        console.log('Consumo:', consumo.toJSON());
+                        const consumoAnterior = consumos.find(consumoAnt => moment(consumoAnt.data_consumo).isBefore(moment(consumo.data_consumo)));
+                        if (consumoAnterior) {
+                            console.log('Consumo anterior:', consumoAnterior.toJSON());
+                            const diffDays = moment(consumo.data_consumo).diff(moment(consumoAnterior.data_consumo), 'days') || 1; // Se a diferença for 0, definir como 1
+                            const consumoDiferenca = parseFloat((consumo.volume_consumido - consumoAnterior.volume_consumido).toFixed(3));
+                            const consumoIdealDiario = process.env.LITROS_POR_PESSOA_IDEAL / 1000; // Consumo ideal diário por pessoa em m³
+                            const consumoIdeal = consumoIdealDiario * consumo.Casa.pessoas * diffDays * consumo.Casa.TipoCasa.fator;
+                            // Calcula a eficiência hídrica em porcentagem
+                            let eficiencia = parseFloat(((consumoIdeal / consumoDiferenca) * 100).toFixed(2))
+                            consumosComEficiencia.push({ ...consumo.toJSON(), eficiencia, dataconsumo: consumo.data_consumo });
+                        } else {
+                            // Se não houver consumo anterior, definir a eficiência como 0
+                            console.log('Não há consumo anterior');
+                            consumosComEficiencia.push({ ...consumo.toJSON(), eficiencia: 0.00, dataconsumo: consumo.data_consumo });
+                        }
+                    }
+                }
+
+                return consumosComEficiencia;
+            }
+
+            // Calcular a eficiência de cada consumo por casa, ano e mês
+            const consumosComEficiencia = await calcularEficiencia(consumosPorCasa);
+
             // Função para converter os objetos Sequelize para objetos simples
             function convertToPlainObject(obj) {
                 if (obj instanceof sequelize.Model) {
@@ -496,15 +515,16 @@ const getAllConsumos = async (req, res) => {
                     return obj;
                 }
             }
-        
+
             // Convertendo os consumos para objetos simples
             const consumosPlain = consumosComEficiencia.map(consumo => ({
                 ...consumo,
                 Casa: convertToPlainObject(consumo.Casa), // Convertendo o objeto Casa
             }));
-        
+
             // Enviar a resposta JSON
-            res.json(consumosPlain);
+            console.log('Consumos com eficiência:', JSON.stringify(consumosPlain, null, 2));
+            res.json(consumosPlain)
         }
     } catch (error) {
         console.error('Erro ao processar requisição:', error);
