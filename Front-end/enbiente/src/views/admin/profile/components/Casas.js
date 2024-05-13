@@ -146,7 +146,7 @@ export default function Projects(props) {
       return;
     }
 
-    const editedData = { ...editedFields, casa_id: casa_id, data_ultalteracao: new Date() };
+    const editedData = { ...editedFields, casa_id: casa_id, data_ultalteracao: new Date(), utilizador_id: parseInt(localStorage.getItem('utilizador_id'))};
     setIsLoading(true);
 
     api.put(`/casas/${casa_id}`, editedData)
@@ -326,7 +326,7 @@ export default function Projects(props) {
                 fontWeight='500'
                 color={textColor}
               >
-                Preço por metro
+                Preço por metro cúbico de água
               </FormLabel>
               <Input
                 value={precopormetro}
@@ -334,7 +334,7 @@ export default function Projects(props) {
                 variant='auth'
                 fontSize='sm'
                 type='number'
-                placeholder='100'
+                placeholder='5.0'
                 fontWeight='500'
                 size='lg'
                 isRequired={true}
@@ -468,7 +468,7 @@ export default function Projects(props) {
                 fontWeight='500'
                 color={textColor}
               >
-                Preço por metro
+                Preço por metro cúbico de água
               </FormLabel>
               <Input
                 value={precopormetro}
@@ -476,7 +476,7 @@ export default function Projects(props) {
                 variant='auth'
                 fontSize='sm'
                 type='number'
-                placeholder='100'
+                placeholder='5.0'
                 fontWeight='500'
                 size='lg'
                 isRequired={true}

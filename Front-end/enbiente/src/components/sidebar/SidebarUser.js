@@ -12,6 +12,7 @@ import {
   useDisclosure,
   DrawerContent,
   DrawerCloseButton,
+  Text,
 } from "@chakra-ui/react";
 import Content from "./components/ContentUser";
 import {
@@ -62,7 +63,7 @@ function Sidebar(props) {
 }
 
 // FUNCTIONS
-export function SidebarResponsive(props) {
+export function SidebarResponsiveUser(props) {
   let sidebarBackgroundColor = useColorModeValue("white", "navy.800");
   let menuColor = useColorModeValue("gray.400", "white");
   // // SIDEBAR
@@ -106,6 +107,7 @@ export function SidebarResponsive(props) {
               renderThumbVertical={renderThumb}
               renderView={renderView}>
               <Content routes={routes} />
+              <Text>Teste</Text>
             </Scrollbars>
           </DrawerBody>
         </DrawerContent>
