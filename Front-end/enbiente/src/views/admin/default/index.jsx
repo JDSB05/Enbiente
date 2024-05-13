@@ -106,7 +106,7 @@ export default function UserReports() {
 
   useEffect(() => {
     if ((consumidoNesteMes === 0 || valorMesAtual === 0 || poupadoeuros === 0 || poupadoPercentagem === 0)) {
-      showMessageToast("Não existem dados suficientes para mostrar os dados, adicione consumos para mostrar as estatisticas.");
+      showMessageToast("Não existem dados suficientes para mostrar os dados relativos ao mês atual, adicione consumos para mostrar as estatisticas.");
       setMostrar1(dadosMensais && Object.keys(dadosMensais.totalConsumoMes).length !== 0);
       setMostrar2(consumosPorCasa && consumosPorCasa.totalConsumoMesAtual && Object.keys(consumosPorCasa.totalConsumoMesAtual).length !== 0);
       setMostrar3(consumidoNesteMes !== null && consumidoNesteMes !== undefined && consumidoNesteMes !== 0);
