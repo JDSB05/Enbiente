@@ -162,11 +162,7 @@ export default function DevelopmentTable(props) {
       updateUserComponent();
     } catch (error) {
       console.error(error);
-      if (error.response && error.response.status === 400) {
-        showErrorToast("O valor do consumo que introduziu tem que ser maior do que o último valor de consumo da mesma casa! Verifique os valores inseridos e tente novamente.");
-      } else {
-        showErrorToast("Erro ao criar consumo");
-      }
+      showErrorToast(error.response.status == 400 || error.response.status == 403 ? error.response.data.error : 'Erro ao criar consumo');
       setIsLoading(false);
     }
   }

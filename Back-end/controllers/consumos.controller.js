@@ -570,6 +570,11 @@ const createConsumo = async (req, res) => {
             data_consumo,
             volume_consumido
         };
+        // Verificar se todos os campos obrigatórios foram preenchidos
+        if (!casa_id || !data_consumo || !volume_consumido) {
+            console.log('Preencha todos os campos obrigatórios');
+            return res.status(400).json({ error: 'Preencha todos os campos obrigatórios' });
+        }
         // CALCULAR EFICIENCIA HIDRICA
         // Busca o último consumo da mesma casa, ordenado cronologicamente, anterior ao consumo atual
         const ultimoConsumo = await Consumo.findOne({
@@ -584,6 +589,19 @@ const createConsumo = async (req, res) => {
             },
             order: [['data_consumo', 'DESC']]
         });
+        const consumoMaisRecente = await Consumo.findOne({
+            where: { casa_id, data_consumo: { [Op.gt]: data_consumo } },
+            include: {
+                model: Casa,
+                attributes: ['pessoas', 'tipo_casa_id', 'utilizador_id'], // Incluir pessoas e tipo_casa_id da Casa
+                include: {
+                    model: TipoCasa,
+                    attributes: ['fator'] // Incluir fator do TipoCasa
+                }
+            },
+            order: [['data_consumo', 'ASC']]
+        });
+
         if (ultimoConsumo && (ultimoConsumo.Casa.utilizador_id != req.user.utilizador_id && req.user.cargo_id != 1)) {
             // Se o consumo anterior pertencer a outro utilizador, retorne um erro
             console.log('Não está autorizado para criar consumo a outros utilizadores');
@@ -593,7 +611,13 @@ const createConsumo = async (req, res) => {
          else if (ultimoConsumo && volume_consumido < ultimoConsumo.volume_consumido) {
             console.log('O volume consumido não pode ser menor do que o volume consumido do último consumo');
             return res.status(400).json({ error: 'O volume consumido não pode ser menor do que o volume consumido do último consumo' });
-        } else {
+        } 
+        // Se o valor_consumido for maior ao valor_consumido do consumo mais recente, retorne um erro
+         else if (consumoMaisRecente && volume_consumido > consumoMaisRecente.volume_consumido) {
+            console.log('O volume consumido não pode ser maior do que o volume consumido do consumo mais recente');
+            return res.status(400).json({ error: 'O volume consumido não pode ser maior do que o volume consumido do consumo mais recente' });
+         }
+         else {
             // Se não houver consumo anterior, cria o novo consumo
             //Cria o novo consumo
             consumo = await Consumo.create({ casa_id, data_consumo, volume_consumido });

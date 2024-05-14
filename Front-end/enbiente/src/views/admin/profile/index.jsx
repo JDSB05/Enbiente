@@ -37,7 +37,6 @@ export default function Overview() {
         const response = await api.get('/tipoclientes');
         const response1 = await api.get('/utilizador/' + utilizador);
         const response2 = await api.get('/consumos?tipo=consumototal&utilizador_id=' + utilizador);
-        console.log(response2.data)
         setTipoCliente(response.data);
         setNome(response1.data.nome);
         setNome1(response1.data.nome)
