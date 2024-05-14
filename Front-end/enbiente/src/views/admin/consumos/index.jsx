@@ -43,7 +43,6 @@ export default function Settings() {
         const response = await api.get("/consumos?utilizador_id=" + localStorage.getItem("utilizador_id"));
         response.data.sort((a, b) => new Date(b.data_consumo) - new Date(a.data_consumo));
         setConsumos(response.data);
-        console.log(response.data)
       } catch (error) {
         showErrorToast("Erro ao carregar consumos");
       } finally {
