@@ -46,7 +46,8 @@ exports.login = async (req, res) => {
 
   // Verifica se o usuário está ativado.
   if (user.estado === 0) {
-    res.status(401).send(
+    console.log("Conta desativada")
+    return res.status(401).send(
       {
         success: false,
         message: "A conta está desativada. Por favor, verifique o seu email ou contacte a adminstração."

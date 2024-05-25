@@ -130,7 +130,11 @@ function SignIn({ verificarAutenticacao }) {
       if (err.code === "ERR_NETWORK") {
         showErrorToast("Erro de Conexão");
         setIsLoading(false);
-      } else {
+      } else if (err.response.status === 400 || err.response.status === 401 || err.response.status === 500) {
+        showErrorToast(err.response.data.message || "Erro ao iniciar sessão");
+        setIsLoading(false);
+      }
+        else {
         showErrorToast("Erro ao iniciar sessão");
         setIsLoading(false);
       }
