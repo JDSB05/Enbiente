@@ -315,8 +315,9 @@ const getAllConsumos = async (req, res) => {
                         eurosGastos += ultimoConsumo.volume_consumido * casa.precopormetro; // Calculamos os euros gastos
                     }
                 }
-
-                res.json({ totalConsumido, eurosGastos: eurosGastos.toFixed(2), quantidadeCasas });
+                console.log('Total consumido:', totalConsumido);
+                console.log('Euros gastos:', eurosGastos);
+                res.json({ totalConsumido: totalConsumido.toFixed(3), eurosGastos: eurosGastos.toFixed(2), quantidadeCasas });
             } catch (error) {
                 console.error('Erro ao calcular consumo total:', error);
                 res.status(500).json({ error: 'Internal server error' });
